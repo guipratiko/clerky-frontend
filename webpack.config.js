@@ -6,10 +6,10 @@ module.exports = {
     // ... outras configurações
     client: {
       webSocketURL: {
-        hostname: 'ws.clerky.com.br',
+        hostname: 'app.clerky.com.br',
         port: 3500,
         pathname: '/ws',
-        protocol: 'wss'
+        protocol: 'ws'
       }
     }
   }
