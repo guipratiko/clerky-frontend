@@ -1,0 +1,249 @@
+.App {
+  height: 100vh;
+  background: #111b21;
+  overflow: hidden;
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(134, 150, 160, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(134, 150, 160, 0.5);
+}
+
+/* Chat background pattern */
+.chat-background {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23182229' fill-opacity='0.05'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+/* Message animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-item {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+/* Typing indicator */
+@keyframes typing {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.typing-indicator {
+  animation: typing 1.5s infinite;
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.status-sent {
+  background-color: #8696a0;
+}
+
+.status-delivered {
+  background-color: #8696a0;
+}
+
+.status-read {
+  background-color: #00a884;
+}
+
+.status-error {
+  background-color: #f15c6d;
+}
+
+/* QR Code animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.qr-code {
+  animation: pulse 2s infinite;
+}
+
+/* Connection status */
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-connected {
+  background: rgba(0, 168, 132, 0.1);
+  color: #00a884;
+}
+
+.status-connecting {
+  background: rgba(255, 171, 0, 0.1);
+  color: #ffab00;
+}
+
+.status-disconnected {
+  background: rgba(241, 92, 109, 0.1);
+  color: #f15c6d;
+}
+
+/* Audio waveform animation */
+@keyframes waveform {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+.waveform-bar {
+  animation: waveform 1s infinite;
+}
+
+.waveform-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.waveform-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.waveform-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.waveform-bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+/* Message bubble styles */
+.message-bubble {
+  border-radius: 12px;
+  padding: 8px 12px;
+  max-width: 280px;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.message-bubble.sent {
+  background: #005c4b;
+  color: #e9edef;
+  margin-left: auto;
+}
+
+.message-bubble.received {
+  background: #202c33;
+  color: #e9edef;
+}
+
+.message-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+.message-bubble.sent::before {
+  right: -6px;
+  border-left-color: #005c4b;
+}
+
+.message-bubble.received::before {
+  left: -6px;
+  border-right-color: #202c33;
+}
+
+/* Media message styles */
+.media-message {
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 300px;
+}
+
+.media-message img,
+.media-message video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Emoji picker custom styles */
+.emoji-picker-react {
+  background: #202c33 !important;
+  border: 1px solid #313d43 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.emoji-picker-react .emoji-group::before {
+  background: #202c33 !important;
+}
+
+.emoji-picker-react .emoji-categories {
+  background: #202c33 !important;
+}
+
+.emoji-picker-react .emoji-search {
+  background: #2a3942 !important;
+  border: 1px solid #313d43 !important;
+  color: #e9edef !important;
+}
+
+.emoji-picker-react .emoji-search::placeholder {
+  color: #8696a0 !important;
+}
+
+/* Custom scrollbar for messages */
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: rgba(134, 150, 160, 0.2);
+  border-radius: 3px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(134, 150, 160, 0.4);
+}

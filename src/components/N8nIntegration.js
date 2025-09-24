@@ -1,0 +1,670 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Grid,
+  Chip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+  FormGroup,
+  // Divider,
+  // Alert,
+  CircularProgress,
+  Tooltip,
+  // Table,
+  // TableBody,
+  // TableCell,
+  // TableContainer,
+  // TableHead,
+  // TableRow,
+  // Paper,
+  Tabs,
+  Tab
+  // Badge
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  PlayArrow as TestIcon,
+  // Settings as SettingsIcon,
+  Webhook as WebhookIcon,
+  CheckCircle as SuccessIcon,
+  Error as ErrorIcon,
+  Warning as WarningIcon,
+  // Refresh as RefreshIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as HideIcon
+} from '@mui/icons-material';
+import toast from 'react-hot-toast';
+import {
+  getN8nIntegrations,
+  createN8nIntegration,
+  updateN8nIntegration,
+  deleteN8nIntegration,
+  testN8nIntegration,
+  toggleN8nIntegration,
+  getInstances
+  // getN8nIntegrationStats,
+  // testWebhook
+} from '../services/api';
+
+const N8nIntegration = () => {
+  const [integrations, setIntegrations] = useState([]);
+  const [instances, setInstances] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingIntegration, setEditingIntegration] = useState(null);
+  const [testingIntegration, setTestingIntegration] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [formData, setFormData] = useState({
+    instanceName: '',
+    webhookUrl: '',
+    webhookSecret: '',
+    isActive: true,
+    events: {
+      newMessage: true,
+      messageSent: true,
+      messageUpsert: true,
+      newContact: true,
+      contactUpdate: true,
+      chatUpdate: true,
+      connectionUpdate: true,
+      qrCodeUpdate: true
+    },
+    filters: {
+      includeGroups: false,
+      includeMedia: true,
+      includeContacts: true,
+      minMessageLength: 0,
+      excludeKeywords: [],
+      includeKeywords: []
+    },
+    retryConfig: {
+      maxRetries: 3,
+      retryDelay: 1000,
+      timeout: 10000
+    }
+  });
+
+  // Carregar dados iniciais
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [integrationsResponse, instancesResponse] = await Promise.all([
+        getN8nIntegrations(),
+        getInstances()
+      ]);
+      
+      setIntegrations(integrationsResponse.data || []);
+      setInstances(instancesResponse.data || []);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      toast.error('Erro ao carregar integrações N8N');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDialog = (integration = null) => {
+    if (integration) {
+      setEditingIntegration(integration);
+      setFormData({
+        instanceName: integration.instanceName || '',
+        webhookUrl: integration.webhookUrl || '',
+        webhookSecret: integration.webhookSecret || '',
+        isActive: integration.isActive,
+        events: { ...integration.events },
+        filters: { ...integration.filters },
+        retryConfig: { ...integration.retryConfig }
+      });
+    } else {
+      setEditingIntegration(null);
+      setFormData({
+        instanceName: '',
+        webhookUrl: '',
+        webhookSecret: '',
+        isActive: true,
+        events: {
+          newMessage: true,
+          messageSent: true,
+          messageUpsert: true,
+          newContact: true,
+          contactUpdate: true,
+          chatUpdate: true,
+          connectionUpdate: true,
+          qrCodeUpdate: true
+        },
+        filters: {
+          includeGroups: false,
+          includeMedia: true,
+          includeContacts: true,
+          minMessageLength: 0,
+          excludeKeywords: [],
+          includeKeywords: []
+        },
+        retryConfig: {
+          maxRetries: 3,
+          retryDelay: 1000,
+          timeout: 10000
+        }
+      });
+    }
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setEditingIntegration(null);
+  };
+
+  const handleSave = async () => {
+    try {
+      if (editingIntegration) {
+        await updateN8nIntegration(editingIntegration._id, formData);
+        toast.success('Integração N8N atualizada com sucesso!');
+      } else {
+        await createN8nIntegration(formData);
+        toast.success('Integração N8N criada com sucesso!');
+      }
+      
+      handleCloseDialog();
+      loadData();
+    } catch (error) {
+      console.error('Erro ao salvar integração:', error);
+      toast.error(error.response?.data?.error || 'Erro ao salvar integração');
+    }
+  };
+
+  const handleDelete = async (integrationId) => {
+    if (window.confirm('Tem certeza que deseja deletar esta integração?')) {
+      try {
+        await deleteN8nIntegration(integrationId);
+        toast.success('Integração N8N deletada com sucesso!');
+        loadData();
+      } catch (error) {
+        console.error('Erro ao deletar integração:', error);
+        toast.error('Erro ao deletar integração');
+      }
+    }
+  };
+
+  const handleTest = async (integrationId) => {
+    try {
+      setTestingIntegration(integrationId);
+      const result = await testN8nIntegration(integrationId, {
+        message: 'Teste de integração N8N',
+        timestamp: new Date().toISOString()
+      });
+      
+      if (result.data.success) {
+        toast.success('Teste realizado com sucesso!');
+      } else {
+        toast.error(`Teste falhou: ${result.data.error}`);
+      }
+      
+      loadData(); // Recarregar para atualizar estatísticas
+    } catch (error) {
+      console.error('Erro ao testar integração:', error);
+      toast.error('Erro ao testar integração');
+    } finally {
+      setTestingIntegration(null);
+    }
+  };
+
+  const handleToggle = async (integrationId, isActive) => {
+    try {
+      await toggleN8nIntegration(integrationId, isActive);
+      toast.success(`Integração ${isActive ? 'ativada' : 'desativada'} com sucesso!`);
+      loadData();
+    } catch (error) {
+      console.error('Erro ao alterar status:', error);
+      toast.error('Erro ao alterar status da integração');
+    }
+  };
+
+  const getStatusColor = (integration) => {
+    if (!integration.isActive) return 'default';
+    if (integration.lastTestStatus === 'success') return 'success';
+    if (integration.lastTestStatus === 'failed') return 'error';
+    return 'warning';
+  };
+
+  const getStatusIcon = (integration) => {
+    if (!integration.isActive) return <HideIcon />;
+    if (integration.lastTestStatus === 'success') return <SuccessIcon />;
+    if (integration.lastTestStatus === 'failed') return <ErrorIcon />;
+    return <WarningIcon />;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Nunca';
+    return new Date(dateString).toLocaleString('pt-BR');
+  };
+
+  const TabPanel = ({ children, value, index, ...other }) => (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" component="h1">
+          Integrações N8N
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+        >
+          Nova Integração
+        </Button>
+      </Box>
+
+      {integrations.length === 0 ? (
+        <Card>
+          <CardContent sx={{ textAlign: 'center', py: 6 }}>
+            <WebhookIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Nenhuma integração N8N configurada
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={3}>
+              Configure integrações com N8N para automatizar seus workflows
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog()}
+            >
+              Criar Primeira Integração
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Grid container spacing={3}>
+          {integrations.map((integration) => (
+            <Grid item xs={12} md={6} lg={4} key={integration._id}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                    <Typography variant="h6" component="h2">
+                      {integration.instanceName || 'Todas as Instâncias'}
+                    </Typography>
+                    <Box display="flex" gap={1}>
+                      <Tooltip title={integration.isActive ? 'Desativar' : 'Ativar'}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleToggle(integration._id, !integration.isActive)}
+                        >
+                          {integration.isActive ? <VisibilityIcon /> : <HideIcon />}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Editar">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenDialog(integration)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Testar">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleTest(integration._id)}
+                          disabled={testingIntegration === integration._id}
+                        >
+                          {testingIntegration === integration._id ? (
+                            <CircularProgress size={20} />
+                          ) : (
+                            <TestIcon />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Deletar">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(integration._id)}
+                          color="error"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Box>
+
+                  <Box mb={2}>
+                    <Chip
+                      icon={getStatusIcon(integration)}
+                      label={integration.isActive ? 'Ativa' : 'Inativa'}
+                      color={getStatusColor(integration)}
+                      size="small"
+                    />
+                  </Box>
+
+                  <Typography variant="body2" color="text.secondary" mb={1}>
+                    <strong>Webhook:</strong> {integration.webhookUrl}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary" mb={1}>
+                    <strong>Último Teste:</strong> {formatDate(integration.lastTest)}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary" mb={2}>
+                    <strong>Webhooks Enviados:</strong> {integration.stats?.totalWebhooks || 0}
+                  </Typography>
+
+                  <Box display="flex" gap={1} flexWrap="wrap">
+                    {Object.entries(integration.events)
+                      .filter(([_, enabled]) => enabled)
+                      .map(([event, _]) => {
+                        const eventLabels = {
+                          newMessage: 'Nova Mensagem',
+                          messageSent: 'Mensagem Enviada',
+                          messageUpsert: 'Message Upsert',
+                          newContact: 'Novo Contato',
+                          contactUpdate: 'Contato Update',
+                          chatUpdate: 'Chat Update',
+                          connectionUpdate: 'Conexão Update',
+                          qrCodeUpdate: 'QR Code Update'
+                        };
+                        
+                        return (
+                          <Chip
+                            key={event}
+                            label={eventLabels[event] || event.replace(/([A-Z])/g, ' $1').trim()}
+                            size="small"
+                            variant="outlined"
+                          />
+                        );
+                      })}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {/* Dialog de Criação/Edição */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {editingIntegration ? 'Editar Integração N8N' : 'Nova Integração N8N'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+              <Tab label="Configuração Básica" />
+              <Tab label="Eventos" />
+              <Tab label="Filtros" />
+              <Tab label="Configurações Avançadas" />
+            </Tabs>
+          </Box>
+
+          <TabPanel value={activeTab} index={0}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>Instância</InputLabel>
+                  <Select
+                    value={formData.instanceName}
+                    onChange={(e) => setFormData({ ...formData, instanceName: e.target.value })}
+                    label="Instância"
+                  >
+                    <MenuItem value="">Todas as Instâncias</MenuItem>
+                    {instances.map((instance) => (
+                      <MenuItem key={instance.instanceName} value={instance.instanceName}>
+                        {instance.instanceName} ({instance.status})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="URL do Webhook N8N"
+                  value={formData.webhookUrl}
+                  onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
+                  placeholder="https://seu-n8n.com/webhook/abc123"
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Secret do Webhook (opcional)"
+                  value={formData.webhookSecret}
+                  onChange={(e) => setFormData({ ...formData, webhookSecret: e.target.value })}
+                  type="password"
+                  placeholder="Chave secreta para autenticação"
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    />
+                  }
+                  label="Integração Ativa"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          <TabPanel value={activeTab} index={1}>
+            <Typography variant="h6" gutterBottom>
+              Eventos a serem enviados para N8N
+            </Typography>
+            <FormGroup>
+              {Object.entries(formData.events).map(([event, enabled]) => {
+                // Debug: mostrar eventos disponíveis
+                console.log('Evento disponível:', event, enabled);
+                
+                // Mapear nomes dos eventos para exibição mais amigável
+                const eventLabels = {
+                  newMessage: 'Nova Mensagem',
+                  messageSent: 'Mensagem Enviada',
+                  messageUpsert: 'Message Upsert (Raw)',
+                  newContact: 'Novo Contato',
+                  contactUpdate: 'Atualização de Contato',
+                  chatUpdate: 'Atualização de Chat',
+                  connectionUpdate: 'Atualização de Conexão',
+                  qrCodeUpdate: 'Atualização de QR Code'
+                };
+                
+                return (
+                  <FormControlLabel
+                    key={event}
+                    control={
+                      <Switch
+                        checked={enabled}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            events: { ...formData.events, [event]: e.target.checked }
+                          })
+                        }
+                      />
+                    }
+                    label={eventLabels[event] || event.replace(/([A-Z])/g, ' $1').trim()}
+                  />
+                );
+              })}
+            </FormGroup>
+          </TabPanel>
+
+          <TabPanel value={activeTab} index={2}>
+            <Typography variant="h6" gutterBottom>
+              Filtros de Dados
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.filters.includeGroups}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          filters: { ...formData.filters, includeGroups: e.target.checked }
+                        })
+                      }
+                    />
+                  }
+                  label="Incluir Grupos"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.filters.includeMedia}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          filters: { ...formData.filters, includeMedia: e.target.checked }
+                        })
+                      }
+                    />
+                  }
+                  label="Incluir Mídia"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.filters.includeContacts}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          filters: { ...formData.filters, includeContacts: e.target.checked }
+                        })
+                      }
+                    />
+                  }
+                  label="Incluir Contatos"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Tamanho Mínimo da Mensagem"
+                  type="number"
+                  value={formData.filters.minMessageLength}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      filters: { ...formData.filters, minMessageLength: parseInt(e.target.value) || 0 }
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          <TabPanel value={activeTab} index={3}>
+            <Typography variant="h6" gutterBottom>
+              Configurações de Retry
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Máximo de Tentativas"
+                  type="number"
+                  value={formData.retryConfig.maxRetries}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      retryConfig: { ...formData.retryConfig, maxRetries: parseInt(e.target.value) || 3 }
+                    })
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Delay entre Tentativas (ms)"
+                  type="number"
+                  value={formData.retryConfig.retryDelay}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      retryConfig: { ...formData.retryConfig, retryDelay: parseInt(e.target.value) || 1000 }
+                    })
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Timeout (ms)"
+                  type="number"
+                  value={formData.retryConfig.timeout}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      retryConfig: { ...formData.retryConfig, timeout: parseInt(e.target.value) || 10000 }
+                    })
+                  }
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancelar</Button>
+          <Button onClick={handleSave} variant="contained">
+            {editingIntegration ? 'Atualizar' : 'Criar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default N8nIntegration;

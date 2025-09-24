@@ -1,0 +1,25 @@
+{
+  "short_name": "Clerky CRM",
+  "name": "Clerky CRM - Sistema de Gerenciamento WhatsApp",
+  "description": "Sistema completo de gerenciamento WhatsApp com CRM integrado",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#00a884",
+  "background_color": "#111b21",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["business", "productivity", "communication"],
+  "lang": "pt-BR"
+}
