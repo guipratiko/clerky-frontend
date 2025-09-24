@@ -65,6 +65,12 @@ const MassDispatch = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedDispatch, setSelectedDispatch] = useState(null);
   
+  // Estados para seleção de contatos do Kanban
+  const [kanbanColumns, setKanbanColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [columnContacts, setColumnContacts] = useState([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
+  
   // Estados do formulário de criação
   const [formData, setFormData] = useState({
     name: '',
@@ -72,6 +78,7 @@ const MassDispatch = () => {
     selectedTemplate: '',
     numbers: '',
     file: null,
+    kanbanColumn: '',
     settings: {
       speed: 'normal',
       validateNumbers: true,
@@ -118,6 +125,41 @@ const MassDispatch = () => {
     { value: 'random', label: 'Randomizado (45-85s)', description: 'Intervalos aleatórios para evitar detecção' }
   ];
 
+  // Carregar colunas do Kanban
+  const loadKanbanColumns = async (instanceName) => {
+    try {
+      const response = await api.get(`/api/chats/${instanceName}/kanban/columns`);
+      if (response.data.success) {
+        setKanbanColumns(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar colunas do Kanban:', error);
+    }
+  };
+
+  // Carregar contatos de uma coluna específica
+  const loadColumnContacts = async (instanceName, columnId) => {
+    try {
+      setLoadingContacts(true);
+      const response = await api.get(`/api/chats/${instanceName}/kanban/column/${columnId}/contacts`);
+      if (response.data.success) {
+        const contacts = response.data.data || [];
+        setColumnContacts(contacts);
+        
+        // Extrair números dos contatos e adicionar ao campo numbers
+        const numbers = contacts.map(contact => contact.chatId?.replace('@s.whatsapp.net', '')).join('\n');
+        setFormData(prev => ({ ...prev, numbers }));
+        
+        toast.success(`${contacts.length} contatos carregados da coluna`);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar contatos da coluna:', error);
+      toast.error('Erro ao carregar contatos da coluna');
+    } finally {
+      setLoadingContacts(false);
+    }
+  };
+
   // Carregar dados iniciais
   useEffect(() => {
     loadDispatches();
@@ -125,6 +167,15 @@ const MassDispatch = () => {
     loadStats();
     loadScheduledDispatches();
   }, []);
+
+  // Carregar colunas do Kanban quando a instância mudar
+  useEffect(() => {
+    if (formData.instanceName) {
+      loadKanbanColumns(formData.instanceName);
+      setSelectedColumn('');
+      setColumnContacts([]);
+    }
+  }, [formData.instanceName]);
 
   // Escutar eventos WebSocket
   useEffect(() => {
@@ -300,6 +351,7 @@ const MassDispatch = () => {
       selectedTemplate: '',
       numbers: '',
       file: null,
+      kanbanColumn: '',
       settings: {
         speed: 'normal',
         validateNumbers: true,
@@ -1179,6 +1231,86 @@ const MassDispatch = () => {
               }
             }}
           />
+
+          {/* Seção de Seleção de Contatos do Kanban */}
+          <Box sx={{ mt: 2, p: 2, border: '1px solid #313d43', borderRadius: 1 }}>
+            <Typography variant="h6" sx={{ color: '#00a884', mb: 2 }}>
+              📋 Selecionar Contatos do Kanban
+            </Typography>
+            
+            <FormControl fullWidth margin="normal">
+              <InputLabel 
+                sx={{ 
+                  color: '#8696a0',
+                  '&.Mui-focused': { 
+                    color: '#00a884',
+                    transform: 'translate(14px, -9px) scale(0.75)',
+                    backgroundColor: '#202c33',
+                    paddingLeft: '4px',
+                    paddingRight: '4px'
+                  },
+                  '&.MuiInputLabel-shrink': {
+                    transform: 'translate(14px, -9px) scale(0.75)',
+                    backgroundColor: '#202c33',
+                    paddingLeft: '4px',
+                    paddingRight: '4px'
+                  }
+                }}
+              >
+                Coluna do Kanban
+              </InputLabel>
+              <Select
+                value={selectedColumn}
+                onChange={(e) => {
+                  setSelectedColumn(e.target.value);
+                  if (e.target.value && formData.instanceName) {
+                    loadColumnContacts(formData.instanceName, e.target.value);
+                  }
+                }}
+                disabled={!formData.instanceName || loadingContacts}
+                sx={{
+                  color: '#e9edef',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' },
+                  '& .MuiInputLabel-root': {
+                    backgroundColor: '#202c33',
+                    paddingLeft: '4px',
+                    paddingRight: '4px'
+                  }
+                }}
+              >
+                <MenuItem value="">
+                  <em>Selecione uma coluna</em>
+                </MenuItem>
+                {kanbanColumns.map((column) => (
+                  <MenuItem key={column.id} value={column.id}>
+                    {column.title} ({column.chatCount || 0} contatos)
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {loadingContacts && (
+              <Box sx={{ mt: 2 }}>
+                <LinearProgress sx={{ background: '#313d43', '& .MuiLinearProgress-bar': { background: '#00a884' } }} />
+                <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+                  Carregando contatos da coluna...
+                </Typography>
+              </Box>
+            )}
+
+            {columnContacts.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  ✅ {columnContacts.length} contatos carregados da coluna
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#8696a0', display: 'block', mt: 1 }}>
+                  Os números foram automaticamente adicionados ao campo acima
+                </Typography>
+              </Box>
+            )}
+          </Box>
 
           <Box sx={{ mt: 2 }}>
             <Button

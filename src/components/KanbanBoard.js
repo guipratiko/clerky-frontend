@@ -747,7 +747,7 @@ const KanbanBoard = () => {
         name: finalName,
         originalName: finalOriginalName,
         apiName: finalApiName,
-        lastMessage: updatedChat.lastMessage?.content || updatedChat.lastMessage,
+        lastMessage: updatedChat.lastMessage?.content || updatedChat.lastMessage || currentChat?.lastMessage || 'Nenhuma mensagem',
         lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity
       };
       
