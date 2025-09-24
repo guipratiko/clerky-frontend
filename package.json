@@ -28,7 +28,8 @@
     "react-toastify": "^11.0.5",
     "react-virtualized": "^9.22.5",
     "socket.io-client": "^4.7.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.18.3"
   },
   "scripts": {
     "start": "react-scripts start",
