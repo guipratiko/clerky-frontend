@@ -2,16 +2,13 @@ version: '3.8'
 
 services:
   clerky-frontend:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: clerky-frontend
+    restart: always
     ports:
       - "3500:3500"
-    environment:
-      - NODE_ENV=production
-      - PORT=3500
-      - REACT_APP_API_URL=https://back.clerky.com.br
-      - REACT_APP_SOCKET_URL=https://back.clerky.com.br
-      - REACT_APP_UPLOADS_URL=https://back.clerky.com.br/uploads
-      - REACT_APP_FRONTEND_URL=https://app.clerky.com.br
     labels:
       # Configurações do Traefik
       - "traefik.enable=true"
@@ -19,29 +16,22 @@ services:
       - "traefik.http.routers.clerky-frontend.entrypoints=websecure"
       - "traefik.http.routers.clerky-frontend.tls.certresolver=letsencrypt"
       
-      # Configurações para WebSocket
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Upgrade=websocket"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Connection=Upgrade"
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Sec-WebSocket-Protocol=chat,superchat"
-      
-      # Headers de resposta para WebSocket
-      - "traefik.http.middlewares.websocket-response.headers.customresponseheaders.Upgrade=websocket"
-      - "traefik.http.middlewares.websocket-response.headers.customresponseheaders.Connection=Upgrade"
-      
-      # Timeouts para WebSocket
-      - "traefik.http.middlewares.websocket-timeout.forwardauth.trustforwardheader=true"
-      - "traefik.http.middlewares.websocket-timeout.headers.customrequestheaders.X-Forwarded-Proto=https"
-      
-      # Aplicar middlewares
-      - "traefik.http.routers.clerky-frontend.middlewares=websocket-headers,websocket-response,websocket-timeout"
-      
       # Configurações de proxy
       - "traefik.http.services.clerky-frontend.loadbalancer.server.port=3500"
-      - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.path=/"
+      - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.interval=30s"
       - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.timeout=10s"
       
-      # Configurações específicas para WebSocket
+      # Configurações de cache e performance
+      - "traefik.http.middlewares.clerky-frontend-cache.headers.customresponseheaders.Cache-Control=public, max-age=31536000"
+      - "traefik.http.routers.clerky-frontend.middlewares=clerky-frontend-cache"
+      
+      # Configurações de segurança
+      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      
+      # Prioridade e TLS
       - "traefik.http.routers.clerky-frontend.priority=100"
       - "traefik.http.routers.clerky-frontend.tls=true"
       - "traefik.http.routers.clerky-frontend.tls.domains[0].main=app.clerky.com.br"
