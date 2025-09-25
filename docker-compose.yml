@@ -5,40 +5,6 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: clerky-frontend
     restart: always
     ports:
       - "3500:3500"
-    labels:
-      # Configurações do Traefik
-      - "traefik.enable=true"
-      - "traefik.http.routers.clerky-frontend.rule=Host(`app.clerky.com.br`)"
-      - "traefik.http.routers.clerky-frontend.entrypoints=websecure"
-      - "traefik.http.routers.clerky-frontend.tls.certresolver=letsencrypt"
-      
-      # Configurações de proxy
-      - "traefik.http.services.clerky-frontend.loadbalancer.server.port=3500"
-      - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.path=/health"
-      - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.interval=30s"
-      - "traefik.http.services.clerky-frontend.loadbalancer.healthcheck.timeout=10s"
-      
-      # Configurações de cache e performance
-      - "traefik.http.middlewares.clerky-frontend-cache.headers.customresponseheaders.Cache-Control=public, max-age=31536000"
-      - "traefik.http.routers.clerky-frontend.middlewares=clerky-frontend-cache"
-      
-      # Configurações de segurança
-      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
-      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-Content-Type-Options=nosniff"
-      - "traefik.http.middlewares.clerky-frontend-security.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
-      
-      # Prioridade e TLS
-      - "traefik.http.routers.clerky-frontend.priority=100"
-      - "traefik.http.routers.clerky-frontend.tls=true"
-      - "traefik.http.routers.clerky-frontend.tls.domains[0].main=app.clerky.com.br"
-      
-    networks:
-      - traefik
-
-networks:
-  traefik:
-    external: true
