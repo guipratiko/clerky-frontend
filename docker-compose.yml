@@ -1,6 +1,0 @@
-services:
-  clerky-frontend:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    restart: always
