@@ -645,10 +645,10 @@ const MassDispatch = () => {
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box>
           <Typography variant="h4" sx={{ color: '#e9edef', fontWeight: 'bold', mb: 1 }}>
-            Disparo em Massa
+            {t('massDispatch.title')}
           </Typography>
           <Typography variant="body1" sx={{ color: '#8696a0' }}>
-            Gerencie seus disparos de mensagens em massa
+            {t('massDispatch.pageDescription')}
           </Typography>
         </Box>
         
@@ -658,7 +658,7 @@ const MassDispatch = () => {
             startIcon={<AddIcon />}
             onClick={() => setTemplateDialogOpen(true)}
           >
-            Novo Template
+            {t('massDispatch.newTemplate')}
           </Button>
           
           <Button
@@ -667,7 +667,7 @@ const MassDispatch = () => {
             onClick={() => setCreateDialogOpen(true)}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            Novo Disparo
+            {t('massDispatch.newDispatch')}
           </Button>
         </Box>
       </Box>
@@ -675,13 +675,13 @@ const MassDispatch = () => {
       {/* Seção de Templates */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" sx={{ mb: 2, color: '#e9edef' }}>
-          Templates Disponíveis
+          {t('massDispatch.availableTemplates')}
         </Typography>
         
         {templates.length === 0 ? (
           <Card sx={{ background: '#202c33', border: '1px solid #313d43', p: 3, textAlign: 'center' }}>
             <Typography variant="body1" sx={{ color: '#8696a0', mb: 2 }}>
-              Nenhum template criado ainda
+              {t('massDispatch.noTemplatesCreated')}
             </Typography>
             <Button
               variant="outlined"
@@ -693,7 +693,7 @@ const MassDispatch = () => {
                 '&:hover': { borderColor: '#008069', backgroundColor: 'rgba(0, 168, 132, 0.1)' }
               }}
             >
-              Criar Primeiro Template
+              {t('massDispatch.createFirstTemplate')}
             </Button>
           </Card>
         ) : (
@@ -777,7 +777,7 @@ const MassDispatch = () => {
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ mb: 2, color: '#e9edef', display: 'flex', alignItems: 'center' }}>
             <ScheduleIcon sx={{ mr: 1, color: '#667eea' }} />
-            Disparos Agendados
+            {t('massDispatch.scheduledDispatches')}
           </Typography>
           <Grid container spacing={2}>
             {scheduledDispatches.map((dispatch, index) => (
@@ -794,9 +794,9 @@ const MassDispatch = () => {
                         {dispatch.name}
                       </Typography>
                       <Chip 
-                        label={dispatch.status === 'scheduled' ? 'Agendado' : 
-                               dispatch.status === 'paused' ? 'Pausado' : 
-                               dispatch.status === 'running' ? 'Executando' : 'Concluído'}
+                        label={dispatch.status === 'scheduled' ? t('massDispatch.status.scheduled') : 
+                               dispatch.status === 'paused' ? t('massDispatch.status.paused') : 
+                               dispatch.status === 'running' ? t('massDispatch.status.running') : t('massDispatch.status.completed')}
                         size="small"
                         sx={{
                           backgroundColor: dispatch.status === 'scheduled' ? 'rgba(102, 126, 234,0.2)' :
@@ -1103,7 +1103,7 @@ const MassDispatch = () => {
                 </Box>
 
                 {dispatch.status !== 'running' && (
-                  <Tooltip title="Deletar">
+                  <Tooltip title={t('massDispatch.delete')}>
                     <IconButton
                       onClick={() => handleDeleteDispatch(dispatch._id)}
                       sx={{ color: '#f15c6d' }}
@@ -1132,10 +1132,10 @@ const MassDispatch = () => {
         >
           <SendIcon sx={{ fontSize: 64, color: '#8696a0', mb: 2 }} />
           <Typography variant="h5" sx={{ color: '#e9edef', mb: 1 }}>
-            Nenhum disparo encontrado
+            {t('massDispatch.noDispatchesFound')}
           </Typography>
           <Typography variant="body1" sx={{ color: '#8696a0', mb: 3 }}>
-            Crie seu primeiro disparo em massa
+            {t('massDispatch.createFirstDispatch')}
           </Typography>
           <Button
             variant="contained"
@@ -1143,7 +1143,7 @@ const MassDispatch = () => {
             onClick={() => setCreateDialogOpen(true)}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            Novo Disparo
+            {t('massDispatch.newDispatch')}
           </Button>
         </Box>
       )}
@@ -1158,11 +1158,11 @@ const MassDispatch = () => {
           sx: { background: '#202c33', color: '#e9edef' }
         }}
       >
-        <DialogTitle>Criar Novo Disparo em Massa</DialogTitle>
+        <DialogTitle>{t('massDispatch.createNewDispatch')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label="Nome do Disparo"
+            label={t('massDispatch.dispatchName')}
             value={formData.name}
             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
             margin="normal"
@@ -1179,7 +1179,7 @@ const MassDispatch = () => {
           />
           
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: '#8696a0' }}>Instância</InputLabel>
+            <InputLabel sx={{ color: '#8696a0' }}>{t('massDispatch.instance')}</InputLabel>
             <Select
               value={formData.instanceName}
               onChange={(e) => setFormData(prev => ({ ...prev, instanceName: e.target.value }))}
@@ -1634,11 +1634,11 @@ const MassDispatch = () => {
           sx: { background: '#202c33', color: '#e9edef' }
         }}
       >
-        <DialogTitle>Criar Novo Template</DialogTitle>
+        <DialogTitle>{t('massDispatch.createNewTemplate')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label="Nome do Template"
+            label={t('massDispatch.templateName')}
             value={templateForm.name}
             onChange={(e) => setTemplateForm(prev => ({ ...prev, name: e.target.value }))}
             margin="normal"
@@ -1655,7 +1655,7 @@ const MassDispatch = () => {
           />
           
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: '#8696a0' }}>Tipo de Template</InputLabel>
+            <InputLabel sx={{ color: '#8696a0' }}>{t('massDispatch.templateType')}</InputLabel>
             <Select
               value={templateForm.type}
               onChange={(e) => setTemplateForm(prev => ({ ...prev, type: e.target.value }))}
@@ -1666,12 +1666,12 @@ const MassDispatch = () => {
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' }
               }}
             >
-              <MenuItem value="text">Texto</MenuItem>
-              <MenuItem value="image">Imagem</MenuItem>
-              <MenuItem value="image_caption">Imagem + Legenda</MenuItem>
-              <MenuItem value="audio">Áudio</MenuItem>
-              <MenuItem value="file">Arquivo</MenuItem>
-              <MenuItem value="file_caption">Arquivo + Legenda</MenuItem>
+              <MenuItem value="text">{t('massDispatch.templateTypes.text')}</MenuItem>
+              <MenuItem value="image">{t('massDispatch.templateTypes.image')}</MenuItem>
+              <MenuItem value="image_caption">{t('massDispatch.templateTypes.imageCaption')}</MenuItem>
+              <MenuItem value="audio">{t('massDispatch.templateTypes.audio')}</MenuItem>
+              <MenuItem value="file">{t('massDispatch.templateTypes.file')}</MenuItem>
+              <MenuItem value="file_caption">{t('massDispatch.templateTypes.fileCaption')}</MenuItem>
             </Select>
           </FormControl>
 
@@ -1679,7 +1679,7 @@ const MassDispatch = () => {
           {templateForm.type === 'text' && (
             <TextField
               fullWidth
-              label="Texto da Mensagem"
+              label={t('massDispatch.messageText')}
               value={templateForm.text}
               onChange={(e) => setTemplateForm(prev => ({ ...prev, text: e.target.value }))}
               margin="normal"

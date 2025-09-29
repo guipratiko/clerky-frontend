@@ -285,14 +285,14 @@ const N8nIntegration = () => {
     <Box sx={{ p: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1">
-          Integrações N8N
+          {t('n8nIntegration.title')}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpenDialog()}
         >
-          Nova Integração
+          {t('n8nIntegration.addIntegration')}
         </Button>
       </Box>
 
@@ -439,13 +439,13 @@ const N8nIntegration = () => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Instância</InputLabel>
+                  <InputLabel>{t('n8nIntegration.instance')}</InputLabel>
                   <Select
                     value={formData.instanceName}
                     onChange={(e) => setFormData({ ...formData, instanceName: e.target.value })}
-                    label="Instância"
+                    label={t('n8nIntegration.instance')}
                   >
-                    <MenuItem value="">Todas as Instâncias</MenuItem>
+                    <MenuItem value="">{t('n8nIntegration.allInstances')}</MenuItem>
                     {instances.map((instance) => (
                       <MenuItem key={instance.instanceName} value={instance.instanceName}>
                         {instance.instanceName} ({instance.status})
@@ -458,7 +458,7 @@ const N8nIntegration = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="URL do Webhook N8N"
+                  label={t('n8nIntegration.webhookUrl')}
                   value={formData.webhookUrl}
                   onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
                   placeholder="https://seu-n8n.com/webhook/abc123"
@@ -469,7 +469,7 @@ const N8nIntegration = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Secret do Webhook (opcional)"
+                  label={t('n8nIntegration.webhookSecret')}
                   value={formData.webhookSecret}
                   onChange={(e) => setFormData({ ...formData, webhookSecret: e.target.value })}
                   type="password"
@@ -485,7 +485,7 @@ const N8nIntegration = () => {
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                     />
                   }
-                  label="Integração Ativa"
+                  label={t('n8nIntegration.integrationActive')}
                 />
               </Grid>
             </Grid>
@@ -493,7 +493,7 @@ const N8nIntegration = () => {
 
           <TabPanel value={activeTab} index={1}>
             <Typography variant="h6" gutterBottom>
-              Eventos a serem enviados para N8N
+              {t('n8nIntegration.eventsToSend')}
             </Typography>
             <FormGroup>
               {Object.entries(formData.events).map(([event, enabled]) => {
@@ -502,14 +502,14 @@ const N8nIntegration = () => {
                 
                 // Mapear nomes dos eventos para exibição mais amigável
                 const eventLabels = {
-                  newMessage: 'Nova Mensagem',
-                  messageSent: 'Mensagem Enviada',
-                  messageUpsert: 'Message Upsert (Raw)',
-                  newContact: 'Novo Contato',
-                  contactUpdate: 'Atualização de Contato',
-                  chatUpdate: 'Atualização de Chat',
-                  connectionUpdate: 'Atualização de Conexão',
-                  qrCodeUpdate: 'Atualização de QR Code'
+                  newMessage: t('n8nIntegration.eventLabels.newMessage'),
+                  messageSent: t('n8nIntegration.eventLabels.messageSent'),
+                  messageUpsert: t('n8nIntegration.eventLabels.messageUpsert'),
+                  newContact: t('n8nIntegration.eventLabels.newContact'),
+                  contactUpdate: t('n8nIntegration.eventLabels.contactUpdate'),
+                  chatUpdate: t('n8nIntegration.eventLabels.chatUpdate'),
+                  connectionUpdate: t('n8nIntegration.eventLabels.connectionUpdate'),
+                  qrCodeUpdate: t('n8nIntegration.eventLabels.qrCodeUpdate')
                 };
                 
                 return (
@@ -535,7 +535,7 @@ const N8nIntegration = () => {
 
           <TabPanel value={activeTab} index={2}>
             <Typography variant="h6" gutterBottom>
-              Filtros de Dados
+              {t('n8nIntegration.dataFilters')}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -551,7 +551,7 @@ const N8nIntegration = () => {
                       }
                     />
                   }
-                  label="Incluir Grupos"
+                  label={t('n8nIntegration.includeGroups')}
                 />
               </Grid>
 
@@ -568,7 +568,7 @@ const N8nIntegration = () => {
                       }
                     />
                   }
-                  label="Incluir Mídia"
+                  label={t('n8nIntegration.includeMedia')}
                 />
               </Grid>
 
@@ -585,14 +585,14 @@ const N8nIntegration = () => {
                       }
                     />
                   }
-                  label="Incluir Contatos"
+                  label={t('n8nIntegration.includeContacts')}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Tamanho Mínimo da Mensagem"
+                  label={t('n8nIntegration.minMessageLength')}
                   type="number"
                   value={formData.filters.minMessageLength}
                   onChange={(e) =>
@@ -608,13 +608,13 @@ const N8nIntegration = () => {
 
           <TabPanel value={activeTab} index={3}>
             <Typography variant="h6" gutterBottom>
-              Configurações de Retry
+              {t('n8nIntegration.retrySettings')}
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
-                  label="Máximo de Tentativas"
+                  label={t('n8nIntegration.maxRetries')}
                   type="number"
                   value={formData.retryConfig.maxRetries}
                   onChange={(e) =>
@@ -629,7 +629,7 @@ const N8nIntegration = () => {
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
-                  label="Delay entre Tentativas (ms)"
+                  label={t('n8nIntegration.retryDelay')}
                   type="number"
                   value={formData.retryConfig.retryDelay}
                   onChange={(e) =>
@@ -644,7 +644,7 @@ const N8nIntegration = () => {
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
-                  label="Timeout (ms)"
+                  label={t('n8nIntegration.timeout')}
                   type="number"
                   value={formData.retryConfig.timeout}
                   onChange={(e) =>
@@ -659,9 +659,9 @@ const N8nIntegration = () => {
           </TabPanel>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
+          <Button onClick={handleCloseDialog}>{t('n8nIntegration.cancel')}</Button>
           <Button onClick={handleSave} variant="contained">
-            {editingIntegration ? 'Atualizar' : 'Criar'}
+            {editingIntegration ? t('n8nIntegration.update') : t('n8nIntegration.create')}
           </Button>
         </DialogActions>
       </Dialog>

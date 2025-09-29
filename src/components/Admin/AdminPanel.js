@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useI18n } from '../../contexts/I18nContext';
 import {
   Box,
   Container,
@@ -39,6 +40,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const AdminPanel = () => {
+  const { t } = useI18n();
   const [tabValue, setTabValue] = useState(0);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
@@ -62,7 +64,7 @@ const AdminPanel = () => {
       setPendingUsers(pending);
       setAllUsers(all);
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      console.error(t('admin.errorLoadingData'), error);
     } finally {
       setLoading(false);
     }
@@ -103,10 +105,10 @@ const AdminPanel = () => {
 
   const getStatusChip = (status) => {
     const statusConfig = {
-      pending: { label: 'Pendente', color: 'warning', icon: <Schedule /> },
-      approved: { label: 'Aprovado', color: 'success', icon: <CheckCircle /> },
-      rejected: { label: 'Rejeitado', color: 'error', icon: <Cancel /> },
-      suspended: { label: 'Suspenso', color: 'default', icon: <Cancel /> }
+      pending: { label: t('admin.status.pending'), color: 'warning', icon: <Schedule /> },
+      approved: { label: t('admin.status.approved'), color: 'success', icon: <CheckCircle /> },
+      rejected: { label: t('admin.status.rejected'), color: 'error', icon: <Cancel /> },
+      suspended: { label: t('admin.status.suspended'), color: 'default', icon: <Cancel /> }
     };
 
     const config = statusConfig[status] || statusConfig.pending;
@@ -124,8 +126,8 @@ const AdminPanel = () => {
 
   const getRoleChip = (role) => {
     const roleConfig = {
-      admin: { label: 'Admin', color: 'primary', icon: <AdminPanelSettings /> },
-      user: { label: 'Usuário', color: 'default', icon: <Person /> }
+      admin: { label: t('admin.role.admin'), color: 'primary', icon: <AdminPanelSettings /> },
+      user: { label: t('admin.role.user'), color: 'default', icon: <Person /> }
     };
 
     const config = roleConfig[role] || roleConfig.user;
@@ -149,7 +151,7 @@ const AdminPanel = () => {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Alert severity="error">
-          Acesso negado. Apenas administradores podem acessar esta página.
+          {t('admin.accessDenied')}
         </Alert>
       </Container>
     );
@@ -160,7 +162,7 @@ const AdminPanel = () => {
       <Paper elevation={3} sx={{ p: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Painel Administrativo
+            {t('admin.title')}
           </Typography>
           <Button
             variant="outlined"
@@ -168,18 +170,18 @@ const AdminPanel = () => {
             onClick={loadData}
             disabled={loading}
           >
-            Atualizar
+            {t('admin.refresh')}
           </Button>
         </Box>
 
         <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 3 }}>
           <Tab 
-            label={`Pendentes (${pendingUsers.length})`} 
+            label={`${t('admin.pending')} (${pendingUsers.length})`} 
             icon={<Schedule />}
             iconPosition="start"
           />
           <Tab 
-            label={`Todos Usuários (${allUsers.length})`} 
+            label={`${t('admin.allUsers')} (${allUsers.length})`} 
             icon={<Person />}
             iconPosition="start"
           />
@@ -196,17 +198,17 @@ const AdminPanel = () => {
               <Box>
                 {pendingUsers.length === 0 ? (
                   <Alert severity="info">
-                    Não há usuários aguardando aprovação.
+                    {t('admin.noPendingUsers')}
                   </Alert>
                 ) : (
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Usuário</TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell>Data Registro</TableCell>
-                          <TableCell align="center">Ações</TableCell>
+                          <TableCell>{t('admin.user')}</TableCell>
+                          <TableCell>{t('admin.email')}</TableCell>
+                          <TableCell>{t('admin.registrationDate')}</TableCell>
+                          <TableCell align="center">{t('admin.actions')}</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -236,7 +238,7 @@ const AdminPanel = () => {
                             </TableCell>
                             <TableCell align="center">
                               <Box display="flex" gap={1} justifyContent="center">
-                                <Tooltip title="Aprovar usuário">
+                                <Tooltip title={t('admin.approveUser')}>
                                   <IconButton
                                     color="success"
                                     onClick={() => handleApproveReject(user, 'approve')}
@@ -249,7 +251,7 @@ const AdminPanel = () => {
                                     )}
                                   </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Rejeitar usuário">
+                                <Tooltip title={t('admin.rejectUser')}>
                                   <IconButton
                                     color="error"
                                     onClick={() => handleApproveReject(user, 'reject')}
@@ -348,15 +350,15 @@ const AdminPanel = () => {
         fullWidth
       >
         <DialogTitle>
-          Confirmar {confirmDialog.action === 'approve' ? 'Aprovação' : 'Rejeição'}
+          {t('admin.confirmAction', { action: confirmDialog.action === 'approve' ? t('admin.approval') : t('admin.rejection') })}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Tem certeza que deseja{' '}
-            <strong>
-              {confirmDialog.action === 'approve' ? 'aprovar' : 'rejeitar'}
-            </strong>{' '}
-            o usuário <strong>{confirmDialog.user?.name}</strong> ({confirmDialog.user?.email})?
+            {t('admin.confirmMessage', { 
+              action: confirmDialog.action === 'approve' ? t('admin.approve') : t('admin.reject'),
+              userName: confirmDialog.user?.name,
+              userEmail: confirmDialog.user?.email
+            })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -364,7 +366,7 @@ const AdminPanel = () => {
             onClick={() => setConfirmDialog({ open: false, user: null, action: null })}
             disabled={Boolean(actionLoading)}
           >
-            Cancelar
+            {t('admin.cancel')}
           </Button>
           <Button
             onClick={confirmAction}
@@ -372,7 +374,7 @@ const AdminPanel = () => {
             variant="contained"
             disabled={Boolean(actionLoading)}
           >
-            {confirmDialog.action === 'approve' ? 'Aprovar' : 'Rejeitar'}
+            {confirmDialog.action === 'approve' ? t('admin.approve') : t('admin.reject')}
           </Button>
         </DialogActions>
       </Dialog>

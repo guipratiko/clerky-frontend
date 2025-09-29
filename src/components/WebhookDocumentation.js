@@ -251,29 +251,29 @@ const WebhookDocumentation = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Fluxo de Webhook
+                  {t('webhookDocs.webhookFlow')}
                 </Typography>
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    1. Evento acontece no WhatsApp
+                    {t('webhookDocs.step1')}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     ↓
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    2. Evolution API envia para nosso sistema
+                    {t('webhookDocs.step2')}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     ↓
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    3. Processamos e enviamos para seu webhook
+                    {t('webhookDocs.step3')}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     ↓
                   </Typography>
                   <Typography variant="body2">
-                    4. Sua aplicação recebe os dados
+                    {t('webhookDocs.step4')}
                   </Typography>
                 </Box>
               </CardContent>
@@ -286,29 +286,28 @@ const WebhookDocumentation = () => {
         <Card>
           <CardContent>
             <Typography variant="h5" gutterBottom>
-              Configuração Básica
+              {t('webhookDocs.basicConfiguration')}
             </Typography>
             
             <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-              1. URL do Webhook
+              {t('webhookDocs.webhookUrlStep')}
             </Typography>
             <Typography paragraph>
-              Configure uma URL pública que receberá os dados via HTTP POST. 
-              Sua aplicação deve estar acessível via internet.
+              {t('webhookDocs.webhookUrlDescription')}
             </Typography>
 
             <CodeBlock 
               code="https://sua-aplicacao.com/webhook/whatsapp"
               language="text"
               id="webhook-url"
-              title="Exemplo de URL"
+              title={t('webhookDocs.urlExample')}
             />
 
             <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-              2. Endpoint de Recebimento
+              {t('webhookDocs.receivingEndpoint')}
             </Typography>
             <Typography paragraph>
-              Crie um endpoint que aceite requisições POST e processe os dados recebidos.
+              {t('webhookDocs.receivingEndpointDescription')}
             </Typography>
 
             <CodeBlock 
@@ -330,14 +329,14 @@ app.post('/webhook/whatsapp', (req, res) => {
 });`}
               language="javascript"
               id="webhook-endpoint"
-              title="Exemplo de Endpoint"
+              title={t('webhookDocs.endpointExample')}
             />
 
             <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-              3. Configuração no Sistema
+              {t('webhookDocs.systemConfiguration')}
             </Typography>
             <Typography paragraph>
-              Use nossa interface de integração N8N ou configure manualmente via API.
+              {t('webhookDocs.systemConfigurationDescription')}
             </Typography>
 
             <CodeBlock 
@@ -363,7 +362,7 @@ app.post('/webhook/whatsapp', (req, res) => {
 
       <TabPanel value={activeTab} index={2}>
         <Typography variant="h5" gutterBottom>
-          Eventos Disponíveis
+          {t('webhookDocs.availableEvents')}
         </Typography>
         
         <Grid container spacing={2}>
@@ -371,44 +370,44 @@ app.post('/webhook/whatsapp', (req, res) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  📨 Eventos de Mensagem
+                  📨 {t('webhookDocs.messageEvents')}
                 </Typography>
                 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>MESSAGES_UPSERT</strong> - Message Upsert (Raw)</Typography>
+                    <Typography><strong>MESSAGES_UPSERT</strong> - {t('webhookDocs.messageUpsertRaw')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Dados exatos recebidos do Evolution API, sem modificações.
+                      {t('webhookDocs.messageUpsertDescription')}
                     </Typography>
-                    <Chip label="Payload Original" color="primary" size="small" />
-                    <Chip label="Sem Filtros" color="secondary" size="small" sx={{ ml: 1 }} />
+                    <Chip label={t('webhookDocs.originalPayload')} color="primary" size="small" />
+                    <Chip label={t('webhookDocs.noFilters')} color="secondary" size="small" sx={{ ml: 1 }} />
                   </AccordionDetails>
                 </Accordion>
 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>new-message</strong> - Nova Mensagem</Typography>
+                    <Typography><strong>new-message</strong> - {t('webhookDocs.newMessage')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Mensagens processadas pelo sistema com dados enriquecidos.
+                      {t('webhookDocs.newMessageDescription')}
                     </Typography>
-                    <Chip label="Processado" color="success" size="small" />
-                    <Chip label="Com Filtros" color="info" size="small" sx={{ ml: 1 }} />
+                    <Chip label={t('webhookDocs.processed')} color="success" size="small" />
+                    <Chip label={t('webhookDocs.withFilters')} color="info" size="small" sx={{ ml: 1 }} />
                   </AccordionDetails>
                 </Accordion>
 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>message-sent</strong> - Mensagem Enviada</Typography>
+                    <Typography><strong>message-sent</strong> - {t('webhookDocs.messageSent')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Quando você envia uma mensagem através do sistema.
+                      {t('webhookDocs.messageSentDescription')}
                     </Typography>
-                    <Chip label="Envio" color="warning" size="small" />
+                    <Chip label={t('webhookDocs.sending')} color="warning" size="small" />
                   </AccordionDetails>
                 </Accordion>
               </CardContent>
@@ -419,38 +418,38 @@ app.post('/webhook/whatsapp', (req, res) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  👥 Eventos de Contato
+                  👥 {t('webhookDocs.contactEvents')}
                 </Typography>
                 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>new-contact</strong> - Novo Contato</Typography>
+                    <Typography><strong>new-contact</strong> - {t('webhookDocs.newContact')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Quando um novo contato é adicionado ao WhatsApp.
+                      {t('webhookDocs.newContactDescription')}
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>contact-update</strong> - Atualização de Contato</Typography>
+                    <Typography><strong>contact-update</strong> - {t('webhookDocs.contactUpdate')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Quando informações de um contato são atualizadas.
+                      {t('webhookDocs.contactUpdateDescription')}
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography><strong>chat-update</strong> - Atualização de Chat</Typography>
+                    <Typography><strong>chat-update</strong> - {t('webhookDocs.chatUpdate')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      Quando uma conversa é movida entre colunas do Kanban.
+                      {t('webhookDocs.chatUpdateDescription')}
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
@@ -462,12 +461,12 @@ app.post('/webhook/whatsapp', (req, res) => {
 
       <TabPanel value={activeTab} index={3}>
         <Typography variant="h5" gutterBottom>
-          Exemplos Práticos
+          {t('webhookDocs.practicalExamples')}
         </Typography>
 
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography><strong>Exemplo 1:</strong> MESSAGES_UPSERT - Payload Original</Typography>
+            <Typography><strong>{t('webhookDocs.example1')}:</strong> MESSAGES_UPSERT - {t('webhookDocs.originalPayload')}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <CodeBlock 
@@ -491,14 +490,14 @@ app.post('/webhook/whatsapp', (req, res) => {
 }`}
               language="json"
               id="example-messages-upsert"
-              title="Payload MESSAGES_UPSERT"
+              title={t('webhookDocs.payloadMessagesUpsert')}
             />
           </AccordionDetails>
         </Accordion>
 
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography><strong>Exemplo 2:</strong> Nova Mensagem Processada</Typography>
+            <Typography><strong>{t('webhookDocs.example2')}:</strong> {t('webhookDocs.newMessageProcessed')}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <CodeBlock 
@@ -522,14 +521,14 @@ app.post('/webhook/whatsapp', (req, res) => {
 }`}
               language="json"
               id="example-new-message"
-              title="Payload Nova Mensagem"
+              title={t('webhookDocs.payloadNewMessage')}
             />
           </AccordionDetails>
         </Accordion>
 
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography><strong>Exemplo 3:</strong> Processamento em Python</Typography>
+            <Typography><strong>{t('webhookDocs.example3')}:</strong> {t('webhookDocs.processingInPython')}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <CodeBlock 
@@ -584,14 +583,14 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)`}
               language="python"
               id="example-python"
-              title="Exemplo em Python/Flask"
+              title={t('webhookDocs.exampleInPythonFlask')}
             />
           </AccordionDetails>
         </Accordion>
 
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography><strong>Exemplo 4:</strong> Processamento em Node.js</Typography>
+            <Typography><strong>{t('webhookDocs.example4')}:</strong> {t('webhookDocs.processingInNodejs')}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <CodeBlock 
@@ -651,7 +650,7 @@ app.listen(3500, () => {
 });`}
               language="javascript"
               id="example-nodejs"
-              title="Exemplo em Node.js/Express"
+              title={t('webhookDocs.exampleInNodejsExpress')}
             />
           </AccordionDetails>
         </Accordion>
@@ -659,29 +658,28 @@ app.listen(3500, () => {
 
       <TabPanel value={activeTab} index={4}>
         <Typography variant="h5" gutterBottom>
-          Envio de Mensagens via API
+          {t('webhookDocs.sendMessagesViaAPI')}
         </Typography>
         
         <Alert severity="info" sx={{ mb: 3 }}>
-          <AlertTitle>📤 Envio de Mensagens</AlertTitle>
-          Você pode enviar mensagens através de instâncias específicas de usuários usando nossa API REST.
+          <AlertTitle>📤 {t('webhookDocs.sendMessages')}</AlertTitle>
+          {t('webhookDocs.sendMessagesDescription')}
         </Alert>
 
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              🔐 Autenticação
+              🔐 {t('webhookDocs.authentication')}
             </Typography>
             <Typography paragraph>
-              Para enviar mensagens, você precisa de um token de autenticação válido. 
-              Use o token do usuário proprietário da instância.
+              {t('webhookDocs.authenticationDescription')}
             </Typography>
 
             <CodeBlock 
               code={`Authorization: Bearer SEU_TOKEN_AQUI`}
               language="text"
               id="auth-header"
-              title="Header de Autenticação"
+              title={t('webhookDocs.authenticationHeader')}
             />
           </CardContent>
         </Card>
@@ -689,61 +687,61 @@ app.listen(3500, () => {
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              🔍 Como Obter o Token
+              🔍 {t('webhookDocs.howToGetToken')}
             </Typography>
             <Typography paragraph>
-              Existem várias formas de obter o token de autenticação:
+              {t('webhookDocs.howToGetTokenDescription')}
             </Typography>
 
             <Accordion sx={{ mb: 2 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography><strong>1. Via Interface Web (Recomendado)</strong></Typography>
+                <Typography><strong>{t('webhookDocs.viaWebInterface')}</strong></Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography paragraph>
-                  <strong>Passo a passo:</strong>
+                  <strong>{t('webhookDocs.stepByStep')}:</strong>
                 </Typography>
                 <List dense>
                   <ListItem>
                     <ListItemText 
-                      primary="1. Faça login na interface web"
-                      secondary={`Acesse ${process.env.REACT_APP_FRONTEND_URL || 'http://localhost:3500'}/login`}
+                      primary={t('webhookDocs.step1Login')}
+                      secondary={`${t('webhookDocs.access')} ${process.env.REACT_APP_FRONTEND_URL || 'http://localhost:3500'}/login`}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemText 
-                      primary="2. Abra o DevTools do navegador"
-                      secondary="Pressione F12 ou Ctrl+Shift+I"
+                      primary={t('webhookDocs.step2DevTools')}
+                      secondary={t('webhookDocs.step2DevToolsDescription')}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemText 
-                      primary="3. Vá para a aba 'Application' ou 'Storage'"
-                      secondary={`No Chrome: Application → Local Storage → ${process.env.REACT_APP_FRONTEND_URL || 'http://localhost:3500'}`}
+                      primary={t('webhookDocs.step3Application')}
+                      secondary={`${t('webhookDocs.step3Chrome')}: Application → Local Storage → ${process.env.REACT_APP_FRONTEND_URL || 'http://localhost:3500'}`}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemText 
-                      primary="4. Procure pela chave 'token'"
-                      secondary="Copie o valor do token"
+                      primary={t('webhookDocs.step4Token')}
+                      secondary={t('webhookDocs.step4TokenDescription')}
                     />
                   </ListItem>
                 </List>
                 
                 <Alert severity="info" sx={{ mt: 2 }}>
-                  <AlertTitle>💡 Dica</AlertTitle>
-                  O token fica salvo no localStorage do navegador após o login.
+                  <AlertTitle>💡 {t('webhookDocs.tip')}</AlertTitle>
+                  {t('webhookDocs.tokenSaved')}
                 </Alert>
               </AccordionDetails>
             </Accordion>
 
             <Accordion sx={{ mb: 2 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography><strong>2. Via API de Login</strong></Typography>
+                <Typography><strong>{t('webhookDocs.viaLoginAPI')}</strong></Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography paragraph>
-                  Faça login via API para obter o token programaticamente:
+                  {t('webhookDocs.loginViaAPIDescription')}
                 </Typography>
 
                 <CodeBlock 
@@ -809,18 +807,18 @@ curl -X POST "\${process.env.REACT_APP_API_URL}/api/auth/login" \\
   }'`}
                   language="bash"
                   id="login-curl"
-                  title="Login via cURL"
+                  title={t('webhookDocs.loginViaCurl')}
                 />
               </AccordionDetails>
             </Accordion>
 
             <Accordion sx={{ mb: 2 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography><strong>3. Via Console do Navegador</strong></Typography>
+                <Typography><strong>{t('webhookDocs.viaBrowserConsole')}</strong></Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography paragraph>
-                  Execute este comando no console do navegador (F12 → Console):
+                  {t('webhookDocs.executeInConsole')}
                 </Typography>
 
                 <CodeBlock 
@@ -828,22 +826,22 @@ curl -X POST "\${process.env.REACT_APP_API_URL}/api/auth/login" \\
 console.log('Token:', localStorage.getItem('token'));`}
                   language="javascript"
                   id="console-token"
-                  title="Obter Token via Console"
+                  title={t('webhookDocs.getTokenViaConsole')}
                 />
 
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                  <strong>Resultado:</strong> O token será exibido no console.
+                  <strong>{t('webhookDocs.result')}:</strong> {t('webhookDocs.tokenWillBeDisplayed')}
                 </Typography>
               </AccordionDetails>
             </Accordion>
 
             <Alert severity="warning" sx={{ mt: 2 }}>
-              <AlertTitle>⚠️ Importante</AlertTitle>
+              <AlertTitle>⚠️ {t('webhookDocs.important')}</AlertTitle>
               <Typography variant="body2">
-                • O token expira após um tempo (geralmente 24h)<br/>
-                • Use sempre o token do usuário proprietário da instância<br/>
-                • Mantenha o token seguro e não o compartilhe<br/>
-                • Para produção, use variáveis de ambiente
+                • {t('webhookDocs.tokenExpires')}<br/>
+                • {t('webhookDocs.useInstanceOwnerToken')}<br/>
+                • {t('webhookDocs.keepTokenSecure')}<br/>
+                • {t('webhookDocs.useEnvironmentVariables')}
               </Typography>
             </Alert>
           </CardContent>
@@ -852,27 +850,27 @@ console.log('Token:', localStorage.getItem('token'));`}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              📱 Endpoint de Envio
+              📱 {t('webhookDocs.sendEndpoint')}
             </Typography>
             <Typography paragraph>
-              Use o endpoint abaixo para enviar mensagens através de uma instância específica:
+              {t('webhookDocs.sendEndpointDescription')}
             </Typography>
 
             <CodeBlock 
               code={`POST /api/messages/:instanceName/text`}
               language="text"
               id="send-endpoint"
-              title="Endpoint de Envio"
+              title={t('webhookDocs.sendEndpoint')}
             />
 
             <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-              Parâmetros da URL:
+              {t('webhookDocs.urlParameters')}:
             </Typography>
             <List dense>
               <ListItem>
                 <ListItemText 
                   primary=":instanceName" 
-                  secondary="Nome da instância (ex: teste2)" 
+                  secondary={t('webhookDocs.instanceNameDescription')}
                 />
               </ListItem>
             </List>
@@ -882,10 +880,10 @@ console.log('Token:', localStorage.getItem('token'));`}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              📋 Payload de Envio
+              📋 {t('webhookDocs.sendPayload')}
             </Typography>
             <Typography paragraph>
-              Estrutura do corpo da requisição para envio de mensagens:
+              {t('webhookDocs.sendPayloadDescription')}
             </Typography>
 
             <CodeBlock 
@@ -895,23 +893,23 @@ console.log('Token:', localStorage.getItem('token'));`}
 }`}
               language="json"
               id="send-payload"
-              title="Payload de Envio"
+              title={t('webhookDocs.sendPayload')}
             />
 
             <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-              Campos obrigatórios:
+              {t('webhookDocs.requiredFields')}:
             </Typography>
             <List dense>
               <ListItem>
                 <ListItemText 
                   primary="number" 
-                  secondary="Número do destinatário no formato WhatsApp (ex: 556293557070@s.whatsapp.net)" 
+                  secondary={t('webhookDocs.numberDescription')} 
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
                   primary="text" 
-                  secondary="Conteúdo da mensagem de texto a ser enviada" 
+                  secondary={t('webhookDocs.textDescription')} 
                 />
               </ListItem>
             </List>
@@ -921,10 +919,10 @@ console.log('Token:', localStorage.getItem('token'));`}
         <Card sx={{ mb: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              🎯 Exemplo Prático
+              🎯 {t('webhookDocs.practicalExample')}
             </Typography>
             <Typography paragraph>
-              Exemplo completo de como enviar uma mensagem para a instância "teste2" do usuário "admin@clerky.com.br":
+              {t('webhookDocs.practicalExampleDescription')}
             </Typography>
 
             <CodeBlock 
@@ -1145,13 +1143,12 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
 
       <TabPanel value={activeTab} index={5}>
         <Typography variant="h5" gutterBottom>
-          Movimentação de Cards no Kanban
+          {t('webhookDocs.kanbanCardMovement')}
         </Typography>
         
         <Alert severity="info" sx={{ mb: 3 }}>
-          <AlertTitle>⚡ Atualização em Tempo Real</AlertTitle>
-          Os cards se movem instantaneamente no Kanban quando você usa este webhook. 
-          Não é necessário atualizar a página!
+          <AlertTitle>⚡ {t('webhookDocs.realTimeUpdate')}</AlertTitle>
+          {t('webhookDocs.realTimeUpdateDescription')}
         </Alert>
 
         <Grid container spacing={3}>
@@ -1160,7 +1157,7 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   <SendIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Endpoint
+                  {t('webhookDocs.endpoint')}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 2 }}>
                   <strong>PUT</strong> /api/chats/:instanceName/:chatId/kanban-column
@@ -1168,7 +1165,7 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
                 
                 <Typography variant="h6" gutterBottom>
                   <SecurityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Autenticação
+                  {t('webhookDocs.authentication')}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 2 }}>
                   Header: <code>Authorization: Bearer &lt;token&gt;</code>
@@ -1176,25 +1173,25 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
 
                 <Typography variant="h6" gutterBottom>
                   <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Parâmetros
+                  {t('webhookDocs.parameters')}
                 </Typography>
                 <List dense>
                   <ListItem>
                     <ListItemText 
                       primary="instanceName" 
-                      secondary="Nome da instância (ex: teste2)" 
+                      secondary={t('webhookDocs.instanceNameDescription')} 
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemText 
                       primary="chatId" 
-                      secondary="ID do chat (ex: 556293557070@s.whatsapp.net)" 
+                      secondary={t('webhookDocs.chatIdDescription')} 
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemText 
                       primary="column" 
-                      secondary="Coluna de destino no body JSON" 
+                      secondary={t('webhookDocs.columnDescription')} 
                     />
                   </ListItem>
                 </List>
@@ -1207,28 +1204,28 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   <CheckIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Colunas Válidas
+                  {t('webhookDocs.validColumns')}
                 </Typography>
                 <List dense>
                   <ListItem>
                     <Chip label="novo" size="small" color="primary" sx={{ mr: 1 }} />
-                    <ListItemText primary="Novo Contato" />
+                    <ListItemText primary={t('webhookDocs.newContact')} />
                   </ListItem>
                   <ListItem>
                     <Chip label="andamento" size="small" color="warning" sx={{ mr: 1 }} />
-                    <ListItemText primary="Em Andamento" />
+                    <ListItemText primary={t('webhookDocs.inProgress')} />
                   </ListItem>
                   <ListItem>
                     <Chip label="carrinho" size="small" color="info" sx={{ mr: 1 }} />
-                    <ListItemText primary="Carrinho Abandonado" />
+                    <ListItemText primary={t('webhookDocs.abandonedCart')} />
                   </ListItem>
                   <ListItem>
                     <Chip label="aprovado" size="small" color="success" sx={{ mr: 1 }} />
-                    <ListItemText primary="Aprovado" />
+                    <ListItemText primary={t('webhookDocs.approved')} />
                   </ListItem>
                   <ListItem>
                     <Chip label="reprovado" size="small" color="error" sx={{ mr: 1 }} />
-                    <ListItemText primary="Reprovado" />
+                    <ListItemText primary={t('webhookDocs.rejected')} />
                   </ListItem>
                 </List>
               </CardContent>
@@ -1239,7 +1236,7 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
         <Divider sx={{ my: 3 }} />
 
         <Typography variant="h6" gutterBottom>
-          Exemplos de Uso
+          {t('webhookDocs.usageExamples')}
         </Typography>
 
         <Accordion>
@@ -1381,99 +1378,99 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
         <Card>
           <CardContent>
             <Typography variant="h5" gutterBottom>
-              Integração N8N Nativa
+              {t('webhookDocs.nativeN8nIntegration')}
             </Typography>
             
             <Alert severity="success" sx={{ mb: 3 }}>
-              <AlertTitle>🎉 Nova Funcionalidade!</AlertTitle>
-              Agora você pode configurar integrações N8N diretamente na interface do sistema!
+              <AlertTitle>🎉 {t('webhookDocs.newFeature')}!</AlertTitle>
+              {t('webhookDocs.newFeatureDescription')}
             </Alert>
 
             <Typography variant="h6" gutterBottom>
-              Como Usar:
+              {t('webhookDocs.howToUse')}:
             </Typography>
             
             <List>
               <ListItem>
                 <ListItemText 
-                  primary="1. Acesse /n8n-integration no menu lateral"
-                  secondary="Navegue até a seção de integrações N8N"
+                  primary={t('webhookDocs.step1Access')}
+                  secondary={t('webhookDocs.step1AccessDescription')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
-                  primary="2. Clique em 'Nova Integração'"
-                  secondary="Configure sua primeira integração"
+                  primary={t('webhookDocs.step2Click')}
+                  secondary={t('webhookDocs.step2ClickDescription')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
-                  primary="3. Configure a URL do webhook N8N"
-                  secondary="Ex: https://seu-n8n.com/webhook/abc123"
+                  primary={t('webhookDocs.step3Configure')}
+                  secondary={t('webhookDocs.step3ConfigureDescription')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
-                  primary="4. Selecione os eventos desejados"
-                  secondary="Escolha quais eventos enviar para o N8N"
+                  primary={t('webhookDocs.step4Select')}
+                  secondary={t('webhookDocs.step4SelectDescription')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
-                  primary="5. Teste a integração"
-                  secondary="Use o botão de teste para verificar conectividade"
+                  primary={t('webhookDocs.step5Test')}
+                  secondary={t('webhookDocs.step5TestDescription')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText 
-                  primary="6. Ative quando estiver funcionando"
-                  secondary="Sua integração estará ativa e enviando dados"
+                  primary={t('webhookDocs.step6Activate')}
+                  secondary={t('webhookDocs.step6ActivateDescription')}
                 />
               </ListItem>
             </List>
 
             <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-              Recursos Disponíveis:
+              {t('webhookDocs.availableResources')}:
             </Typography>
             
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    🔧 Configuração Individual
+                    🔧 {t('webhookDocs.individualConfiguration')}
                   </Typography>
                   <Typography variant="body2">
-                    Cada usuário pode ter suas próprias integrações N8N
+                    {t('webhookDocs.individualConfigurationDescription')}
                   </Typography>
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    📡 Eventos Específicos
+                    📡 {t('webhookDocs.specificEvents')}
                   </Typography>
                   <Typography variant="body2">
-                    Escolha exatamente quais eventos enviar
+                    {t('webhookDocs.specificEventsDescription')}
                   </Typography>
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    🎯 Filtros Avançados
+                    🎯 {t('webhookDocs.advancedFilters')}
                   </Typography>
                   <Typography variant="body2">
-                    Configure filtros para controlar os dados enviados
+                    {t('webhookDocs.advancedFiltersDescription')}
                   </Typography>
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    📊 Monitoramento
+                    📊 {t('webhookDocs.monitoring')}
                   </Typography>
                   <Typography variant="body2">
-                    Acompanhe estatísticas e status das integrações
+                    {t('webhookDocs.monitoringDescription')}
                   </Typography>
                 </Paper>
               </Grid>
@@ -1484,7 +1481,7 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
 
       <TabPanel value={activeTab} index={7}>
         <Typography variant="h5" gutterBottom>
-          Troubleshooting
+          {t('webhookDocs.troubleshooting')}
         </Typography>
 
         <Grid container spacing={3}>
@@ -1492,29 +1489,29 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom color="error">
-                  ❌ Problemas Comuns
+                  ❌ {t('webhookDocs.commonProblems')}
                 </Typography>
                 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Webhook não recebe dados</Typography>
+                    <Typography>{t('webhookDocs.webhookNotReceivingData')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      <strong>Possíveis causas:</strong>
+                      <strong>{t('webhookDocs.possibleCauses')}:</strong>
                     </Typography>
                     <List dense>
                       <ListItem>
-                        <ListItemText primary="• URL não é acessível publicamente" />
+                        <ListItemText primary={`• ${t('webhookDocs.urlNotPubliclyAccessible')}`} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="• Integração não está ativa" />
+                        <ListItemText primary={`• ${t('webhookDocs.integrationNotActive')}`} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="• Eventos não estão habilitados" />
+                        <ListItemText primary={`• ${t('webhookDocs.eventsNotEnabled')}`} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="• Firewall bloqueando requisições" />
+                        <ListItemText primary={`• ${t('webhookDocs.firewallBlockingRequests')}`} />
                       </ListItem>
                     </List>
                   </AccordionDetails>
@@ -1522,21 +1519,21 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
 
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Erro 500 no webhook</Typography>
+                    <Typography>{t('webhookDocs.error500InWebhook')}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography variant="body2" paragraph>
-                      <strong>Soluções:</strong>
+                      <strong>{t('webhookDocs.solutions')}:</strong>
                     </Typography>
                     <List dense>
                       <ListItem>
-                        <ListItemText primary="• Verifique logs do seu servidor" />
+                        <ListItemText primary={`• ${t('webhookDocs.checkServerLogs')}`} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="• Valide formato dos dados recebidos" />
+                        <ListItemText primary={`• ${t('webhookDocs.validateDataFormat')}`} />
                       </ListItem>
                       <ListItem>
-                        <ListItemText primary="• Implemente tratamento de erros" />
+                        <ListItemText primary={`• ${t('webhookDocs.implementErrorHandling')}`} />
                       </ListItem>
                     </List>
                   </AccordionDetails>
@@ -1549,36 +1546,36 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom color="success">
-                  ✅ Boas Práticas
+                  ✅ {t('webhookDocs.goodPractices')}
                 </Typography>
                 
                 <List>
                   <ListItem>
                     <ListItemIcon><CheckIcon color="success" /></ListItemIcon>
                     <ListItemText 
-                      primary="Sempre retorne status 200"
-                      secondary="Para confirmar recebimento do webhook"
+                      primary={t('webhookDocs.alwaysReturnStatus200')}
+                      secondary={t('webhookDocs.alwaysReturnStatus200Description')}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon><CheckIcon color="success" /></ListItemIcon>
                     <ListItemText 
-                      primary="Implemente timeout"
-                      secondary="Processe dados de forma assíncrona"
+                      primary={t('webhookDocs.implementTimeout')}
+                      secondary={t('webhookDocs.implementTimeoutDescription')}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon><CheckIcon color="success" /></ListItemIcon>
                     <ListItemText 
-                      primary="Valide dados recebidos"
-                      secondary="Verifique estrutura antes de processar"
+                      primary={t('webhookDocs.validateReceivedData')}
+                      secondary={t('webhookDocs.validateReceivedDataDescription')}
                     />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon><CheckIcon color="success" /></ListItemIcon>
                     <ListItemText 
-                      primary="Use HTTPS"
-                      secondary="Para segurança na transmissão"
+                      primary={t('webhookDocs.useHTTPS')}
+                      secondary={t('webhookDocs.useHTTPSDescription')}
                     />
                   </ListItem>
                 </List>
@@ -1590,11 +1587,11 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
         <Card sx={{ mt: 3 }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              🔍 Debug e Logs
+              🔍 {t('webhookDocs.debugAndLogs')}
             </Typography>
             
             <Typography paragraph>
-              Para debugar problemas, verifique os logs do sistema:
+              {t('webhookDocs.debugAndLogsDescription')}
             </Typography>
 
             <CodeBlock 
