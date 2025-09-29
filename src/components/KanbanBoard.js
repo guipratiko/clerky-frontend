@@ -492,6 +492,11 @@ const KanbanBoard = () => {
             }
           });
           
+          // Garantir que cada coluna mantenha os chats ordenados por lastActivity (mais recentes primeiro)
+          newColumns.forEach(column => {
+            column.chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+          });
+          
           return newColumns;
         });
         
@@ -539,8 +544,11 @@ const KanbanBoard = () => {
           };
           newColumns[0] = {
             ...newColumns[0],
-            chats: [mappedChat, ...newColumns[0].chats]
+            chats: [...newColumns[0].chats, mappedChat]
           };
+          
+          // Ordenar a coluna por lastActivity (mais recentes primeiro)
+          newColumns[0].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
           toast.success('Nova conversa recebida!');
         }
         return newColumns;
@@ -814,13 +822,10 @@ const KanbanBoard = () => {
           }
           
           // Adicionar à nova coluna
-          if (isNewActivity) {
-            // Se houve nova atividade, colocar no topo
-            newColumns[targetColumnIndex].chats.unshift(mappedChat);
-          } else {
-            // Senão, colocar no final
-            newColumns[targetColumnIndex].chats.push(mappedChat);
-          }
+          newColumns[targetColumnIndex].chats.push(mappedChat);
+          
+          // Ordenar a coluna por lastActivity (mais recentes primeiro)
+          newColumns[targetColumnIndex].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
         }
         
         return newColumns;
@@ -868,12 +873,17 @@ const KanbanBoard = () => {
                 lastActivity: message.timestamp
               };
               
-              // Mover para o topo
-              const updatedChat = newColumns[i].chats.splice(chatIndex, 1)[0];
-              newColumns[i].chats.unshift(updatedChat);
+              // Atualizar o chat na posição atual
               updated = true;
               break;
             }
+          }
+          
+          // Ordenar todas as colunas por lastActivity (mais recentes primeiro)
+          if (updated) {
+            newColumns.forEach(column => {
+              column.chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+            });
           }
           
           return updated ? newColumns : prev;
