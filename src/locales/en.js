@@ -359,7 +359,73 @@ export const en = {
     timeout: 'Timeout (ms)',
     integrationActive: 'Integration Active',
     update: 'Update',
-    create: 'Create'
+    create: 'Create',
+    
+    // AI Workflows
+    aiWorkflows: {
+      title: 'AI Workflows',
+      subtitle: 'Create intelligent virtual assistants for automatic customer service',
+      createWorkflow: 'Create AI Workflow',
+      newWorkflow: 'New AI Workflow',
+      editWorkflow: 'Edit AI Workflow',
+      noWorkflows: 'No AI workflows created',
+      createFirstWorkflow: 'Create First Workflow',
+      workflowCreated: 'AI Workflow created successfully!',
+      workflowUpdated: 'AI Workflow updated successfully!',
+      workflowDeleted: 'AI Workflow deleted successfully!',
+      workflowTested: 'Workflow tested successfully!',
+      workflowToggled: 'Workflow {status} successfully!',
+      testFailed: 'Test failed',
+      workflowDeleteError: 'Error deleting workflow',
+      workflowTestError: 'Error testing workflow',
+      workflowToggleError: 'Error changing workflow status',
+      
+      // Interface
+      active: 'Active',
+      inactive: 'Inactive',
+      activate: 'Activate',
+      deactivate: 'Deactivate',
+      lastTest: 'Last Test',
+      messagesProcessed: 'Messages Processed',
+      successRate: 'Success Rate',
+      webhookUrl: 'Webhook URL',
+      n8nUrl: 'N8N URL',
+      
+      // Form
+      prompt: 'Service Prompt',
+      promptPlaceholder: 'Enter the prompt that defines how the assistant should behave...',
+      promptHelp: 'Example: "You are a virtual sales assistant. Always be polite, professional and focused on helping the customer."',
+      promptRequired: 'Prompt is required',
+      promptMaxLength: 'Prompt too long (maximum 2000 characters)',
+      
+      // Statistics
+      stats: {
+        totalMessages: 'Total Messages',
+        successfulResponses: 'Successful Responses',
+        failedResponses: 'Failed Responses',
+        successRate: 'Success Rate',
+        lastMessageAt: 'Last Message',
+        never: 'Never'
+      },
+      
+      // Test
+      testWorkflow: 'Test Workflow',
+      testMessage: 'Test Message',
+      testMessagePlaceholder: 'Enter a message to test the workflow...',
+      testSuccess: 'Test completed successfully!',
+      testError: 'Test error',
+      
+      // Confirmation
+      deleteConfirm: 'Are you sure you want to delete this AI workflow? This action cannot be undone.',
+      deleteConfirmTitle: 'Confirm Deletion',
+      
+      // Status
+      status: {
+        success: 'Success',
+        failed: 'Failed',
+        never: 'Never tested'
+      }
+    }
   },
 
   // Webhook Documentation

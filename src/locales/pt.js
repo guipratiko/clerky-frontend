@@ -359,7 +359,73 @@ export const pt = {
     timeout: 'Timeout (ms)',
     integrationActive: 'Integração Ativa',
     update: 'Atualizar',
-    create: 'Criar'
+    create: 'Criar',
+    
+    // AI Workflows
+    aiWorkflows: {
+      title: 'Workflows de IA',
+      subtitle: 'Crie assistentes virtuais inteligentes para atendimento automático',
+      createWorkflow: 'Criar Workflow de IA',
+      newWorkflow: 'Novo Workflow de IA',
+      editWorkflow: 'Editar Workflow de IA',
+      noWorkflows: 'Nenhum workflow de IA criado',
+      createFirstWorkflow: 'Criar Primeiro Workflow',
+      workflowCreated: 'Workflow de IA criado com sucesso!',
+      workflowUpdated: 'Workflow de IA atualizado com sucesso!',
+      workflowDeleted: 'Workflow de IA deletado com sucesso!',
+      workflowTested: 'Workflow testado com sucesso!',
+      workflowToggled: 'Workflow {status} com sucesso!',
+      testFailed: 'Teste falhou',
+      workflowDeleteError: 'Erro ao deletar workflow',
+      workflowTestError: 'Erro ao testar workflow',
+      workflowToggleError: 'Erro ao alterar status do workflow',
+      
+      // Interface
+      active: 'Ativo',
+      inactive: 'Inativo',
+      activate: 'Ativar',
+      deactivate: 'Desativar',
+      lastTest: 'Último Teste',
+      messagesProcessed: 'Mensagens Processadas',
+      successRate: 'Taxa de Sucesso',
+      webhookUrl: 'URL do Webhook',
+      n8nUrl: 'URL do N8N',
+      
+      // Formulário
+      prompt: 'Prompt de Atendimento',
+      promptPlaceholder: 'Digite o prompt que define como o assistente deve se comportar...',
+      promptHelp: 'Exemplo: "Você é um assistente virtual de vendas. Seja sempre educado, profissional e focado em ajudar o cliente."',
+      promptRequired: 'Prompt é obrigatório',
+      promptMaxLength: 'Prompt muito longo (máximo 2000 caracteres)',
+      
+      // Estatísticas
+      stats: {
+        totalMessages: 'Total de Mensagens',
+        successfulResponses: 'Respostas Bem-sucedidas',
+        failedResponses: 'Respostas com Falha',
+        successRate: 'Taxa de Sucesso',
+        lastMessageAt: 'Última Mensagem',
+        never: 'Nunca'
+      },
+      
+      // Teste
+      testWorkflow: 'Testar Workflow',
+      testMessage: 'Mensagem de Teste',
+      testMessagePlaceholder: 'Digite uma mensagem para testar o workflow...',
+      testSuccess: 'Teste realizado com sucesso!',
+      testError: 'Erro no teste',
+      
+      // Confirmação
+      deleteConfirm: 'Tem certeza que deseja deletar este workflow de IA? Esta ação não pode ser desfeita.',
+      deleteConfirmTitle: 'Confirmar Exclusão',
+      
+      // Status
+      status: {
+        success: 'Sucesso',
+        failed: 'Falhou',
+        never: 'Nunca testado'
+      }
+    }
   },
 
   // Webhook Documentation

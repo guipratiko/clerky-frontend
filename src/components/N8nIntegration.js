@@ -47,7 +47,9 @@ import {
   Warning as WarningIcon,
   // Refresh as RefreshIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as HideIcon
+  VisibilityOff as HideIcon,
+  SmartToy as AIIcon,
+  OpenInNew as OpenIcon
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 import { useI18n } from '../contexts/I18nContext';
@@ -58,7 +60,15 @@ import {
   deleteN8nIntegration,
   testN8nIntegration,
   toggleN8nIntegration,
-  getInstances
+  getInstances,
+  // AI Workflows
+  getAIWorkflows,
+  createAIWorkflow,
+  updateAIWorkflowPrompt,
+  testAIWorkflow,
+  toggleAIWorkflow,
+  deleteAIWorkflow,
+  getAIWorkflowStats
   // getN8nIntegrationStats,
   // testWebhook
 } from '../services/api';
@@ -72,6 +82,16 @@ const N8nIntegration = () => {
   const [editingIntegration, setEditingIntegration] = useState(null);
   const [testingIntegration, setTestingIntegration] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+  
+  // AI Workflows states
+  const [aiWorkflows, setAiWorkflows] = useState([]);
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [editingAIWorkflow, setEditingAIWorkflow] = useState(null);
+  const [testingAIWorkflow, setTestingAIWorkflow] = useState(null);
+  const [aiFormData, setAiFormData] = useState({
+    prompt: ''
+  });
+  
   const [formData, setFormData] = useState({
     instanceName: '',
     webhookUrl: '',
@@ -110,13 +130,15 @@ const N8nIntegration = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [integrationsResponse, instancesResponse] = await Promise.all([
+      const [integrationsResponse, instancesResponse, aiWorkflowsResponse] = await Promise.all([
         getN8nIntegrations(),
-        getInstances()
+        getInstances(),
+        getAIWorkflows()
       ]);
       
       setIntegrations(integrationsResponse.data || []);
       setInstances(instancesResponse.data || []);
+      setAiWorkflows(aiWorkflowsResponse.data || []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       toast.error('Erro ao carregar integrações N8N');
@@ -261,6 +283,106 @@ const N8nIntegration = () => {
     return new Date(dateString).toLocaleString('pt-BR');
   };
 
+  // ===== AI WORKFLOWS FUNCTIONS =====
+
+  const handleOpenAIDialog = (workflow = null) => {
+    if (workflow) {
+      setEditingAIWorkflow(workflow);
+      setAiFormData({
+        prompt: workflow.prompt || ''
+      });
+    } else {
+      setEditingAIWorkflow(null);
+      setAiFormData({
+        prompt: ''
+      });
+    }
+    setAiDialogOpen(true);
+  };
+
+  const handleCloseAIDialog = () => {
+    setAiDialogOpen(false);
+    setEditingAIWorkflow(null);
+  };
+
+  const handleSaveAIWorkflow = async () => {
+    try {
+      if (editingAIWorkflow) {
+        await updateAIWorkflowPrompt(editingAIWorkflow._id, aiFormData.prompt);
+        toast.success(t('n8nIntegration.aiWorkflows.workflowUpdated'));
+      } else {
+        await createAIWorkflow({ prompt: aiFormData.prompt });
+        toast.success(t('n8nIntegration.aiWorkflows.workflowCreated'));
+      }
+      
+      handleCloseAIDialog();
+      loadData();
+    } catch (error) {
+      console.error('Erro ao salvar workflow de IA:', error);
+      toast.error(error.response?.data?.error || 'Erro ao salvar workflow');
+    }
+  };
+
+  const handleDeleteAIWorkflow = async (workflowId) => {
+    if (window.confirm(t('n8nIntegration.aiWorkflows.deleteConfirm'))) {
+      try {
+        await deleteAIWorkflow(workflowId);
+        toast.success(t('n8nIntegration.aiWorkflows.workflowDeleted'));
+        loadData();
+      } catch (error) {
+        console.error('Erro ao deletar workflow:', error);
+        toast.error(t('n8nIntegration.aiWorkflows.workflowDeleteError'));
+      }
+    }
+  };
+
+  const handleTestAIWorkflow = async (workflowId) => {
+    try {
+      setTestingAIWorkflow(workflowId);
+      const result = await testAIWorkflow(workflowId, t('n8nIntegration.aiWorkflows.testMessage'));
+      
+      if (result.data.success) {
+        toast.success(t('n8nIntegration.aiWorkflows.workflowTested'));
+      } else {
+        toast.error(`${t('n8nIntegration.aiWorkflows.testFailed')}: ${result.data.error}`);
+      }
+      
+      loadData();
+    } catch (error) {
+      console.error('Erro ao testar workflow:', error);
+      toast.error(t('n8nIntegration.aiWorkflows.workflowTestError'));
+    } finally {
+      setTestingAIWorkflow(null);
+    }
+  };
+
+  const handleToggleAIWorkflow = async (workflowId, isActive) => {
+    try {
+      await toggleAIWorkflow(workflowId, isActive);
+      toast.success(t('n8nIntegration.aiWorkflows.workflowToggled', { 
+        status: isActive ? t('n8nIntegration.aiWorkflows.activated') : t('n8nIntegration.aiWorkflows.deactivated') 
+      }));
+      loadData();
+    } catch (error) {
+      console.error('Erro ao alterar status:', error);
+      toast.error(t('n8nIntegration.aiWorkflows.workflowToggleError'));
+    }
+  };
+
+  const getAIStatusColor = (workflow) => {
+    if (!workflow.isActive) return 'default';
+    if (workflow.lastTestStatus === 'success') return 'success';
+    if (workflow.lastTestStatus === 'failed') return 'error';
+    return 'warning';
+  };
+
+  const getAIStatusIcon = (workflow) => {
+    if (!workflow.isActive) return <HideIcon />;
+    if (workflow.lastTestStatus === 'success') return <SuccessIcon />;
+    if (workflow.lastTestStatus === 'failed') return <ErrorIcon />;
+    return <WarningIcon />;
+  };
+
   const TabPanel = ({ children, value, index, ...other }) => (
     <div
       role="tabpanel"
@@ -287,16 +409,44 @@ const N8nIntegration = () => {
         <Typography variant="h4" component="h1">
           {t('n8nIntegration.title')}
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          {t('n8nIntegration.addIntegration')}
-        </Button>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="contained"
+            startIcon={<AIIcon />}
+            onClick={() => handleOpenAIDialog()}
+            color="secondary"
+          >
+            {t('n8nIntegration.aiWorkflows.createWorkflow')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+          >
+            {t('n8nIntegration.addIntegration')}
+          </Button>
+        </Box>
       </Box>
 
-      {integrations.length === 0 ? (
+      {/* Tabs para alternar entre Integrações N8N e AI Workflows */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+          <Tab 
+            label={t('n8nIntegration.title')} 
+            icon={<WebhookIcon />} 
+            iconPosition="start"
+          />
+          <Tab 
+            label={t('n8nIntegration.aiWorkflows.title')} 
+            icon={<AIIcon />} 
+            iconPosition="start"
+          />
+        </Tabs>
+      </Box>
+
+      {/* Tab Panel para Integrações N8N */}
+      <TabPanel value={activeTab} index={0}>
+        {integrations.length === 0 ? (
         <Card>
           <CardContent sx={{ textAlign: 'center', py: 6 }}>
             <WebhookIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
@@ -418,7 +568,132 @@ const N8nIntegration = () => {
             </Grid>
           ))}
         </Grid>
-      )}
+        )}
+      </TabPanel>
+
+      {/* Tab Panel para AI Workflows */}
+      <TabPanel value={activeTab} index={1}>
+        {aiWorkflows.length === 0 ? (
+          <Card>
+            <CardContent sx={{ textAlign: 'center', py: 6 }}>
+              <AIIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" gutterBottom>
+                {t('n8nIntegration.aiWorkflows.noWorkflows')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" mb={3}>
+                {t('n8nIntegration.aiWorkflows.subtitle')}
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<AIIcon />}
+                onClick={() => handleOpenAIDialog()}
+                color="secondary"
+              >
+                {t('n8nIntegration.aiWorkflows.createFirstWorkflow')}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Grid container spacing={3}>
+            {aiWorkflows.map((workflow) => (
+              <Grid item xs={12} md={6} lg={4} key={workflow._id}>
+                <Card sx={{ height: '100%' }}>
+                  <CardContent>
+                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                      <Typography variant="h6" component="h2">
+                        {workflow.workflowName}
+                      </Typography>
+                      <Box display="flex" gap={1}>
+                        <Tooltip title={workflow.isActive ? t('n8nIntegration.aiWorkflows.deactivate') : t('n8nIntegration.aiWorkflows.activate')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleToggleAIWorkflow(workflow._id, !workflow.isActive)}
+                          >
+                            {workflow.isActive ? <VisibilityIcon /> : <HideIcon />}
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Editar Prompt">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenAIDialog(workflow)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('n8nIntegration.aiWorkflows.testWorkflow')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleTestAIWorkflow(workflow._id)}
+                            disabled={testingAIWorkflow === workflow._id}
+                          >
+                            {testingAIWorkflow === workflow._id ? (
+                              <CircularProgress size={20} />
+                            ) : (
+                              <TestIcon />
+                            )}
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Abrir no N8N">
+                          <IconButton
+                            size="small"
+                            onClick={() => window.open(workflow.n8nUrl, '_blank')}
+                          >
+                            <OpenIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('n8nIntegration.delete')}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteAIWorkflow(workflow._id)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+
+                    <Box mb={2}>
+                      <Chip
+                        icon={getAIStatusIcon(workflow)}
+                        label={workflow.isActive ? t('n8nIntegration.aiWorkflows.active') : t('n8nIntegration.aiWorkflows.inactive')}
+                        color={getAIStatusColor(workflow)}
+                        size="small"
+                      />
+                    </Box>
+
+                    <Typography variant="body2" color="text.secondary" mb={1}>
+                      <strong>{t('n8nIntegration.aiWorkflows.webhookUrl')}:</strong> {workflow.webhookUrl}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary" mb={1}>
+                      <strong>{t('n8nIntegration.aiWorkflows.lastTest')}:</strong> {formatDate(workflow.lastTest)}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary" mb={2}>
+                      <strong>{t('n8nIntegration.aiWorkflows.messagesProcessed')}:</strong> {workflow.stats?.totalMessages || 0}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary" mb={1}>
+                      <strong>Prompt:</strong>
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ 
+                      maxHeight: '60px', 
+                      overflow: 'hidden', 
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {workflow.prompt || 'Nenhum prompt configurado'}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </TabPanel>
 
       {/* Dialog de Criação/Edição */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
@@ -662,6 +937,36 @@ const N8nIntegration = () => {
           <Button onClick={handleCloseDialog}>{t('n8nIntegration.cancel')}</Button>
           <Button onClick={handleSave} variant="contained">
             {editingIntegration ? t('n8nIntegration.update') : t('n8nIntegration.create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog de Criação/Edição AI Workflow */}
+      <Dialog open={aiDialogOpen} onClose={handleCloseAIDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {editingAIWorkflow ? t('n8nIntegration.aiWorkflows.editWorkflow') : t('n8nIntegration.aiWorkflows.newWorkflow')}
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                label={t('n8nIntegration.aiWorkflows.prompt')}
+                value={aiFormData.prompt}
+                onChange={(e) => setAiFormData({ ...aiFormData, prompt: e.target.value })}
+                placeholder={t('n8nIntegration.aiWorkflows.promptPlaceholder')}
+                helperText={t('n8nIntegration.aiWorkflows.promptHelp')}
+                required
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAIDialog}>{t('n8nIntegration.cancel')}</Button>
+          <Button onClick={handleSaveAIWorkflow} variant="contained" color="secondary">
+            {editingAIWorkflow ? t('n8nIntegration.update') : t('n8nIntegration.aiWorkflows.createWorkflow')}
           </Button>
         </DialogActions>
       </Dialog>
