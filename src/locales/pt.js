@@ -489,7 +489,7 @@ export const pt = {
     sendMessagesViaAPI: 'Envio de Mensagens via API',
     sendMessages: 'Envio de Mensagens',
     sendMessagesDescription: 'Você pode enviar mensagens através de instâncias específicas de usuários usando nossa API REST.',
-    authentication: 'Autenticação',
+    apiAuthentication: 'Autenticação',
     authenticationDescription: 'Para enviar mensagens, você precisa de um token de autenticação válido. Use o token do usuário proprietário da instância.',
     authenticationHeader: 'Header de Autenticação',
     howToGetToken: 'Como Obter o Token',
@@ -605,7 +605,7 @@ export const pt = {
     monitoring: 'Monitoramento',
     monitoringDescription: 'Acompanhe estatísticas e status das integrações',
     // Troubleshooting (Added)
-    troubleshooting: 'Troubleshooting',
+    troubleshootingSection: 'Troubleshooting',
     commonProblems: 'Problemas Comuns',
     webhookNotReceivingData: 'Webhook não recebe dados',
     possibleCauses: 'Possíveis causas',

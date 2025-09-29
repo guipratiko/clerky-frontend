@@ -67,8 +67,7 @@ import {
   updateAIWorkflowPrompt,
   testAIWorkflow,
   toggleAIWorkflow,
-  deleteAIWorkflow,
-  getAIWorkflowStats
+  deleteAIWorkflow
   // getN8nIntegrationStats,
   // testWebhook
 } from '../services/api';

@@ -489,7 +489,7 @@ export const en = {
     sendMessagesViaAPI: 'Send Messages via API',
     sendMessages: 'Send Messages',
     sendMessagesDescription: 'You can send messages through specific user instances using our REST API.',
-    authentication: 'Authentication',
+    apiAuthentication: 'Authentication',
     authenticationDescription: 'To send messages, you need a valid authentication token. Use the token of the instance owner user.',
     authenticationHeader: 'Authentication Header',
     howToGetToken: 'How to Get the Token',
@@ -605,7 +605,7 @@ export const en = {
     monitoring: 'Monitoring',
     monitoringDescription: 'Track statistics and status of integrations',
     // Troubleshooting (Added)
-    troubleshooting: 'Troubleshooting',
+    troubleshootingSection: 'Troubleshooting',
     commonProblems: 'Common Problems',
     webhookNotReceivingData: 'Webhook does not receive data',
     possibleCauses: 'Possible causes',
