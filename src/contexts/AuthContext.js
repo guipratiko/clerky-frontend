@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useToastMessages } from '../hooks/useToastMessages';
 
 const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const toastMessages = useToastMessages();
 
   // Configurar axios com token
   // Interceptor já configurado no api.js
@@ -53,10 +55,10 @@ export const AuthProvider = ({ children }) => {
       setToken(userToken);
       localStorage.setItem('token', userToken);
       
-      toast.success('Login realizado com sucesso!');
+      toast.success(toastMessages.loginSuccess);
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Erro ao fazer login';
+      const errorMessage = error.response?.data?.error || toastMessages.loginError;
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -77,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       toast.success(response.data.message);
       return { success: true, message: response.data.message };
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Erro ao fazer registro';
+      const errorMessage = error.response?.data?.error || toastMessages.registerError;
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
-    toast.success('Logout realizado com sucesso!');
+    toast.success(toastMessages.logoutSuccess);
   };
 
   // Verificar se é admin

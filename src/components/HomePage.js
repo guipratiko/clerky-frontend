@@ -26,55 +26,57 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useInstance } from '../contexts/InstanceContext';
+import { useI18n } from '../contexts/I18nContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { instances } = useInstance();
+  const { t } = useI18n();
 
   const features = [
     {
       icon: <WhatsAppIcon sx={{ fontSize: 40, color: '#00a884' }} />,
-      title: 'Conexões WhatsApp',
-      description: 'Gerencie múltiplas instâncias do WhatsApp Business de forma centralizada',
+      title: t('home.features.whatsappConnections.title'),
+      description: t('home.features.whatsappConnections.description'),
       color: 'linear-gradient(135deg, #00a884 0%, #008069 100%)'
     },
     {
       icon: <DashboardIcon sx={{ fontSize: 40, color: '#667eea' }} />,
-      title: 'Dashboard Avançado',
-      description: 'Monitore métricas, estatísticas e performance em tempo real',
+      title: t('home.features.advancedDashboard.title'),
+      description: t('home.features.advancedDashboard.description'),
       color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     },
     {
       icon: <BusinessIcon sx={{ fontSize: 40, color: '#f093fb' }} />,
-      title: 'CRM Integrado',
-      description: 'Sistema Kanban para gestão de leads e pipeline de vendas',
+      title: t('home.features.integratedCrm.title'),
+      description: t('home.features.integratedCrm.description'),
       color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
     {
       icon: <SpeedIcon sx={{ fontSize: 40, color: '#4facfe' }} />,
-      title: 'Alta Performance',
-      description: 'Processamento rápido de mensagens com WebSocket em tempo real',
+      title: t('home.features.highPerformance.title'),
+      description: t('home.features.highPerformance.description'),
       color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
     },
     {
       icon: <SecurityIcon sx={{ fontSize: 40, color: '#43e97b' }} />,
-      title: 'Segurança',
-      description: 'Conexões seguras e dados protegidos com criptografia avançada',
+      title: t('home.features.security.title'),
+      description: t('home.features.security.description'),
       color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
     },
     {
       icon: <SupportIcon sx={{ fontSize: 40, color: '#fa709a' }} />,
-      title: 'Suporte 24/7',
-      description: 'Assistência técnica completa e documentação detalhada',
+      title: t('home.features.support247.title'),
+      description: t('home.features.support247.description'),
       color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
     }
   ];
 
   const stats = [
-    { label: 'Instâncias Ativas', value: instances.filter(i => i.status === 'connected').length, color: '#00a884' },
-    { label: 'Total de Instâncias', value: instances.length, color: '#667eea' },
-    { label: 'Desconectadas', value: instances.filter(i => i.status === 'disconnected').length, color: '#f44336' },
-    { label: 'Conectando', value: instances.filter(i => i.status === 'connecting').length, color: '#ff9800' }
+    { label: t('home.stats.activeInstances'), value: instances.filter(i => i.status === 'connected').length, color: '#00a884' },
+    { label: t('home.stats.totalInstances'), value: instances.length, color: '#667eea' },
+    { label: t('home.stats.disconnected'), value: instances.filter(i => i.status === 'disconnected').length, color: '#f44336' },
+    { label: t('home.stats.connecting'), value: instances.filter(i => i.status === 'connecting').length, color: '#ff9800' }
   ];
 
   const handleNavigateToInstances = () => {
@@ -139,7 +141,7 @@ const HomePage = () => {
                 fontSize: { xs: '2.5rem', md: '3.5rem' }
               }}
             >
-              Gerenciador de Conexões
+              {t('home.title')}
             </Typography>
             
             <Typography 
@@ -152,8 +154,7 @@ const HomePage = () => {
                 lineHeight: 1.6
               }}
             >
-              Plataforma completa para gerenciamento de múltiplas instâncias WhatsApp Business
-              com Evolution API
+              {t('home.subtitle')}
             </Typography>
 
             <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -181,7 +182,7 @@ const HomePage = () => {
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               >
-                Gerenciar Conexões
+                {t('home.manageConnections')}
               </Button>
 
               {instances.length > 0 && (
@@ -207,7 +208,7 @@ const HomePage = () => {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
-                  Abrir Chat
+                  {t('home.openChat')}
                 </Button>
               )}
             </Box>
@@ -269,7 +270,7 @@ const HomePage = () => {
                 mb: 2
               }}
             >
-              Recursos Principais
+              {t('home.mainFeatures')}
             </Typography>
             <Typography 
               variant="body1" 
@@ -281,8 +282,7 @@ const HomePage = () => {
                 mx: 'auto'
               }}
             >
-              Descubra todas as funcionalidades que fazem desta plataforma a melhor escolha
-              para seu negócio
+              {t('home.featuresDescription')}
             </Typography>
 
             <Grid container spacing={4}>
@@ -371,7 +371,7 @@ const HomePage = () => {
                   mb: 4
                 }}
               >
-                Acesso Rápido às Instâncias
+                {t('home.quickAccess')}
               </Typography>
               
               <Grid container spacing={3} justifyContent="center">
@@ -413,8 +413,8 @@ const HomePage = () => {
                           </Typography>
                           <Chip
                             size="small"
-                            label={instance.status === 'connected' ? 'Conectado' : 
-                                   instance.status === 'connecting' ? 'Conectando' : 'Desconectado'}
+                            label={instance.status === 'connected' ? t('whatsapp.connected') : 
+                                   instance.status === 'connecting' ? t('whatsapp.connecting') : t('whatsapp.disconnected')}
                             color={instance.status === 'connected' ? 'success' : 
                                    instance.status === 'connecting' ? 'warning' : 'error'}
                             sx={{ fontSize: '0.7rem' }}

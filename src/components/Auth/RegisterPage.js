@@ -23,6 +23,8 @@ import {
   CheckCircle
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '../../contexts/I18nContext';
+import LanguageSelector from '../LanguageSelector';
 import { Link as RouterLink } from 'react-router-dom';
 
 const RegisterPage = () => {
@@ -38,6 +40,7 @@ const RegisterPage = () => {
   const [success, setSuccess] = useState(false);
   
   const { register, loading } = useAuth();
+  const { t } = useI18n();
 
   const handleChange = (e) => {
     setFormData({
@@ -49,32 +52,32 @@ const RegisterPage = () => {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      setError('Nome é obrigatório');
+      setError(t('auth.nameRequired'));
       return false;
     }
 
     if (!formData.email.trim()) {
-      setError('Email é obrigatório');
+      setError(t('auth.emailRequired'));
       return false;
     }
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Email inválido');
+      setError(t('auth.emailInvalid'));
       return false;
     }
 
     if (!formData.password) {
-      setError('Senha é obrigatória');
+      setError(t('auth.passwordRequired'));
       return false;
     }
 
     if (formData.password.length < 6) {
-      setError('Senha deve ter pelo menos 6 caracteres');
+      setError(t('auth.passwordMinLength'));
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Senhas não coincidem');
+      setError(t('auth.passwordsNotMatch'));
       return false;
     }
 
@@ -127,10 +130,10 @@ const RegisterPage = () => {
   const getPasswordStrengthText = () => {
     const strength = getPasswordStrength();
     if (strength === 0) return '';
-    if (strength <= 25) return 'Fraca';
-    if (strength <= 50) return 'Regular';
-    if (strength <= 75) return 'Boa';
-    return 'Forte';
+    if (strength <= 25) return t('auth.passwordWeak');
+    if (strength <= 50) return t('auth.passwordRegular');
+    if (strength <= 75) return t('auth.passwordGood');
+    return t('auth.passwordStrong');
   };
 
   const getPasswordStrengthColor = () => {
@@ -154,6 +157,11 @@ const RegisterPage = () => {
         }}
       >
         <Container maxWidth="sm">
+          {/* Language Selector */}
+          <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+            <LanguageSelector />
+          </Box>
+          
           <Paper
             elevation={24}
             sx={{
@@ -179,7 +187,7 @@ const RegisterPage = () => {
               sx={{ color: '#fff', mb: 2 }}
               gutterBottom
             >
-              Registro Realizado!
+              {t('auth.registerSuccess')}
             </Typography>
             <Typography 
               variant="h6" 

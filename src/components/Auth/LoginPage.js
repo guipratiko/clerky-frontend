@@ -19,6 +19,8 @@ import {
   Lock
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '../../contexts/I18nContext';
+import LanguageSelector from '../LanguageSelector';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -30,6 +32,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   
   const { login, loading } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,7 +47,7 @@ const LoginPage = () => {
     e.preventDefault();
     
     if (!formData.email || !formData.password) {
-      setError('Todos os campos são obrigatórios');
+      setError(t('auth.allFieldsRequired'));
       return;
     }
 
@@ -73,6 +76,11 @@ const LoginPage = () => {
       }}
     >
       <Container maxWidth="sm">
+        {/* Language Selector */}
+        <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+          <LanguageSelector />
+        </Box>
+        
         <Paper
           elevation={24}
           sx={{
@@ -105,7 +113,7 @@ const LoginPage = () => {
               variant="body2" 
               sx={{ color: 'rgba(255,255,255,0.6)' }}
             >
-              Faça login para acessar sua conta
+              {t('auth.loginTitle')}
             </Typography>
           </Box>
 
@@ -131,7 +139,7 @@ const LoginPage = () => {
             <TextField
               fullWidth
               name="email"
-              label="Email"
+              label={t('auth.email')}
               type="email"
               value={formData.email}
               onChange={handleChange}
@@ -171,7 +179,7 @@ const LoginPage = () => {
             <TextField
               fullWidth
               name="password"
-              label="Senha"
+              label={t('auth.password')}
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={handleChange}
@@ -246,7 +254,7 @@ const LoginPage = () => {
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                'Entrar'
+                t('auth.login')
               )}
             </Button>
           </form>
@@ -254,7 +262,7 @@ const LoginPage = () => {
           {/* Footer */}
           <Box textAlign="center" mt={3}>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-              Não tem uma conta?{' '}
+              {t('auth.noAccount')}{' '}
               <Link
                 component={RouterLink}
                 to="/register"
@@ -269,12 +277,12 @@ const LoginPage = () => {
                   transition: 'color 0.3s ease'
                 }}
               >
-                Registre-se aqui
+                {t('auth.registerHere')}
               </Link>
             </Typography>
             
             <Typography variant="caption" display="block" mt={2} sx={{ color: 'rgba(255,255,255,0.4)' }}>
-              Sistema seguro com aprovação administrativa
+              {t('auth.secureSystem')}
             </Typography>
           </Box>
         </Paper>

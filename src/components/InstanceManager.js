@@ -38,12 +38,14 @@ import {
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useI18n } from '../contexts/I18nContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const InstanceManager = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { t } = useI18n();
   const { 
     instances, 
     loading, 
@@ -295,7 +297,7 @@ const InstanceManager = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <WhatsAppIcon sx={{ fontSize: 32, color: '#00a884' }} />
           <Typography variant="h4" sx={{ color: '#e9edef', fontWeight: 'bold' }}>
-            Gerenciador de Conexões
+            {t('instanceManager.title')}
           </Typography>
         </Box>
         
@@ -312,7 +314,7 @@ const InstanceManager = () => {
             onClick={loadInstances}
             disabled={loading}
           >
-            Atualizar
+            {t('instanceManager.refresh')}
           </Button>
           
           <Button
@@ -321,7 +323,7 @@ const InstanceManager = () => {
             onClick={() => setCreateDialogOpen(true)}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            Nova Instância
+            {t('instanceManager.addInstance')}
           </Button>
         </Box>
       </Box>
@@ -527,10 +529,10 @@ const InstanceManager = () => {
         >
           <WhatsAppIcon sx={{ fontSize: 64, color: '#8696a0', mb: 2 }} />
           <Typography variant="h5" sx={{ color: '#e9edef', mb: 1 }}>
-            Nenhuma instância encontrada
+            {t('instanceManager.noInstances')}
           </Typography>
           <Typography variant="body1" sx={{ color: '#8696a0', mb: 3 }}>
-            Crie sua primeira instância para começar
+            {t('instanceManager.createFirstInstance')}
           </Typography>
           <Button
             variant="contained"
@@ -538,7 +540,7 @@ const InstanceManager = () => {
             onClick={() => setCreateDialogOpen(true)}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            Criar Instância
+            {t('instanceManager.createInstance')}
           </Button>
         </Box>
       )}
@@ -553,7 +555,7 @@ const InstanceManager = () => {
           sx: { background: '#202c33', color: '#e9edef' }
         }}
       >
-        <DialogTitle>Criar Nova Instância</DialogTitle>
+        <DialogTitle>{t('instanceManager.createInstance')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ color: '#8696a0', mb: 2 }}>
             O nome da instância será gerado automaticamente (7 caracteres aleatórios).
@@ -621,7 +623,7 @@ const InstanceManager = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateDialogOpen(false)}>
-            Cancelar
+            {t('instanceManager.cancel')}
           </Button>
           <Button
             onClick={handleCreateInstance}
@@ -652,7 +654,7 @@ const InstanceManager = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
             <WhatsAppIcon sx={{ color: '#00a884', fontSize: 32 }} />
             <Typography variant="h5" component="span">
-              Conectar Instância
+              {t('instanceManager.connect')}
             </Typography>
           </Box>
         </DialogTitle>

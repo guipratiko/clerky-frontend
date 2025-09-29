@@ -38,6 +38,8 @@ import {
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useInstance } from '../../contexts/InstanceContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '../../contexts/I18nContext';
+import LanguageSelector from '../LanguageSelector';
 
 const DRAWER_WIDTH = 280;
 const DRAWER_WIDTH_COLLAPSED = 64;
@@ -50,73 +52,74 @@ const Sidebar = () => {
   const { instanceName } = useParams();
   const { getInstance } = useInstance();
   const { user, logout, isAdmin } = useAuth();
+  const { t } = useI18n();
   
   const currentInstance = instanceName ? getInstance(instanceName) : null;
 
   const menuItems = [
     {
-      text: 'Início',
+      text: t('nav.home'),
       icon: <HomeIcon />,
       path: '/',
       description: 'Página inicial do sistema'
     },
     {
-      text: 'Gerenciador de Conexões',
+      text: t('nav.instances'),
       icon: <BusinessIcon />,
       path: '/instances',
       description: 'Gerenciar conexões WhatsApp'
     },
     {
-      text: 'Disparo em Massa',
+      text: t('nav.campaigns'),
       icon: <SendIcon />,
       path: '/mass-dispatch',
       description: 'Envio de mensagens em massa'
     },
     {
-      text: 'Integração N8N',
+      text: t('nav.webhooks'),
       icon: <WebhookIcon />,
       path: '/n8n-integration',
       description: 'Configurar integrações com N8N'
     },
     {
-      text: 'Documentação Webhooks',
+      text: t('nav.documentation'),
       icon: <DocsIcon />,
       path: '/webhook-docs',
       description: 'Guia completo de integração via webhooks'
     },
     ...(isAdmin() ? [{
-      text: 'Painel Admin',
+      text: t('nav.admin'),
       icon: <AdminIcon />,
       path: '/admin',
       description: 'Gerenciar usuários e aprovações'
     }] : []),
     ...(instanceName ? [
       {
-        text: 'Dashboard',
+        text: t('nav.dashboard'),
         icon: <DashboardIcon />,
         path: `/dashboard/${instanceName}`,
         description: 'Visão geral e métricas'
       },
       {
-        text: 'Chat WhatsApp',
+        text: t('nav.chat'),
         icon: <ChatIcon />,
         path: `/chat/${instanceName}`,
         description: 'Conversas do WhatsApp'
       },
       {
-        text: 'CRM Kanban',
+        text: t('nav.kanban'),
         icon: <KanbanIcon />,
         path: `/crm/${instanceName}`,
         description: 'Gerenciamento de leads'
       },
       {
-        text: 'Contatos',
+        text: t('nav.contacts'),
         icon: <PeopleIcon />,
         path: `/contacts/${instanceName}`,
         description: 'Lista de contatos'
       },
       {
-        text: 'Campanhas',
+        text: t('nav.campaigns'),
         icon: <CampaignIcon />,
         path: `/campaigns/${instanceName}`,
         description: 'Disparos em massa'
@@ -396,9 +399,20 @@ const Sidebar = () => {
               mt: 1
             }}
           >
-            Clerky CRM v1.0
+            {t('app.name')}
           </Typography>
         )}
+        
+        {/* Language Selector */}
+        <Box sx={{ 
+          p: 2, 
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <LanguageSelector />
+        </Box>
       </Box>
     </Box>
   );

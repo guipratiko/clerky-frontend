@@ -3,6 +3,7 @@ import { Box, Grid, Typography, Chip } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../contexts/SocketContext';
 import { useInstance } from '../contexts/InstanceContext';
+import { useI18n } from '../contexts/I18nContext';
 import ChatList from './ChatList';
 import ChatWindow from './ChatWindow';
 import WelcomeScreen from './WelcomeScreen';
@@ -11,6 +12,7 @@ const WhatsAppMain = () => {
   const { instanceName } = useParams();
   const { joinInstance, connected } = useSocket();
   const { getInstance } = useInstance();
+  const { t } = useI18n();
   const [selectedChat, setSelectedChat] = useState(null);
   const [instance, setInstance] = useState(null);
 
@@ -41,7 +43,7 @@ const WhatsAppMain = () => {
         background: '#111b21'
       }}>
         <Typography variant="h6" sx={{ color: '#e9edef' }}>
-          Carregando instância...
+          {t('whatsapp.loadingInstance')}
         </Typography>
       </Box>
     );
@@ -60,11 +62,11 @@ const WhatsAppMain = () => {
         gap: 2
       }}>
         <Typography variant="h6" sx={{ color: '#e9edef', flex: 1 }}>
-          WhatsApp Web
+          {t('whatsapp.title')}
         </Typography>
         
         <Chip
-          label={instance.status === 'connected' ? 'Conectado' : 'Desconectado'}
+          label={instance.status === 'connected' ? t('whatsapp.connected') : t('whatsapp.disconnected')}
           color={instance.status === 'connected' ? 'success' : 'error'}
           size="small"
         />
