@@ -50,6 +50,7 @@ import {
   VisibilityOff as HideIcon
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
+import { useI18n } from '../contexts/I18nContext';
 import {
   getN8nIntegrations,
   createN8nIntegration,
@@ -63,6 +64,7 @@ import {
 } from '../services/api';
 
 const N8nIntegration = () => {
+  const { t } = useI18n();
   const [integrations, setIntegrations] = useState([]);
   const [instances, setInstances] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,7 +199,7 @@ const N8nIntegration = () => {
     if (window.confirm('Tem certeza que deseja deletar esta integração?')) {
       try {
         await deleteN8nIntegration(integrationId);
-        toast.success('Integração N8N deletada com sucesso!');
+        toast.success(t('n8nIntegration.integrationDeleted'));
         loadData();
       } catch (error) {
         console.error('Erro ao deletar integração:', error);
@@ -215,9 +217,9 @@ const N8nIntegration = () => {
       });
       
       if (result.data.success) {
-        toast.success('Teste realizado com sucesso!');
+        toast.success(t('n8nIntegration.integrationTested'));
       } else {
-        toast.error(`Teste falhou: ${result.data.error}`);
+        toast.error(`${t('n8nIntegration.testFailed')}: ${result.data.error}`);
       }
       
       loadData(); // Recarregar para atualizar estatísticas
@@ -299,17 +301,17 @@ const N8nIntegration = () => {
           <CardContent sx={{ textAlign: 'center', py: 6 }}>
             <WebhookIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              Nenhuma integração N8N configurada
+              {t('n8nIntegration.noIntegrations')}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
-              Configure integrações com N8N para automatizar seus workflows
+              {t('n8nIntegration.subtitle')}
             </Typography>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog()}
             >
-              Criar Primeira Integração
+              {t('n8nIntegration.createFirstIntegration')}
             </Button>
           </CardContent>
         </Card>
@@ -421,15 +423,15 @@ const N8nIntegration = () => {
       {/* Dialog de Criação/Edição */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>
-          {editingIntegration ? 'Editar Integração N8N' : 'Nova Integração N8N'}
+          {editingIntegration ? t('n8nIntegration.editIntegration') : t('n8nIntegration.newIntegration')}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
-              <Tab label="Configuração Básica" />
-              <Tab label="Eventos" />
-              <Tab label="Filtros" />
-              <Tab label="Configurações Avançadas" />
+              <Tab label={t('n8nIntegration.tabs.basic')} />
+              <Tab label={t('n8nIntegration.tabs.events')} />
+              <Tab label={t('n8nIntegration.tabs.filters')} />
+              <Tab label={t('n8nIntegration.tabs.advanced')} />
             </Tabs>
           </Box>
 

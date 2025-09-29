@@ -169,26 +169,59 @@ export const pt = {
     createFirstInstance: 'Crie sua primeira instância para começar'
   },
 
-  // Mass Dispatch
-  massDispatch: {
-    title: 'Disparo em Massa',
-    subtitle: 'Envie mensagens para múltiplos contatos',
-    selectInstance: 'Selecionar Instância',
-    message: 'Mensagem',
-    contacts: 'Contatos',
-    addContact: 'Adicionar Contato',
-    removeContact: 'Remover Contato',
-    sendMessage: 'Enviar Mensagem',
-    sending: 'Enviando...',
-    sent: 'Enviado',
-    failed: 'Falhou',
-    totalContacts: 'Total de Contatos',
-    successRate: 'Taxa de Sucesso',
-    messageSent: 'Mensagem enviada com sucesso!',
-    messageFailed: 'Falha ao enviar mensagem',
-    noContacts: 'Nenhum contato adicionado',
-    addAtLeastOneContact: 'Adicione pelo menos um contato'
-  },
+    // Mass Dispatch
+    massDispatch: {
+      title: 'Disparo em Massa',
+      subtitle: 'Envie mensagens para múltiplos contatos',
+      selectInstance: 'Selecionar Instância',
+      message: 'Mensagem',
+      contacts: 'Contatos',
+      addContact: 'Adicionar Contato',
+      removeContact: 'Remover Contato',
+      sendMessage: 'Enviar Mensagem',
+      sending: 'Enviando...',
+      sent: 'Enviado',
+      failed: 'Falhou',
+      totalContacts: 'Total de Contatos',
+      successRate: 'Taxa de Sucesso',
+      messageSent: 'Mensagem enviada com sucesso!',
+      messageFailed: 'Falha ao enviar mensagem',
+      noContacts: 'Nenhum contato adicionado',
+      addAtLeastOneContact: 'Adicione pelo menos um contato',
+      status: {
+        draft: 'Rascunho',
+        validating: 'Validando',
+        ready: 'Pronto',
+        running: 'Executando',
+        paused: 'Pausado',
+        completed: 'Concluído',
+        cancelled: 'Cancelado'
+      },
+      schedule: {
+        start: 'Início',
+        pause: 'Pausa',
+        resume: 'Retorno',
+        timeRemaining: 'Faltam',
+        startSending: 'Início do Envio',
+        startDate: 'Data de Início'
+      },
+      progress: {
+        label: 'Progresso'
+      },
+      stats: {
+        title: 'Estatísticas',
+        total: 'Total',
+        sent: 'Enviadas',
+        failed: 'Falhas',
+        pending: 'Pendentes'
+      },
+      form: {
+        numbers: 'Números (um por linha)',
+        enableScheduling: 'Ativar agendamento',
+        cancel: 'Cancelar',
+        createDispatch: 'Criar Disparo'
+      }
+    },
 
   // N8N Integration
   n8nIntegration: {
@@ -207,8 +240,17 @@ export const pt = {
     integrationUpdated: 'Integração atualizada com sucesso!',
     integrationDeleted: 'Integração excluída com sucesso!',
     integrationTested: 'Integração testada com sucesso!',
-    noIntegrations: 'Nenhuma integração encontrada',
-    createFirstIntegration: 'Crie sua primeira integração'
+    testFailed: 'Teste falhou',
+    noIntegrations: 'Nenhuma integração N8N configurada',
+    createFirstIntegration: 'Criar Primeira Integração',
+    newIntegration: 'Nova Integração N8N',
+    editIntegration: 'Editar Integração N8N',
+    tabs: {
+      basic: 'Configuração Básica',
+      events: 'Eventos',
+      filters: 'Filtros',
+      advanced: 'Configurações Avançadas'
+    }
   },
 
   // Webhook Documentation
@@ -228,6 +270,17 @@ export const pt = {
     statusCodes: 'Códigos de Status',
     rateLimiting: 'Limitação de Taxa',
     security: 'Segurança',
-    troubleshooting: 'Solução de Problemas'
+    troubleshooting: 'Solução de Problemas',
+    codeCopied: 'Código copiado!',
+    tabs: {
+      overview: 'Visão Geral',
+      configuration: 'Configuração',
+      events: 'Eventos',
+      examples: 'Exemplos',
+      sendMessages: 'Envio de Mensagens',
+      kanban: 'Kanban',
+      n8nIntegration: 'N8N Integration',
+      troubleshooting: 'Troubleshooting'
+    }
   }
 };

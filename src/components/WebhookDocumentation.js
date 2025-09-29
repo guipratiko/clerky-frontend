@@ -37,6 +37,7 @@ import {
   CopyAll as CopyIcon
 } from '@mui/icons-material';
 import { toast } from 'react-hot-toast';
+import { useI18n } from '../contexts/I18nContext';
 
 // Códigos de exemplo para Kanban
 const kanbanJavaScriptCode = `const moveChatToColumn = async (instanceName, chatId, column, token) => {
@@ -124,13 +125,14 @@ curl -X PUT "\${process.env.REACT_APP_API_URL}/api/chats/teste2/556293557070@s.w
   -d '{"column": "aprovado"}'`;
 
 const WebhookDocumentation = () => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState(0);
   const [copiedCode, setCopiedCode] = useState({});
 
   const copyToClipboard = (text, id) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedCode({ ...copiedCode, [id]: true });
-      toast.success('Código copiado!');
+      toast.success(t('webhookDocs.codeCopied'));
       setTimeout(() => {
         setCopiedCode({ ...copiedCode, [id]: false });
       }, 2000);
@@ -186,10 +188,10 @@ const WebhookDocumentation = () => {
         <WebhookIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            Documentação de Webhooks
+            {t('webhookDocs.title')}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Guia completo para integração com nossa API via webhooks
+            {t('webhookDocs.subtitle')}
           </Typography>
         </Box>
       </Box>
@@ -202,14 +204,14 @@ const WebhookDocumentation = () => {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
-          <Tab label="Visão Geral" />
-          <Tab label="Configuração" />
-          <Tab label="Eventos" />
-          <Tab label="Exemplos" />
-          <Tab label="Envio de Mensagens" />
-          <Tab label="Kanban" />
-          <Tab label="N8N Integration" />
-          <Tab label="Troubleshooting" />
+          <Tab label={t('webhookDocs.tabs.overview')} />
+          <Tab label={t('webhookDocs.tabs.configuration')} />
+          <Tab label={t('webhookDocs.tabs.events')} />
+          <Tab label={t('webhookDocs.tabs.examples')} />
+          <Tab label={t('webhookDocs.tabs.sendMessages')} />
+          <Tab label={t('webhookDocs.tabs.kanban')} />
+          <Tab label={t('webhookDocs.tabs.n8nIntegration')} />
+          <Tab label={t('webhookDocs.tabs.troubleshooting')} />
         </Tabs>
       </Box>
 

@@ -169,26 +169,59 @@ export const en = {
     createFirstInstance: 'Create your first instance to get started'
   },
 
-  // Mass Dispatch
-  massDispatch: {
-    title: 'Mass Dispatch',
-    subtitle: 'Send messages to multiple contacts',
-    selectInstance: 'Select Instance',
-    message: 'Message',
-    contacts: 'Contacts',
-    addContact: 'Add Contact',
-    removeContact: 'Remove Contact',
-    sendMessage: 'Send Message',
-    sending: 'Sending...',
-    sent: 'Sent',
-    failed: 'Failed',
-    totalContacts: 'Total Contacts',
-    successRate: 'Success Rate',
-    messageSent: 'Message sent successfully!',
-    messageFailed: 'Failed to send message',
-    noContacts: 'No contacts added',
-    addAtLeastOneContact: 'Add at least one contact'
-  },
+    // Mass Dispatch
+    massDispatch: {
+      title: 'Mass Dispatch',
+      subtitle: 'Send messages to multiple contacts',
+      selectInstance: 'Select Instance',
+      message: 'Message',
+      contacts: 'Contacts',
+      addContact: 'Add Contact',
+      removeContact: 'Remove Contact',
+      sendMessage: 'Send Message',
+      sending: 'Sending...',
+      sent: 'Sent',
+      failed: 'Failed',
+      totalContacts: 'Total Contacts',
+      successRate: 'Success Rate',
+      messageSent: 'Message sent successfully!',
+      messageFailed: 'Failed to send message',
+      noContacts: 'No contacts added',
+      addAtLeastOneContact: 'Add at least one contact',
+      status: {
+        draft: 'Draft',
+        validating: 'Validating',
+        ready: 'Ready',
+        running: 'Running',
+        paused: 'Paused',
+        completed: 'Completed',
+        cancelled: 'Cancelled'
+      },
+      schedule: {
+        start: 'Start',
+        pause: 'Pause',
+        resume: 'Resume',
+        timeRemaining: 'Time remaining',
+        startSending: 'Start Sending',
+        startDate: 'Start Date'
+      },
+      progress: {
+        label: 'Progress'
+      },
+      stats: {
+        title: 'Statistics',
+        total: 'Total',
+        sent: 'Sent',
+        failed: 'Failed',
+        pending: 'Pending'
+      },
+      form: {
+        numbers: 'Numbers (one per line)',
+        enableScheduling: 'Enable scheduling',
+        cancel: 'Cancel',
+        createDispatch: 'Create Dispatch'
+      }
+    },
 
   // N8N Integration
   n8nIntegration: {
@@ -207,8 +240,17 @@ export const en = {
     integrationUpdated: 'Integration updated successfully!',
     integrationDeleted: 'Integration deleted successfully!',
     integrationTested: 'Integration tested successfully!',
-    noIntegrations: 'No integrations found',
-    createFirstIntegration: 'Create your first integration'
+    testFailed: 'Test failed',
+    noIntegrations: 'No N8N integrations configured',
+    createFirstIntegration: 'Create First Integration',
+    newIntegration: 'New N8N Integration',
+    editIntegration: 'Edit N8N Integration',
+    tabs: {
+      basic: 'Basic Configuration',
+      events: 'Events',
+      filters: 'Filters',
+      advanced: 'Advanced Settings'
+    }
   },
 
   // Webhook Documentation
@@ -228,6 +270,17 @@ export const en = {
     statusCodes: 'Status Codes',
     rateLimiting: 'Rate Limiting',
     security: 'Security',
-    troubleshooting: 'Troubleshooting'
+    troubleshooting: 'Troubleshooting',
+    codeCopied: 'Code copied!',
+    tabs: {
+      overview: 'Overview',
+      configuration: 'Configuration',
+      events: 'Events',
+      examples: 'Examples',
+      sendMessages: 'Send Messages',
+      kanban: 'Kanban',
+      n8nIntegration: 'N8N Integration',
+      troubleshooting: 'Troubleshooting'
+    }
   }
 };

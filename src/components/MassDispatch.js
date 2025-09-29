@@ -46,12 +46,14 @@ import {
 } from '@mui/icons-material';
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
+import { useI18n } from '../contexts/I18nContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 const MassDispatch = () => {
   const { instances } = useInstance();
   const { socket } = useSocket();
+  const { t } = useI18n();
   
   // Estados principais
   const [dispatches, setDispatches] = useState([]);
@@ -609,13 +611,13 @@ const MassDispatch = () => {
   // Função para obter texto do status
   const getStatusText = (status) => {
     const texts = {
-      draft: 'Rascunho',
-      validating: 'Validando',
-      ready: 'Pronto',
-      running: 'Executando',
-      paused: 'Pausado',
-      completed: 'Concluído',
-      cancelled: 'Cancelado'
+      draft: t('massDispatch.status.draft'),
+      validating: t('massDispatch.status.validating'),
+      ready: t('massDispatch.status.ready'),
+      running: t('massDispatch.status.running'),
+      paused: t('massDispatch.status.paused'),
+      completed: t('massDispatch.status.completed'),
+      cancelled: t('massDispatch.status.cancelled')
     };
     return texts[status] || status;
   };
@@ -805,23 +807,23 @@ const MassDispatch = () => {
                     </Box>
                     
                     <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                      📅 Início: {new Date(dispatch.schedule.startDateTime).toLocaleString('pt-BR')}
+                      📅 {t('massDispatch.schedule.start')}: {new Date(dispatch.schedule.startDateTime).toLocaleString('pt-BR')}
                       {dispatch.status === 'scheduled' && dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date() && (
                         <Typography component="span" variant="caption" sx={{ color: '#ffc107', ml: 1 }}>
-                          (Faltam {getTimeRemaining(dispatch.schedule.startDateTime)})
+                          ({t('massDispatch.schedule.timeRemaining')} {getTimeRemaining(dispatch.schedule.startDateTime)})
                         </Typography>
                       )}
                     </Typography>
                     
                     {dispatch.schedule.pauseDateTime && (
                       <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                        ⏸️ Pausa: {new Date(dispatch.schedule.pauseDateTime).toLocaleString('pt-BR')}
+                        ⏸️ {t('massDispatch.schedule.pause')}: {new Date(dispatch.schedule.pauseDateTime).toLocaleString('pt-BR')}
                       </Typography>
                     )}
                     
                     {dispatch.schedule.resumeDateTime && (
                       <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                        ▶️ Retorno: {new Date(dispatch.schedule.resumeDateTime).toLocaleString('pt-BR')}
+                        ▶️ {t('massDispatch.schedule.resume')}: {new Date(dispatch.schedule.resumeDateTime).toLocaleString('pt-BR')}
                       </Typography>
                     )}
                     
@@ -1001,7 +1003,7 @@ const MassDispatch = () => {
                 {dispatch.status === 'running' && dispatch.progress && (
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                      Progresso: {dispatch.progress.current}/{dispatch.progress.total} ({dispatch.progress.percentage}%)
+                      {t('massDispatch.progress.label')}: {dispatch.progress.current}/{dispatch.progress.total} ({dispatch.progress.percentage}%)
                     </Typography>
                     <LinearProgress 
                       variant="determinate" 
@@ -1021,16 +1023,16 @@ const MassDispatch = () => {
                 {/* Estatísticas */}
                 <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
                   <Typography variant="body2" sx={{ color: '#8696a0' }}>
-                    Total: {dispatch.statistics?.total || 0}
+                    {t('massDispatch.stats.total')}: {dispatch.statistics?.total || 0}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#00a884' }}>
-                    Enviadas: {dispatch.statistics?.sent || 0}
+                    {t('massDispatch.stats.sent')}: {dispatch.statistics?.sent || 0}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#f15c6d' }}>
-                    Falhas: {dispatch.statistics?.failed || 0}
+                    {t('massDispatch.stats.failed')}: {dispatch.statistics?.failed || 0}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#ffab00' }}>
-                    Pendentes: {dispatch.statistics?.pending || 0}
+                    {t('massDispatch.stats.pending')}: {dispatch.statistics?.pending || 0}
                   </Typography>
                 </Box>
 
@@ -1214,7 +1216,7 @@ const MassDispatch = () => {
 
           <TextField
             fullWidth
-            label="Números (um por linha)"
+            label={t('massDispatch.form.numbers')}
             value={formData.numbers}
             onChange={(e) => setFormData(prev => ({ ...prev, numbers: e.target.value }))}
             margin="normal"
@@ -1404,7 +1406,7 @@ const MassDispatch = () => {
                   color="primary"
                 />
               }
-              label="Ativar agendamento"
+              label={t('massDispatch.form.enableScheduling')}
             />
 
             {schedulingEnabled && (
@@ -1414,14 +1416,14 @@ const MassDispatch = () => {
                   <Grid item xs={12}>
                     <Typography variant="subtitle2" sx={{ color: '#667eea', mb: 1, display: 'flex', alignItems: 'center' }}>
                       <PlayCircleIcon sx={{ mr: 1, fontSize: 20 }} />
-                      Início do Envio
+                      {t('massDispatch.schedule.startSending')}
                     </Typography>
                     <Grid container spacing={1}>
                       <Grid item xs={6}>
                         <TextField
                           fullWidth
                           type="date"
-                          label="Data de Início"
+                          label={t('massDispatch.schedule.startDate')}
                           value={scheduleData.startDate}
                           onChange={(e) => setScheduleData(prev => ({ ...prev, startDate: e.target.value }))}
                           InputLabelProps={{ shrink: true }}
@@ -1605,7 +1607,7 @@ const MassDispatch = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { setCreateDialogOpen(false); resetForm(); }}>
-            Cancelar
+            {t('massDispatch.form.cancel')}
           </Button>
           <Button
             onClick={handleCreateDispatch}
@@ -1613,7 +1615,7 @@ const MassDispatch = () => {
             disabled={loading}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            {loading ? <CircularProgress size={20} /> : 'Criar Disparo'}
+            {loading ? <CircularProgress size={20} /> : t('massDispatch.form.createDispatch')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1798,7 +1800,7 @@ const MassDispatch = () => {
               </Grid>
 
               <Typography variant="h6" sx={{ mb: 2, color: '#00a884' }}>
-                Estatísticas
+                {t('massDispatch.stats.title')}
               </Typography>
               
               <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -1808,7 +1810,7 @@ const MassDispatch = () => {
                       {selectedDispatch.statistics?.total || 0}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#8696a0' }}>
-                      Total
+                      {t('massDispatch.stats.total')}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -1818,7 +1820,7 @@ const MassDispatch = () => {
                       {selectedDispatch.statistics?.sent || 0}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#8696a0' }}>
-                      Enviadas
+                      {t('massDispatch.stats.sent')}
                     </Typography>
                   </Paper>
                 </Grid>
