@@ -397,6 +397,8 @@ export const en = {
       promptHelp: 'Example: "You are a virtual sales assistant. Always be polite, professional and focused on helping the customer."',
       promptRequired: 'Prompt is required',
       promptMaxLength: 'Prompt too long (maximum 2000 characters)',
+      instanceRequired: 'Select a connected instance',
+      noConnectedInstances: 'No connected instances available',
       
       // Statistics
       stats: {

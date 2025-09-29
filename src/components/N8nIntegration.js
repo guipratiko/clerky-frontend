@@ -88,6 +88,7 @@ const N8nIntegration = () => {
   const [editingAIWorkflow, setEditingAIWorkflow] = useState(null);
   const [testingAIWorkflow, setTestingAIWorkflow] = useState(null);
   const [aiFormData, setAiFormData] = useState({
+    instanceName: '',
     prompt: ''
   });
   
@@ -288,11 +289,13 @@ const N8nIntegration = () => {
     if (workflow) {
       setEditingAIWorkflow(workflow);
       setAiFormData({
+        instanceName: workflow.instanceName || '',
         prompt: workflow.prompt || ''
       });
     } else {
       setEditingAIWorkflow(null);
       setAiFormData({
+        instanceName: '',
         prompt: ''
       });
     }
@@ -310,7 +313,14 @@ const N8nIntegration = () => {
         await updateAIWorkflowPrompt(editingAIWorkflow._id, aiFormData.prompt);
         toast.success(t('n8nIntegration.aiWorkflows.workflowUpdated'));
       } else {
-        await createAIWorkflow({ prompt: aiFormData.prompt });
+        if (!aiFormData.instanceName) {
+          toast.error(t('n8nIntegration.aiWorkflows.instanceRequired'));
+          return;
+        }
+        await createAIWorkflow({ 
+          instanceName: aiFormData.instanceName, 
+          prompt: aiFormData.prompt 
+        });
         toast.success(t('n8nIntegration.aiWorkflows.workflowCreated'));
       }
       
@@ -601,6 +611,9 @@ const N8nIntegration = () => {
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                       <Typography variant="h6" component="h2">
                         {workflow.workflowName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {workflow.instanceName}
                       </Typography>
                       <Box display="flex" gap={1}>
                         <Tooltip title={workflow.isActive ? t('n8nIntegration.aiWorkflows.deactivate') : t('n8nIntegration.aiWorkflows.activate')}>
@@ -947,6 +960,34 @@ const N8nIntegration = () => {
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
+            {!editingAIWorkflow && (
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>{t('n8nIntegration.instance')}</InputLabel>
+                  <Select
+                    value={aiFormData.instanceName}
+                    onChange={(e) => setAiFormData({ ...aiFormData, instanceName: e.target.value })}
+                    label={t('n8nIntegration.instance')}
+                  >
+                    {instances
+                      .filter(instance => instance.status === 'connected')
+                      .length === 0 ? (
+                      <MenuItem disabled>
+                        {t('n8nIntegration.aiWorkflows.noConnectedInstances')}
+                      </MenuItem>
+                    ) : (
+                      instances
+                        .filter(instance => instance.status === 'connected')
+                        .map((instance) => (
+                          <MenuItem key={instance.instanceName} value={instance.instanceName}>
+                            {instance.instanceName} ({instance.status})
+                          </MenuItem>
+                        ))
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <TextField
                 fullWidth

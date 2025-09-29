@@ -397,6 +397,8 @@ export const pt = {
       promptHelp: 'Exemplo: "Você é um assistente virtual de vendas. Seja sempre educado, profissional e focado em ajudar o cliente."',
       promptRequired: 'Prompt é obrigatório',
       promptMaxLength: 'Prompt muito longo (máximo 2000 caracteres)',
+      instanceRequired: 'Selecione uma instância conectada',
+      noConnectedInstances: 'Nenhuma instância conectada disponível',
       
       // Estatísticas
       stats: {
