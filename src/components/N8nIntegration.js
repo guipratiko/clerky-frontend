@@ -203,7 +203,7 @@ const N8nIntegration = () => {
         loadData();
       } catch (error) {
         console.error('Erro ao deletar integração:', error);
-        toast.error('Erro ao deletar integração');
+        toast.error(t('n8nIntegration.integrationDeleteError'));
       }
     }
   };
@@ -212,7 +212,7 @@ const N8nIntegration = () => {
     try {
       setTestingIntegration(integrationId);
       const result = await testN8nIntegration(integrationId, {
-        message: 'Teste de integração N8N',
+        message: t('n8nIntegration.testMessage'),
         timestamp: new Date().toISOString()
       });
       
@@ -225,7 +225,7 @@ const N8nIntegration = () => {
       loadData(); // Recarregar para atualizar estatísticas
     } catch (error) {
       console.error('Erro ao testar integração:', error);
-      toast.error('Erro ao testar integração');
+      toast.error(t('n8nIntegration.integrationTestError'));
     } finally {
       setTestingIntegration(null);
     }
@@ -234,11 +234,11 @@ const N8nIntegration = () => {
   const handleToggle = async (integrationId, isActive) => {
     try {
       await toggleN8nIntegration(integrationId, isActive);
-      toast.success(`Integração ${isActive ? 'ativada' : 'desativada'} com sucesso!`);
+      toast.success(t('n8nIntegration.integrationToggled', { status: isActive ? t('n8nIntegration.activated') : t('n8nIntegration.deactivated') }));
       loadData();
     } catch (error) {
       console.error('Erro ao alterar status:', error);
-      toast.error('Erro ao alterar status da integração');
+      toast.error(t('n8nIntegration.integrationToggleError'));
     }
   };
 
@@ -323,10 +323,10 @@ const N8nIntegration = () => {
                 <CardContent>
                   <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                     <Typography variant="h6" component="h2">
-                      {integration.instanceName || 'Todas as Instâncias'}
+                      {integration.instanceName || t('n8nIntegration.allInstances')}
                     </Typography>
                     <Box display="flex" gap={1}>
-                      <Tooltip title={integration.isActive ? 'Desativar' : 'Ativar'}>
+                      <Tooltip title={integration.isActive ? t('n8nIntegration.deactivate') : t('n8nIntegration.activate')}>
                         <IconButton
                           size="small"
                           onClick={() => handleToggle(integration._id, !integration.isActive)}
@@ -334,7 +334,7 @@ const N8nIntegration = () => {
                           {integration.isActive ? <VisibilityIcon /> : <HideIcon />}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Editar">
+                      <Tooltip title={t('n8nIntegration.edit')}>
                         <IconButton
                           size="small"
                           onClick={() => handleOpenDialog(integration)}
@@ -342,7 +342,7 @@ const N8nIntegration = () => {
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Testar">
+                      <Tooltip title={t('n8nIntegration.test')}>
                         <IconButton
                           size="small"
                           onClick={() => handleTest(integration._id)}
@@ -355,7 +355,7 @@ const N8nIntegration = () => {
                           )}
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Deletar">
+                      <Tooltip title={t('n8nIntegration.delete')}>
                         <IconButton
                           size="small"
                           onClick={() => handleDelete(integration._id)}
@@ -370,22 +370,22 @@ const N8nIntegration = () => {
                   <Box mb={2}>
                     <Chip
                       icon={getStatusIcon(integration)}
-                      label={integration.isActive ? 'Ativa' : 'Inativa'}
+                      label={integration.isActive ? t('n8nIntegration.active') : t('n8nIntegration.inactive')}
                       color={getStatusColor(integration)}
                       size="small"
                     />
                   </Box>
 
                   <Typography variant="body2" color="text.secondary" mb={1}>
-                    <strong>Webhook:</strong> {integration.webhookUrl}
+                    <strong>{t('n8nIntegration.webhook')}:</strong> {integration.webhookUrl}
                   </Typography>
 
                   <Typography variant="body2" color="text.secondary" mb={1}>
-                    <strong>Último Teste:</strong> {formatDate(integration.lastTest)}
+                    <strong>{t('n8nIntegration.lastTest')}:</strong> {formatDate(integration.lastTest)}
                   </Typography>
 
                   <Typography variant="body2" color="text.secondary" mb={2}>
-                    <strong>Webhooks Enviados:</strong> {integration.stats?.totalWebhooks || 0}
+                    <strong>{t('n8nIntegration.webhooksSent')}:</strong> {integration.stats?.totalWebhooks || 0}
                   </Typography>
 
                   <Box display="flex" gap={1} flexWrap="wrap">
@@ -393,14 +393,14 @@ const N8nIntegration = () => {
                       .filter(([_, enabled]) => enabled)
                       .map(([event, _]) => {
                         const eventLabels = {
-                          newMessage: 'Nova Mensagem',
-                          messageSent: 'Mensagem Enviada',
-                          messageUpsert: 'Message Upsert',
-                          newContact: 'Novo Contato',
-                          contactUpdate: 'Contato Update',
-                          chatUpdate: 'Chat Update',
-                          connectionUpdate: 'Conexão Update',
-                          qrCodeUpdate: 'QR Code Update'
+                          newMessage: t('n8nIntegration.eventLabels.newMessage'),
+                          messageSent: t('n8nIntegration.eventLabels.messageSent'),
+                          messageUpsert: t('n8nIntegration.eventLabels.messageUpsert'),
+                          newContact: t('n8nIntegration.eventLabels.newContact'),
+                          contactUpdate: t('n8nIntegration.eventLabels.contactUpdate'),
+                          chatUpdate: t('n8nIntegration.eventLabels.chatUpdate'),
+                          connectionUpdate: t('n8nIntegration.eventLabels.connectionUpdate'),
+                          qrCodeUpdate: t('n8nIntegration.eventLabels.qrCodeUpdate')
                         };
                         
                         return (

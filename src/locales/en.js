@@ -220,6 +220,53 @@ export const en = {
         enableScheduling: 'Enable scheduling',
         cancel: 'Cancel',
         createDispatch: 'Create Dispatch'
+      },
+      // Success messages
+      dispatchCreated: 'Dispatch created successfully!',
+      dispatchStarted: 'Dispatch started!',
+      dispatchPaused: 'Dispatch paused!',
+      dispatchResumed: 'Dispatch resumed!',
+      dispatchCancelled: 'Dispatch cancelled!',
+      dispatchDeleted: 'Dispatch deleted!',
+      scheduledDispatchStarted: 'Scheduled dispatch started!',
+      scheduledDispatchCancelled: 'Scheduled dispatch cancelled!',
+      templateCreated: 'Template created successfully!',
+      templateDeleted: 'Template deleted successfully!',
+      // Error messages
+      dispatchCreateError: 'Error creating dispatch',
+      dispatchStartError: 'Error starting dispatch',
+      dispatchPauseError: 'Error pausing dispatch',
+      dispatchResumeError: 'Error resuming dispatch',
+      dispatchCancelError: 'Error cancelling dispatch',
+      dispatchDeleteError: 'Error deleting dispatch',
+      scheduledDispatchNotFound: 'Scheduled dispatch not found',
+      scheduledDispatchTimeError: 'Dispatch scheduled for {time}. {hours}h {minutes}min remaining.',
+      scheduledDispatchStartError: 'Error starting scheduled dispatch',
+      scheduledDispatchCancelError: 'Error cancelling scheduled dispatch',
+      templateCreateError: 'Error creating template',
+      templateDeleteError: 'Error deleting template',
+      // Confirmations
+      confirmCancelScheduled: 'Are you sure you want to cancel this scheduled dispatch?',
+      confirmCancelDispatch: 'Are you sure you want to cancel this dispatch?',
+      confirmDeleteDispatch: 'Are you sure you want to delete this dispatch?',
+      confirmDeleteTemplate: 'Are you sure you want to delete this template?',
+      // Interface
+      deleteTemplate: 'Delete template',
+      noDescription: 'No description',
+      numbers: 'numbers',
+      waiting: 'Waiting',
+      start: 'Start',
+      pause: 'Pause',
+      resume: 'Resume',
+      // Template types
+      templateTypes: {
+        text: 'Text',
+        image: 'Image',
+        imageCaption: 'Image + Caption',
+        audio: 'Audio',
+        file: 'File',
+        fileCaption: 'File + Caption',
+        unknown: 'Unknown'
       }
     },
 
@@ -250,6 +297,34 @@ export const en = {
       events: 'Events',
       filters: 'Filters',
       advanced: 'Advanced Settings'
+    },
+    // Additional messages
+    testMessage: 'N8N integration test',
+    integrationToggled: 'Integration {status} successfully!',
+    activated: 'activated',
+    deactivated: 'deactivated',
+    integrationDeleteError: 'Error deleting integration',
+    integrationTestError: 'Error testing integration',
+    integrationToggleError: 'Error changing integration status',
+    // Interface
+    allInstances: 'All Instances',
+    activate: 'Activate',
+    deactivate: 'Deactivate',
+    active: 'Active',
+    inactive: 'Inactive',
+    webhook: 'Webhook',
+    lastTest: 'Last Test',
+    webhooksSent: 'Webhooks Sent',
+    // Event labels
+    eventLabels: {
+      newMessage: 'New Message',
+      messageSent: 'Message Sent',
+      messageUpsert: 'Message Upsert',
+      newContact: 'New Contact',
+      contactUpdate: 'Contact Update',
+      chatUpdate: 'Chat Update',
+      connectionUpdate: 'Connection Update',
+      qrCodeUpdate: 'QR Code Update'
     }
   },
 
@@ -281,6 +356,18 @@ export const en = {
       kanban: 'Kanban',
       n8nIntegration: 'N8N Integration',
       troubleshooting: 'Troubleshooting'
-    }
+    },
+    // Additional content
+    n8nAvailable: 'N8N Integration Available',
+    n8nDescription: 'You can now configure N8N integrations directly in the interface! Access /n8n-integration to configure automatic webhooks.',
+    whatAreWebhooks: 'What are Webhooks?',
+    webhooksDescription: 'Webhooks are a form of real-time communication between applications. When something happens on our platform (like a new message), we automatically send the data to your application via HTTP POST.',
+    webhooksAdvantages: 'Webhook Advantages:',
+    realTime: 'Real Time',
+    realTimeDescription: 'Receive data instantly when events occur',
+    secure: 'Secure',
+    secureDescription: 'Direct communication between servers, without public exposure',
+    efficient: 'Efficient',
+    efficientDescription: 'No need to constantly poll to check for changes'
   }
 };

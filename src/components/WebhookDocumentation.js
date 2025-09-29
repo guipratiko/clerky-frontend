@@ -197,9 +197,8 @@ const WebhookDocumentation = () => {
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>🚀 Integração N8N Disponível!</AlertTitle>
-        Agora você pode configurar integrações N8N diretamente na interface! 
-        Acesse <strong>/n8n-integration</strong> para configurar webhooks automáticos.
+        <AlertTitle>🚀 {t('webhookDocs.n8nAvailable')}!</AlertTitle>
+        {t('webhookDocs.n8nDescription')}
       </Alert>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
@@ -221,29 +220,27 @@ const WebhookDocumentation = () => {
             <Card>
               <CardContent>
                 <Typography variant="h5" gutterBottom>
-                  O que são Webhooks?
+                  {t('webhookDocs.whatAreWebhooks')}
                 </Typography>
                 <Typography paragraph>
-                  Webhooks são uma forma de comunicação em tempo real entre aplicações. 
-                  Quando algo acontece em nossa plataforma (como uma nova mensagem), 
-                  enviamos automaticamente os dados para sua aplicação via HTTP POST.
+                  {t('webhookDocs.webhooksDescription')}
                 </Typography>
                 
                 <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  Vantagens dos Webhooks:
+                  {t('webhookDocs.webhooksAdvantages')}
                 </Typography>
                 <List>
                   <ListItem>
                     <ListItemIcon><SpeedIcon color="primary" /></ListItemIcon>
-                    <ListItemText primary="Tempo Real" secondary="Receba dados instantaneamente quando eventos acontecem" />
+                    <ListItemText primary={t('webhookDocs.realTime')} secondary={t('webhookDocs.realTimeDescription')} />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon><SecurityIcon color="primary" /></ListItemIcon>
-                    <ListItemText primary="Seguro" secondary="Comunicação direta entre servidores, sem exposição pública" />
+                    <ListItemText primary={t('webhookDocs.secure')} secondary={t('webhookDocs.secureDescription')} />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon><SendIcon color="primary" /></ListItemIcon>
-                    <ListItemText primary="Eficiente" secondary="Não precisa fazer polling constante para verificar mudanças" />
+                    <ListItemText primary={t('webhookDocs.efficient')} secondary={t('webhookDocs.efficientDescription')} />
                   </ListItem>
                 </List>
               </CardContent>

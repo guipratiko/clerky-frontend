@@ -220,6 +220,53 @@ export const pt = {
         enableScheduling: 'Ativar agendamento',
         cancel: 'Cancelar',
         createDispatch: 'Criar Disparo'
+      },
+      // Mensagens de sucesso
+      dispatchCreated: 'Disparo criado com sucesso!',
+      dispatchStarted: 'Disparo iniciado!',
+      dispatchPaused: 'Disparo pausado!',
+      dispatchResumed: 'Disparo retomado!',
+      dispatchCancelled: 'Disparo cancelado!',
+      dispatchDeleted: 'Disparo deletado!',
+      scheduledDispatchStarted: 'Disparo agendado iniciado!',
+      scheduledDispatchCancelled: 'Disparo agendado cancelado!',
+      templateCreated: 'Template criado com sucesso!',
+      templateDeleted: 'Template excluído com sucesso!',
+      // Mensagens de erro
+      dispatchCreateError: 'Erro ao criar disparo',
+      dispatchStartError: 'Erro ao iniciar disparo',
+      dispatchPauseError: 'Erro ao pausar disparo',
+      dispatchResumeError: 'Erro ao retomar disparo',
+      dispatchCancelError: 'Erro ao cancelar disparo',
+      dispatchDeleteError: 'Erro ao deletar disparo',
+      scheduledDispatchNotFound: 'Disparo agendado não encontrado',
+      scheduledDispatchTimeError: 'Disparo agendado para {time}. Faltam {hours}h {minutes}min.',
+      scheduledDispatchStartError: 'Erro ao iniciar disparo agendado',
+      scheduledDispatchCancelError: 'Erro ao cancelar disparo agendado',
+      templateCreateError: 'Erro ao criar template',
+      templateDeleteError: 'Erro ao excluir template',
+      // Confirmações
+      confirmCancelScheduled: 'Tem certeza que deseja cancelar este disparo agendado?',
+      confirmCancelDispatch: 'Tem certeza que deseja cancelar este disparo?',
+      confirmDeleteDispatch: 'Tem certeza que deseja deletar este disparo?',
+      confirmDeleteTemplate: 'Tem certeza que deseja excluir este template?',
+      // Interface
+      deleteTemplate: 'Excluir template',
+      noDescription: 'Sem descrição',
+      numbers: 'números',
+      waiting: 'Aguardando',
+      start: 'Iniciar',
+      pause: 'Pausar',
+      resume: 'Retomar',
+      // Tipos de template
+      templateTypes: {
+        text: 'Texto',
+        image: 'Imagem',
+        imageCaption: 'Imagem + Legenda',
+        audio: 'Áudio',
+        file: 'Arquivo',
+        fileCaption: 'Arquivo + Legenda',
+        unknown: 'Desconhecido'
       }
     },
 
@@ -250,6 +297,34 @@ export const pt = {
       events: 'Eventos',
       filters: 'Filtros',
       advanced: 'Configurações Avançadas'
+    },
+    // Mensagens adicionais
+    testMessage: 'Teste de integração N8N',
+    integrationToggled: 'Integração {status} com sucesso!',
+    activated: 'ativada',
+    deactivated: 'desativada',
+    integrationDeleteError: 'Erro ao deletar integração',
+    integrationTestError: 'Erro ao testar integração',
+    integrationToggleError: 'Erro ao alterar status da integração',
+    // Interface
+    allInstances: 'Todas as Instâncias',
+    activate: 'Ativar',
+    deactivate: 'Desativar',
+    active: 'Ativa',
+    inactive: 'Inativa',
+    webhook: 'Webhook',
+    lastTest: 'Último Teste',
+    webhooksSent: 'Webhooks Enviados',
+    // Labels de eventos
+    eventLabels: {
+      newMessage: 'Nova Mensagem',
+      messageSent: 'Mensagem Enviada',
+      messageUpsert: 'Message Upsert',
+      newContact: 'Novo Contato',
+      contactUpdate: 'Contato Update',
+      chatUpdate: 'Chat Update',
+      connectionUpdate: 'Conexão Update',
+      qrCodeUpdate: 'QR Code Update'
     }
   },
 
@@ -281,6 +356,18 @@ export const pt = {
       kanban: 'Kanban',
       n8nIntegration: 'N8N Integration',
       troubleshooting: 'Troubleshooting'
-    }
+    },
+    // Conteúdo adicional
+    n8nAvailable: 'Integração N8N Disponível',
+    n8nDescription: 'Agora você pode configurar integrações N8N diretamente na interface! Acesse /n8n-integration para configurar webhooks automáticos.',
+    whatAreWebhooks: 'O que são Webhooks?',
+    webhooksDescription: 'Webhooks são uma forma de comunicação em tempo real entre aplicações. Quando algo acontece em nossa plataforma (como uma nova mensagem), enviamos automaticamente os dados para sua aplicação via HTTP POST.',
+    webhooksAdvantages: 'Vantagens dos Webhooks:',
+    realTime: 'Tempo Real',
+    realTimeDescription: 'Receba dados instantaneamente quando eventos acontecem',
+    secure: 'Seguro',
+    secureDescription: 'Comunicação direta entre servidores, sem exposição pública',
+    efficient: 'Eficiente',
+    efficientDescription: 'Não precisa fazer polling constante para verificar mudanças'
   }
 };

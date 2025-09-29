@@ -331,7 +331,7 @@ const MassDispatch = () => {
         }
       });
 
-      toast.success('Disparo criado com sucesso!');
+      toast.success(t('massDispatch.dispatchCreated'));
       setCreateDialogOpen(false);
       resetForm();
       loadDispatches();
@@ -339,7 +339,7 @@ const MassDispatch = () => {
 
     } catch (error) {
       console.error('Erro ao criar disparo:', error);
-      toast.error(error.response?.data?.error || 'Erro ao criar disparo');
+      toast.error(error.response?.data?.error || t('massDispatch.dispatchCreateError'));
     } finally {
       setLoading(false);
     }
@@ -385,7 +385,7 @@ const MassDispatch = () => {
       // Buscar dados do disparo agendado
       const dispatch = scheduledDispatches.find(d => d.id === dispatchId);
       if (!dispatch) {
-        toast.error('Disparo agendado não encontrado');
+        toast.error(t('massDispatch.scheduledDispatchNotFound'));
         return;
       }
 
@@ -399,14 +399,18 @@ const MassDispatch = () => {
           const hours = Math.floor(timeDiff / (1000 * 60 * 60));
           const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
           
-          toast.error(`Disparo agendado para ${startTime.toLocaleString('pt-BR')}. Faltam ${hours}h ${minutes}min.`);
+          toast.error(t('massDispatch.scheduledDispatchTimeError', { 
+            time: startTime.toLocaleString('pt-BR'), 
+            hours, 
+            minutes 
+          }));
           return;
         }
       }
 
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/start`);
       if (response.data.success) {
-        toast.success('Disparo agendado iniciado!');
+        toast.success(t('massDispatch.scheduledDispatchStarted'));
         loadScheduledDispatches();
       }
     } catch (error) {
@@ -416,7 +420,7 @@ const MassDispatch = () => {
       if (error.response?.status === 400 && error.response?.data?.error) {
         toast.error(error.response.data.error);
       } else {
-        toast.error('Erro ao iniciar disparo agendado');
+        toast.error(t('massDispatch.scheduledDispatchStartError'));
       }
     }
   };
@@ -425,12 +429,12 @@ const MassDispatch = () => {
     try {
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/pause`);
       if (response.data.success) {
-        toast.success('Disparo pausado!');
+        toast.success(t('massDispatch.dispatchPaused'));
         loadScheduledDispatches();
       }
     } catch (error) {
       console.error('Erro ao pausar disparo:', error);
-      toast.error('Erro ao pausar disparo');
+      toast.error(t('massDispatch.dispatchPauseError'));
     }
   };
 
@@ -438,27 +442,27 @@ const MassDispatch = () => {
     try {
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/resume`);
       if (response.data.success) {
-        toast.success('Disparo retomado!');
+        toast.success(t('massDispatch.dispatchResumed'));
         loadScheduledDispatches();
       }
     } catch (error) {
       console.error('Erro ao retomar disparo:', error);
-      toast.error('Erro ao retomar disparo');
+      toast.error(t('massDispatch.dispatchResumeError'));
     }
   };
 
   const handleCancelScheduledDispatch = async (dispatchId) => {
-    if (!window.confirm('Tem certeza que deseja cancelar este disparo agendado?')) return;
+    if (!window.confirm(t('massDispatch.confirmCancelScheduled'))) return;
     
     try {
       const response = await api.delete(`/api/mass-dispatch/${dispatchId}`);
       if (response.data.success) {
-        toast.success('Disparo agendado cancelado!');
+        toast.success(t('massDispatch.scheduledDispatchCancelled'));
         loadScheduledDispatches();
       }
     } catch (error) {
       console.error('Erro ao cancelar disparo agendado:', error);
-      toast.error('Erro ao cancelar disparo agendado');
+      toast.error(t('massDispatch.scheduledDispatchCancelError'));
     }
   };
 
@@ -514,7 +518,7 @@ const MassDispatch = () => {
         }
       });
 
-      toast.success('Template criado com sucesso!');
+      toast.success(t('massDispatch.templateCreated'));
       setTemplateDialogOpen(false);
       setTemplateForm({
         name: '',
@@ -529,7 +533,7 @@ const MassDispatch = () => {
 
     } catch (error) {
       console.error('Erro ao criar template:', error);
-      toast.error(error.response?.data?.error || 'Erro ao criar template');
+      toast.error(error.response?.data?.error || t('massDispatch.templateCreateError'));
     } finally {
       setLoading(false);
     }
@@ -538,19 +542,19 @@ const MassDispatch = () => {
   // Excluir template
   const handleDeleteTemplate = async (templateId) => {
     try {
-      if (!window.confirm('Tem certeza que deseja excluir este template?')) {
+      if (!window.confirm(t('massDispatch.confirmDeleteTemplate'))) {
         return;
       }
 
       setLoading(true);
       await api.delete(`/api/mass-dispatch/templates/${templateId}`);
       
-      toast.success('Template excluído com sucesso!');
+      toast.success(t('massDispatch.templateDeleted'));
       loadTemplates();
 
     } catch (error) {
       console.error('Erro ao excluir template:', error);
-      toast.error(error.response?.data?.error || 'Erro ao excluir template');
+      toast.error(error.response?.data?.error || t('massDispatch.templateDeleteError'));
     } finally {
       setLoading(false);
     }
@@ -560,37 +564,37 @@ const MassDispatch = () => {
   const handleStartDispatch = async (dispatchId) => {
     try {
       await api.post(`/api/mass-dispatch/${dispatchId}/start`);
-      toast.success('Disparo iniciado!');
+      toast.success(t('massDispatch.dispatchStarted'));
       loadDispatches();
     } catch (error) {
       console.error('Erro ao iniciar disparo:', error);
-      toast.error(error.response?.data?.error || 'Erro ao iniciar disparo');
+      toast.error(error.response?.data?.error || t('massDispatch.dispatchStartError'));
     }
   };
 
   const handleCancelDispatch = async (dispatchId) => {
-    if (!window.confirm('Tem certeza que deseja cancelar este disparo?')) return;
+    if (!window.confirm(t('massDispatch.confirmCancelDispatch'))) return;
 
     try {
       await api.post(`/api/mass-dispatch/${dispatchId}/cancel`);
-      toast.success('Disparo cancelado!');
+      toast.success(t('massDispatch.dispatchCancelled'));
       loadDispatches();
     } catch (error) {
       console.error('Erro ao cancelar disparo:', error);
-      toast.error(error.response?.data?.error || 'Erro ao cancelar disparo');
+      toast.error(error.response?.data?.error || t('massDispatch.dispatchCancelError'));
     }
   };
 
   const handleDeleteDispatch = async (dispatchId) => {
-    if (!window.confirm('Tem certeza que deseja deletar este disparo?')) return;
+    if (!window.confirm(t('massDispatch.confirmDeleteDispatch'))) return;
 
     try {
       await api.delete(`/api/mass-dispatch/${dispatchId}`);
-      toast.success('Disparo deletado!');
+      toast.success(t('massDispatch.dispatchDeleted'));
       loadDispatches();
     } catch (error) {
       console.error('Erro ao deletar disparo:', error);
-      toast.error(error.response?.data?.error || 'Erro ao deletar disparo');
+      toast.error(error.response?.data?.error || t('massDispatch.dispatchDeleteError'));
     }
   };
 
@@ -710,7 +714,7 @@ const MassDispatch = () => {
                           {template.name}
                         </Typography>
                       </Box>
-                      <Tooltip title="Excluir template">
+                      <Tooltip title={t('massDispatch.deleteTemplate')}>
                         <IconButton
                           size="small"
                           onClick={() => handleDeleteTemplate(template._id)}
@@ -725,16 +729,16 @@ const MassDispatch = () => {
                     </Box>
                     
                     <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                      {template.description || 'Sem descrição'}
+                      {template.description || t('massDispatch.noDescription')}
                     </Typography>
                     
                     <Chip 
-                      label={template.type === 'text' ? 'Texto' : 
-                             template.type === 'image' ? 'Imagem' :
-                             template.type === 'image_caption' ? 'Imagem + Legenda' :
-                             template.type === 'audio' ? 'Áudio' :
-                             template.type === 'file' ? 'Arquivo' :
-                             template.type === 'file_caption' ? 'Arquivo + Legenda' : 'Desconhecido'}
+                      label={template.type === 'text' ? t('massDispatch.templateTypes.text') : 
+                             template.type === 'image' ? t('massDispatch.templateTypes.image') :
+                             template.type === 'image_caption' ? t('massDispatch.templateTypes.imageCaption') :
+                             template.type === 'audio' ? t('massDispatch.templateTypes.audio') :
+                             template.type === 'file' ? t('massDispatch.templateTypes.file') :
+                             template.type === 'file_caption' ? t('massDispatch.templateTypes.fileCaption') : t('massDispatch.templateTypes.unknown')}
                       size="small"
                       sx={{ 
                         backgroundColor: '#313d43',
@@ -828,7 +832,7 @@ const MassDispatch = () => {
                     )}
                     
                     <Typography variant="caption" sx={{ color: '#8696a0', display: 'block' }}>
-                      📱 {dispatch.instanceName} • 📊 {dispatch.numbers?.split('\n').length || 0} números
+                      📱 {dispatch.instanceName} • 📊 {dispatch.numbers?.split('\n').length || 0} {t('massDispatch.numbers')}
                     </Typography>
                   </CardContent>
                   
@@ -852,7 +856,7 @@ const MassDispatch = () => {
                           }}
                         >
                           {dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date() ? 
-                            'Aguardando' : 'Iniciar'}
+                            t('massDispatch.waiting') : t('massDispatch.start')}
                         </Button>
                       )}
                       
@@ -868,7 +872,7 @@ const MassDispatch = () => {
                             px: 1
                           }}
                         >
-                          Pausar
+                          {t('massDispatch.pause')}
                         </Button>
                       )}
                       
@@ -884,7 +888,7 @@ const MassDispatch = () => {
                             px: 1
                           }}
                         >
-                          Retomar
+                          {t('massDispatch.resume')}
                         </Button>
                       )}
                     </Box>
