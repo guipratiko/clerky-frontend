@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useToastMessages } from '../hooks/useToastMessages';
@@ -21,6 +21,14 @@ export const AuthProvider = ({ children }) => {
 
   // Configurar axios com token
   // Interceptor já configurado no api.js
+
+  // Logout
+  const logout = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    toast.success(toastMessages.logoutSuccess);
+  }, [toastMessages.logoutSuccess]);
 
   // Verificar se usuário está logado ao carregar a aplicação
   useEffect(() => {
@@ -85,14 +93,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Logout
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    toast.success(toastMessages.logoutSuccess);
   };
 
   // Verificar se é admin
