@@ -135,6 +135,39 @@ export const pt = {
     confirm: 'Confirmar'
   },
 
+  // CRM/Kanban
+  crm: {
+    title: 'CRM - Gerenciamento de Leads',
+    subtitle: 'Gerencie seu funil de vendas com quadro Kanban',
+    newContact: 'Novo Contato',
+    inProgress: 'Em Andamento',
+    abandonedCart: 'Carrinho Abandonado',
+    approved: 'Aprovado',
+    rejected: 'Reprovado',
+    contact: 'Contato',
+    noMessage: 'Nenhuma mensagem',
+    sendMessage: 'Enviar Mensagem',
+    history: 'Histórico',
+    tasks: 'Tarefas',
+    lead: 'Lead',
+    moreOptions: 'Mais opções',
+    settings: 'Configurações',
+    columnSettings: 'Configurações das Colunas',
+    editColumnName: 'Editar Nome da Coluna',
+    deleteAllContacts: 'Excluir Todos os Contatos',
+    confirmDeleteAll: 'Tem certeza que deseja excluir todos os contatos?',
+    thisActionCannotBeUndone: 'Esta ação não pode ser desfeita.',
+    deleteAll: 'Excluir Todos',
+    deleting: 'Excluindo...',
+    columnNameRequired: 'Nome da coluna é obrigatório',
+    columnNameUpdated: 'Nome da coluna atualizado com sucesso!',
+    allContactsDeleted: 'Todos os contatos excluídos com sucesso!',
+    errorDeletingContacts: 'Erro ao excluir contatos',
+    errorUpdatingColumn: 'Erro ao atualizar nome da coluna',
+    errorLoadingColumns: 'Erro ao carregar nomes das colunas',
+    errorSavingColumns: 'Erro ao salvar nomes das colunas'
+  },
+
   // App
   app: {
     name: 'Clerky CRM v3.0'

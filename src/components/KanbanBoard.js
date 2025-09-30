@@ -47,17 +47,19 @@ import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
+import { useI18n } from '../contexts/I18nContext';
 import ChatWindow from './ChatWindow';
 import toast from 'react-hot-toast';
 import api, { getContactNames } from '../services/api';
 
 // Componente para renderizar o item sendo arrastado
 const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
-  const displayName = chat.pushName || chat.name || chat.originalName || chat.apiName || 'Contato';
+  const { t } = useI18n();
+  const displayName = chat.pushName || chat.name || chat.originalName || chat.apiName || t('crm.contact');
   const initials = displayName.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
   
   // Debug: verificar se o nome está sendo perdido
-  if (displayName === 'Contato' && chat.chatId) {
+  if (displayName === t('crm.contact') && chat.chatId) {
     console.log('🚨 DragItem - Nome perdido:', {
       chatId: chat.chatId,
       pushName: chat.pushName,
@@ -157,7 +159,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
               maxWidth: '200px'
             }}
           >
-            {chat.lastMessage || 'Nenhuma mensagem'}
+            {chat.lastMessage || t('crm.noMessage')}
           </Typography>
           
           {chat.lastMessageTime && (
@@ -206,7 +208,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
           alignItems: 'center'
         }}>
           <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <Tooltip title="Enviar Mensagem">
+            <Tooltip title={t('crm.sendMessage')}>
               <IconButton 
                 size="small" 
                 onClick={(e) => {
@@ -223,7 +225,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
               </IconButton>
             </Tooltip>
             
-            <Tooltip title="Histórico">
+            <Tooltip title={t('crm.history')}>
               <IconButton 
                 size="small" 
                 onClick={(e) => {
@@ -240,7 +242,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
               </IconButton>
             </Tooltip>
             
-            <Tooltip title="Tarefas">
+            <Tooltip title={t('crm.tasks')}>
               <IconButton 
                 size="small" 
                 onClick={(e) => {
@@ -260,7 +262,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
           
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Chip 
-              label="Lead" 
+              label={t('crm.lead')} 
               size="small" 
               sx={{ 
                 backgroundColor: 'rgba(0,168,132,0.2)',
@@ -270,7 +272,7 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
               }} 
             />
             
-            <Tooltip title="Mais opções">
+            <Tooltip title={t('crm.moreOptions')}>
               <IconButton 
                 size="small" 
                 onClick={(e) => {
@@ -304,12 +306,13 @@ const KanbanBoard = () => {
   const { instanceName } = useParams();
   const { getInstance } = useInstance();
   const { socket, on, off } = useSocket();
+  const { t } = useI18n();
   const [columns, setColumns] = useState([
-    { id: 'novo', title: 'Novo Contato', chats: [] },
-    { id: 'andamento', title: 'Em Andamento', chats: [] },
-    { id: 'carrinho', title: 'Carrinho Abandonado', chats: [] },
-    { id: 'aprovado', title: 'Aprovado', chats: [] },
-    { id: 'reprovado', title: 'Reprovado', chats: [] }
+    { id: 'novo', title: t('crm.newContact'), chats: [] },
+    { id: 'andamento', title: t('crm.inProgress'), chats: [] },
+    { id: 'carrinho', title: t('crm.abandonedCart'), chats: [] },
+    { id: 'aprovado', title: t('crm.approved'), chats: [] },
+    { id: 'reprovado', title: t('crm.rejected'), chats: [] }
   ]);
   
   const [loading, setLoading] = useState(true);
@@ -340,7 +343,7 @@ const KanbanBoard = () => {
         );
       }
     } catch (error) {
-      console.error('Erro ao carregar nomes das colunas:', error);
+      console.error(t('crm.errorLoadingColumns'), error);
     }
   }, [instanceName]);
 
@@ -349,7 +352,7 @@ const KanbanBoard = () => {
     try {
       localStorage.setItem(`kanban-column-names-${instanceName}`, JSON.stringify(columnNames));
     } catch (error) {
-      console.error('Erro ao salvar nomes das colunas:', error);
+      console.error(t('crm.errorSavingColumns'), error);
     }
   }, [instanceName]);
 

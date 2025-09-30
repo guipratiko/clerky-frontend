@@ -1543,7 +1543,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <MicIcon sx={{ color: '#f44336' }} />
-          <Typography variant="h6">Enviar Mensagem de Áudio</Typography>
+          <Typography variant="h5" component="div">Enviar Mensagem de Áudio</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>
@@ -1859,7 +1859,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <HistoryIcon sx={{ color: '#667eea' }} />
-          <Typography variant="h6">Histórico do Contato</Typography>
+          <Typography variant="h5" component="div">Histórico do Contato</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>
@@ -1932,7 +1932,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <AssignmentIcon sx={{ color: '#ffc107' }} />
-          <Typography variant="h6">Tarefas do Contato</Typography>
+          <Typography variant="h5" component="div">Tarefas do Contato</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>
@@ -2103,7 +2103,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <PersonIcon sx={{ color: '#9c27b0' }} />
-          <Typography variant="h6">Informações do Contato</Typography>
+          <Typography variant="h5" component="div">Informações do Contato</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>
@@ -2197,7 +2197,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <AssignmentIcon sx={{ color: '#ffc107' }} />
-          <Typography variant="h6">Nova Tarefa</Typography>
+          <Typography variant="h5" component="div">Nova Tarefa</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>
@@ -2390,7 +2390,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           gap: 2
         }}>
           <EditIcon sx={{ color: '#667eea' }} />
-          <Typography variant="h6">Editar Tarefa</Typography>
+          <Typography variant="h5" component="div">Editar Tarefa</Typography>
         </DialogTitle>
         
         <DialogContent sx={{ p: 3 }}>

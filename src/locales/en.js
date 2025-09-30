@@ -135,6 +135,39 @@ export const en = {
     confirm: 'Confirm'
   },
 
+  // CRM/Kanban
+  crm: {
+    title: 'CRM - Lead Management',
+    subtitle: 'Manage your sales pipeline with Kanban board',
+    newContact: 'New Contact',
+    inProgress: 'In Progress',
+    abandonedCart: 'Abandoned Cart',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    contact: 'Contact',
+    noMessage: 'No message',
+    sendMessage: 'Send Message',
+    history: 'History',
+    tasks: 'Tasks',
+    lead: 'Lead',
+    moreOptions: 'More Options',
+    settings: 'Settings',
+    columnSettings: 'Column Settings',
+    editColumnName: 'Edit Column Name',
+    deleteAllContacts: 'Delete All Contacts',
+    confirmDeleteAll: 'Are you sure you want to delete all contacts?',
+    thisActionCannotBeUndone: 'This action cannot be undone.',
+    deleteAll: 'Delete All',
+    deleting: 'Deleting...',
+    columnNameRequired: 'Column name is required',
+    columnNameUpdated: 'Column name updated successfully!',
+    allContactsDeleted: 'All contacts deleted successfully!',
+    errorDeletingContacts: 'Error deleting contacts',
+    errorUpdatingColumn: 'Error updating column name',
+    errorLoadingColumns: 'Error loading column names',
+    errorSavingColumns: 'Error saving column names'
+  },
+
   // App
   app: {
     name: 'Clerky CRM v3.0'
@@ -399,6 +432,11 @@ export const en = {
       promptMaxLength: 'Prompt too long (maximum 2000 characters)',
       instanceRequired: 'Select a connected instance',
       noConnectedInstances: 'No connected instances available',
+      
+      // Prompt Types
+      promptType: 'Prompt Type',
+      customPrompt: 'Custom Prompt',
+      structuredPrompt: 'Structured Template',
       
       // Statistics
       stats: {
