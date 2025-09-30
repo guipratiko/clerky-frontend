@@ -74,10 +74,17 @@ const ChatList = ({ instanceName, selectedChat, onSelectChat }) => {
     };
   }, [instanceName, loadChats, off, on]);
 
-  // Filtrar conversas
-  const filteredChats = chats.filter(chat =>
-    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtrar e ordenar conversas
+  const filteredChats = chats
+    .filter(chat =>
+      chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      // Usar timestamp da última mensagem para ordenação, com fallback para lastActivity
+      const aTime = a.lastMessage?.timestamp || a.lastActivity;
+      const bTime = b.lastMessage?.timestamp || b.lastActivity;
+      return new Date(bTime) - new Date(aTime);
+    });
 
   const formatLastMessageTime = (timestamp) => {
     const now = moment();

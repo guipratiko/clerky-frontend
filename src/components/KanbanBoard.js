@@ -473,7 +473,12 @@ const KanbanBoard = () => {
         });
 
         const sortedChats = chatsWithNames
-          .sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity))
+          .sort((a, b) => {
+            // Usar timestamp da última mensagem para ordenação, com fallback para lastActivity
+            const aTime = a.lastMessage?.timestamp || a.lastActivity;
+            const bTime = b.lastMessage?.timestamp || b.lastActivity;
+            return new Date(bTime) - new Date(aTime);
+          })
           .slice(0, 50);
 
         // Distribuir chats nas colunas corretas baseado no campo kanbanColumn
@@ -492,9 +497,14 @@ const KanbanBoard = () => {
             }
           });
           
-          // Garantir que cada coluna mantenha os chats ordenados por lastActivity (mais recentes primeiro)
+          // Garantir que cada coluna mantenha os chats ordenados por timestamp da última mensagem (mais recentes primeiro)
           newColumns.forEach(column => {
-            column.chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+            column.chats.sort((a, b) => {
+              // Usar timestamp da última mensagem para ordenação, com fallback para lastActivity
+              const aTime = a.lastMessage?.timestamp || a.lastActivity;
+              const bTime = b.lastMessage?.timestamp || b.lastActivity;
+              return new Date(bTime) - new Date(aTime);
+            });
           });
           
           return newColumns;

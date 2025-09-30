@@ -396,9 +396,63 @@ export const pt = {
       promptPlaceholder: 'Digite o prompt que define como o assistente deve se comportar...',
       promptHelp: 'Exemplo: "Você é um assistente virtual de vendas. Seja sempre educado, profissional e focado em ajudar o cliente."',
       promptRequired: 'Prompt é obrigatório',
-      promptMaxLength: 'Prompt muito longo (máximo 2000 caracteres)',
+      promptMaxLength: 'Prompt muito longo (máximo 5000 caracteres)',
       instanceRequired: 'Selecione uma instância conectada',
       noConnectedInstances: 'Nenhuma instância conectada disponível',
+      
+      // Tipos de Prompt
+      promptType: 'Tipo de Prompt',
+      customPrompt: 'Prompt Personalizado',
+      structuredPrompt: 'Modelo Estruturado',
+      
+      // Campos Estruturados
+      identity: 'Identidade',
+      company: 'Empresa',
+      products: 'Produtos/Serviços',
+      salesFlow: 'Fluxo de Vendas',
+      standardResponses: 'Respostas Padrão',
+      
+      // Identidade
+      yourName: 'Seu Nome',
+      yourPosition: 'Seu Cargo',
+      companyName: 'Nome da Empresa',
+      yourSegment: 'Seu Segmento',
+      personality: 'Personalidade',
+      communication: 'Comunicação',
+      
+      // Empresa
+      modalities: 'Modalidades',
+      contact: 'Contato',
+      
+      // Produtos
+      product1: 'Produto/Serviço 1',
+      product2: 'Produto/Serviço 2',
+      productName: 'Nome do Produto/Serviço',
+      price: 'Preço',
+      paymentMethod: 'Forma de Pagamento',
+      paymentLink: 'Link de Pagamento',
+      content: 'Conteúdo',
+      access: 'Acesso',
+      support: 'Suporte',
+      duration: 'Duração',
+      location: 'Local',
+      benefits: 'Benefícios',
+      
+      // Fluxo de Vendas
+      presentation: 'Apresentação',
+      question1: 'Pergunta 1',
+      question2: 'Pergunta 2',
+      question3: 'Pergunta 3',
+      solutionPresentation: 'Apresentação da Solução',
+      modalityChoice: 'Escolha da Modalidade',
+      finalization1: 'Finalização Produto 1',
+      finalization2: 'Finalização Produto 2',
+      
+      // Respostas Padrão
+      forDoubts: 'Para Dúvidas',
+      product1Response: 'Resposta Produto 1',
+      product2Response: 'Resposta Produto 2',
+      closing: 'Fechamento',
       
       // Estatísticas
       stats: {
