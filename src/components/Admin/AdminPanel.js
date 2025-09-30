@@ -68,7 +68,7 @@ const AdminPanel = () => {
     } finally {
       setLoading(false);
     }
-  }, [getPendingUsers, getAllUsers]);
+  }, [getPendingUsers, getAllUsers, t]);
 
   useEffect(() => {
     if (isAdmin()) {

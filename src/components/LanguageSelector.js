@@ -5,12 +5,10 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Typography,
-  Box
+  Typography
 } from '@mui/material';
 import {
-  Language as LanguageIcon,
-  Translate as TranslateIcon
+  Language as LanguageIcon
 } from '@mui/icons-material';
 import { useI18n } from '../contexts/I18nContext';
 

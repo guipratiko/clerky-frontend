@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -598,7 +598,7 @@ const N8nIntegration = () => {
       produto2, preco2, duracao2, local2, conteudo2, beneficios2,
       apresentacao, pergunta1, pergunta2, pergunta3, apresentacaoSolucao,
       escolhaModalidade, finalizacao1, finalizacao2,
-      duvidas, respostaProduto1, respostaProduto2, fechamento
+      respostaProduto1, respostaProduto2, fechamento
     } = data;
 
     return `### 1. IDENTIDADE
@@ -798,19 +798,6 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
     }
   };
 
-  const getAIStatusColor = (workflow) => {
-    if (!workflow.isActive) return 'default';
-    if (workflow.lastTestStatus === 'success') return 'success';
-    if (workflow.lastTestStatus === 'failed') return 'error';
-    return 'warning';
-  };
-
-  const getAIStatusIcon = (workflow) => {
-    if (!workflow.isActive) return <HideIcon />;
-    if (workflow.lastTestStatus === 'success') return <SuccessIcon />;
-    if (workflow.lastTestStatus === 'failed') return <ErrorIcon />;
-    return <WarningIcon />;
-  };
 
   const TabPanel = ({ children, value, index, ...other }) => (
     <div
