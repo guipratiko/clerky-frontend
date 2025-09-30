@@ -381,8 +381,35 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.messageUpsertDescription')}
                     </Typography>
-                    <Chip label={t('webhookDocs.originalPayload')} color="primary" size="small" />
-                    <Chip label={t('webhookDocs.noFilters')} color="secondary" size="small" sx={{ ml: 1 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Chip label={t('webhookDocs.originalPayload')} color="primary" size="small" />
+                      <Chip label={t('webhookDocs.noFilters')} color="secondary" size="small" sx={{ ml: 1 }} />
+                    </Box>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "MESSAGES_UPSERT",
+  "data": {
+    "key": {
+      "remoteJid": "556293557070@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0C767D26B4A8F5A6F"
+    },
+    "message": {
+      "conversation": "Olá, como está?"
+    },
+    "messageTimestamp": 1640995200,
+    "status": "RECEIVED"
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-messages-upsert-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
 
@@ -394,8 +421,35 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.newMessageDescription')}
                     </Typography>
-                    <Chip label={t('webhookDocs.processed')} color="success" size="small" />
-                    <Chip label={t('webhookDocs.withFilters')} color="info" size="small" sx={{ ml: 1 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Chip label={t('webhookDocs.processed')} color="success" size="small" />
+                      <Chip label={t('webhookDocs.withFilters')} color="info" size="small" sx={{ ml: 1 }} />
+                    </Box>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "new-message",
+  "data": {
+    "messageId": "3EB0C767D26B4A8F5A6F",
+    "chatId": "556293557070@s.whatsapp.net",
+    "content": "Olá, como está?",
+    "fromMe": false,
+    "timestamp": "2025-01-23T15:30:00.000Z",
+    "messageType": "text",
+    "contact": {
+      "name": "João Silva",
+      "phone": "556293557070"
+    }
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-new-message-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
 
@@ -407,7 +461,31 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.messageSentDescription')}
                     </Typography>
-                    <Chip label={t('webhookDocs.sending')} color="warning" size="small" />
+                    <Box sx={{ mb: 2 }}>
+                      <Chip label={t('webhookDocs.sending')} color="warning" size="small" />
+                    </Box>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "message-sent",
+  "data": {
+    "messageId": "3EB0C767D26B4A8F5A6F",
+    "chatId": "556293557070@s.whatsapp.net",
+    "content": "Mensagem enviada com sucesso!",
+    "fromMe": true,
+    "timestamp": "2025-01-23T15:30:00.000Z",
+    "messageType": "text",
+    "status": "sent"
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-message-sent-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
               </CardContent>
@@ -429,6 +507,26 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.newContactDescription')}
                     </Typography>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "new-contact",
+  "data": {
+    "chatId": "556293557070@s.whatsapp.net",
+    "name": "João Silva",
+    "phone": "556293557070",
+    "isGroup": false,
+    "timestamp": "2025-01-23T15:30:00.000Z"
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-new-contact-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
 
@@ -440,6 +538,26 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.contactUpdateDescription')}
                     </Typography>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "contact-update",
+  "data": {
+    "chatId": "556293557070@s.whatsapp.net",
+    "oldName": "João",
+    "newName": "João Silva",
+    "phone": "556293557070",
+    "timestamp": "2025-01-23T15:30:00.000Z"
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-contact-update-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
 
@@ -451,6 +569,26 @@ app.post('/webhook/whatsapp', (req, res) => {
                     <Typography variant="body2" paragraph>
                       {t('webhookDocs.chatUpdateDescription')}
                     </Typography>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {t('webhookDocs.payload')}:
+                    </Typography>
+                    <CodeBlock 
+                      code={`{
+  "event": "chat-update",
+  "data": {
+    "chatId": "556293557070@s.whatsapp.net",
+    "updateType": "kanban-move",
+    "oldColumn": "novo",
+    "newColumn": "andamento",
+    "timestamp": "2025-01-23T15:30:00.000Z"
+  },
+  "instanceName": "teste2",
+  "timestamp": "2025-01-23T15:30:00.000Z",
+  "source": "evolution-api"
+}`}
+                      language="json"
+                      id="event-chat-update-payload"
+                    />
                   </AccordionDetails>
                 </Accordion>
               </CardContent>
