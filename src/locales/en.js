@@ -137,7 +137,7 @@ export const en = {
 
   // App
   app: {
-    name: 'Clerky CRM v1.0'
+    name: 'Clerky CRM v3.0'
   },
 
   // Instance Manager

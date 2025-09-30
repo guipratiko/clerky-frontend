@@ -185,20 +185,23 @@ const Sidebar = () => {
         minHeight: 64
       }}>
         {!collapsed && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <BusinessIcon sx={{ color: '#00a884', fontSize: 28 }} />
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                color: '#fff',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #00a884 0%, #26d367 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              Clerky CRM
-            </Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flex: 1,
+            gap: 1 
+          }}>
+            <img 
+              src="/img/logo.png" 
+              alt="Clerky CRM" 
+              style={{ 
+                height: '40px', 
+                width: 'auto',
+                borderRadius: '6px',
+                objectFit: 'contain'
+              }} 
+            />
           </Box>
         )}
         
