@@ -392,7 +392,8 @@ const KanbanBoard = () => {
             ...chat,
             id: chat._id || chat.chatId,
             remoteJid: chat.chatId,
-            pushName: chat.pushName || chat.name,
+            pushName: chat.pushName, // Manter pushName original (pode ser null)
+            name: chat.name, // Manter name original
             lastMessage: chat.lastMessage?.content || 'Nenhuma mensagem',
             lastMessageTime: chat.lastMessage?.timestamp || chat.lastActivity
           };
@@ -400,12 +401,13 @@ const KanbanBoard = () => {
 
         // Aplicar nomes dos contatos (sem busca externa - apenas dados locais)
         const chatsWithNames = mappedChats.map(chat => {
-          // Usar apenas dados já disponíveis: pushName, name ou número
+          // Priorizar pushName quando disponível, senão usar name ou número
           const finalName = chat.pushName || chat.name || chat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
           
           const chatWithName = {
             ...chat,
-            pushName: finalName,
+            pushName: chat.pushName, // Manter pushName original
+            name: finalName, // Usar nome final para exibição
             originalName: chat.pushName || chat.name,
             apiName: null // Não usar mais API externa
           };
@@ -414,8 +416,8 @@ const KanbanBoard = () => {
           setNameCache(prev => {
             const newCache = new Map(prev);
             newCache.set(chat.chatId, {
-              pushName: finalName,
-              name: finalName,
+              pushName: chat.pushName, // Manter pushName original
+              name: finalName, // Usar nome final para exibição
               originalName: chat.pushName || chat.name,
               apiName: null
             });
