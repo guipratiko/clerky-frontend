@@ -610,8 +610,6 @@ const KanbanBoard = () => {
           
           // Se não encontrou o chat, criar na primeira coluna
           if (!chatFound && newColumns[0]) {
-            const phoneNumber = chatId.replace('@s.whatsapp.net', '');
-            
             const newChat = {
               chatId: chatId,
               id: chatId,
