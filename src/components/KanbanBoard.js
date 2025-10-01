@@ -387,54 +387,17 @@ const KanbanBoard = () => {
       if (response.success && response.data) {
         // Criar mapa de número -> nome
         const nameMap = {};
-        
-        // Verificar se response.data é um array
-        if (Array.isArray(response.data)) {
-          response.data.forEach(contact => {
-            if (contact.number && contact.name) {
-              nameMap[contact.number] = contact.name;
-            }
-          });
-        } else if (response.data && typeof response.data === 'object') {
-          // Se não é array, pode ser um objeto com números como chaves
-          Object.keys(response.data).forEach(number => {
-            if (response.data[number]) {
-              nameMap[number] = response.data[number];
-            }
-          });
-        }
+        response.data.forEach(contact => {
+          if (contact.number && contact.name) {
+            nameMap[contact.number] = contact.name;
+          }
+        });
         
         console.log('📝 Mapa de nomes criado:', nameMap);
-        
-        // Se a API retornou array vazio ou objeto vazio, usar pushName como fallback
-        if ((Array.isArray(response.data) && response.data.length === 0) || 
-            (typeof response.data === 'object' && Object.keys(response.data).length === 0)) {
-          console.log('🔄 API retornou dados vazios, usando pushName como fallback');
-          chats.forEach(chat => {
-            const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
-            if (phoneNumber && chat.pushName) {
-              nameMap[phoneNumber] = chat.pushName;
-              console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);
-            }
-          });
-        }
-        
         return nameMap;
       }
     } catch (error) {
       console.error('Erro ao buscar nomes dos contatos:', error);
-      
-      // Em caso de erro, também usar pushName como fallback
-      console.log('🔄 Erro na API, usando pushName como fallback');
-      const nameMap = {};
-      chats.forEach(chat => {
-        const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
-        if (phoneNumber && chat.pushName) {
-          nameMap[phoneNumber] = chat.pushName;
-          console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);
-        }
-      });
-      return nameMap;
     }
     
     return {};
@@ -458,18 +421,11 @@ const KanbanBoard = () => {
             lastActivity: chat.lastActivity
           });
           
-          // Extrair número do chatId para usar como nome temporário
-          const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
-          const tempName = chat.pushName || chat.name || phoneNumber || 'Contato';
-          
           return {
             ...chat,
             id: chat._id || chat.chatId,
             remoteJid: chat.chatId,
-            pushName: tempName,
-            name: tempName,
-            originalName: chat.pushName || chat.name,
-            apiName: null,
+            pushName: chat.pushName || chat.name,
             lastMessage: chat.lastMessage?.content || 'Nenhuma mensagem',
             lastMessageTime: chat.lastMessage?.timestamp || chat.lastActivity
           };
@@ -483,8 +439,8 @@ const KanbanBoard = () => {
           const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
           const apiName = nameMap[phoneNumber];
           
-          // Priorizar: API > pushName > name > número > 'Contato'
-          const finalName = apiName || chat.pushName || chat.name || phoneNumber || 'Contato';
+          // Priorizar nome salvo localmente, depois API, depois dados originais
+          const finalName = chat.pushName || chat.name || apiName || 'Contato';
           
           // Debug: verificar se o nome está sendo aplicado corretamente
           if (finalName === 'Contato' && chat.chatId) {
@@ -493,21 +449,13 @@ const KanbanBoard = () => {
               pushName: chat.pushName,
               name: chat.name,
               apiName: apiName,
-              phoneNumber: phoneNumber,
               finalName: finalName
-            });
-          } else {
-            console.log('✅ refreshChats - Nome aplicado:', {
-              chatId: chat.chatId,
-              finalName: finalName,
-              source: apiName ? 'API' : chat.pushName ? 'pushName' : chat.name ? 'name' : 'phoneNumber'
             });
           }
           
           const chatWithName = {
             ...chat,
             pushName: finalName,
-            name: finalName,
             originalName: chat.pushName || chat.name,
             apiName: apiName
           };
@@ -727,93 +675,88 @@ const KanbanBoard = () => {
         });
       }
       
-      // Priorizar cache de pushName se disponível
-      const cachedName = nameCache.get(updatedChat.chatId);
-      if (cachedName && cachedName.pushName && cachedName.pushName !== 'Contato') {
-        console.log('💾 Usando pushName do cache:', cachedName.pushName);
-        finalName = cachedName.pushName;
-        finalPushName = cachedName.pushName;
-        finalOriginalName = cachedName.originalName || cachedName.pushName;
-        finalApiName = cachedName.apiName || cachedName.pushName;
-      } else if (currentChat) {
+      if (currentChat) {
         // Usar dados do chat atual
         finalName = updatedChat.name || currentChat.name || currentChat.pushName || 'Contato';
         finalPushName = updatedChat.name || currentChat.pushName || currentChat.name || 'Contato';
         finalOriginalName = currentChat.originalName || currentChat.pushName || currentChat.name;
         finalApiName = currentChat.apiName;
-      } else if (cachedName) {
-        // Tentar usar cache mesmo que seja 'Contato'
-        finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';
-        finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';
-        finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;
-        finalApiName = cachedName.apiName;
-        console.log('💾 Usando nome do cache:', cachedName);
       } else {
-        // Se não tem cache, usar uma estratégia mais robusta
-        console.log('🔄 Cache vazio, aplicando estratégia de fallback...');
-        
-        // Estratégia 1: Tentar buscar na API externa
-        try {
-          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
-          console.log('🔍 Buscando nome para:', phoneNumber);
-          const nameResponse = await getContactNames([phoneNumber]);
-          console.log('📡 Resposta da API:', nameResponse);
+        // Tentar usar cache
+        const cachedName = nameCache.get(updatedChat.chatId);
+        if (cachedName) {
+          finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';
+          finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';
+          finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;
+          finalApiName = cachedName.apiName;
+          console.log('💾 Usando nome do cache:', cachedName);
+        } else {
+          // Se não tem cache, usar uma estratégia mais robusta
+          console.log('🔄 Cache vazio, aplicando estratégia de fallback...');
           
-          // Usar a mesma lógica da função fetchContactNames
-          let apiName = null;
-          if (nameResponse.success && nameResponse.data) {
-            const contact = nameResponse.data.find(c => c.number === phoneNumber);
-            apiName = contact?.name;
-          } else if (Array.isArray(nameResponse)) {
-            const contact = nameResponse.find(c => c.number === phoneNumber);
-            apiName = contact?.name;
-          } else if (nameResponse && typeof nameResponse === 'object') {
-            apiName = nameResponse[phoneNumber];
-          }
-          
-          console.log('📝 Nome encontrado:', apiName);
-          
-          if (apiName) {
-            finalName = apiName;
-            finalPushName = apiName;
-            finalOriginalName = apiName;
-            finalApiName = apiName;
+          // Estratégia 1: Tentar buscar na API externa
+          try {
+            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
+            console.log('🔍 Buscando nome para:', phoneNumber);
+            const nameResponse = await getContactNames([phoneNumber]);
+            console.log('📡 Resposta da API:', nameResponse);
             
-            // Atualizar cache com o nome encontrado
-            setNameCache(prev => {
-              const newCache = new Map(prev);
-              newCache.set(updatedChat.chatId, {
-                pushName: apiName,
-                name: apiName,
-                originalName: apiName,
-                apiName: apiName
+            // Usar a mesma lógica da função fetchContactNames
+            let apiName = null;
+            if (nameResponse.success && nameResponse.data) {
+              const contact = nameResponse.data.find(c => c.number === phoneNumber);
+              apiName = contact?.name;
+            } else if (Array.isArray(nameResponse)) {
+              const contact = nameResponse.find(c => c.number === phoneNumber);
+              apiName = contact?.name;
+            } else if (nameResponse && typeof nameResponse === 'object') {
+              apiName = nameResponse[phoneNumber];
+            }
+            
+            console.log('📝 Nome encontrado:', apiName);
+            
+            if (apiName) {
+              finalName = apiName;
+              finalPushName = apiName;
+              finalOriginalName = apiName;
+              finalApiName = apiName;
+              
+              // Atualizar cache com o nome encontrado
+              setNameCache(prev => {
+                const newCache = new Map(prev);
+                newCache.set(updatedChat.chatId, {
+                  pushName: apiName,
+                  name: apiName,
+                  originalName: apiName,
+                  apiName: apiName
+                });
+                return newCache;
               });
-              return newCache;
-            });
+              
+              console.log('✅ Nome encontrado na API externa:', apiName);
+            } else {
+              console.log('❌ Nome não encontrado na API externa para:', phoneNumber);
+              
+              // Estratégia 2: Usar o número como nome temporário
+              finalName = phoneNumber;
+              finalPushName = phoneNumber;
+              finalOriginalName = phoneNumber;
+              finalApiName = null;
+              
+              console.log('📱 Usando número como nome temporário:', phoneNumber);
+            }
+          } catch (error) {
+            console.error('❌ Erro ao buscar nome na API externa:', error);
             
-            console.log('✅ Nome encontrado na API externa:', apiName);
-          } else {
-            console.log('❌ Nome não encontrado na API externa para:', phoneNumber);
-            
-            // Estratégia 2: Usar o número como nome temporário
+            // Estratégia 3: Usar número como fallback final
+            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
             finalName = phoneNumber;
             finalPushName = phoneNumber;
             finalOriginalName = phoneNumber;
             finalApiName = null;
             
-            console.log('📱 Usando número como nome temporário:', phoneNumber);
+            console.log('📱 Fallback final - usando número:', phoneNumber);
           }
-        } catch (error) {
-          console.error('❌ Erro ao buscar nome na API externa:', error);
-          
-          // Estratégia 3: Usar número como fallback final
-          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
-          finalName = phoneNumber;
-          finalPushName = phoneNumber;
-          finalOriginalName = phoneNumber;
-          finalApiName = null;
-          
-          console.log('📱 Fallback final - usando número:', phoneNumber);
         }
       }
       
@@ -914,32 +857,11 @@ const KanbanBoard = () => {
     // Nova mensagem
     const handleNewMessage = (data) => {
       console.log('💬 Recebido new-message via WebSocket:', data);
-      
-      // Capturar pushName do evento se disponível
-      const message = data.data;
-      if (message && message.pushName) {
-        console.log('📱 PushName capturado do evento:', message.pushName);
-        
-        // Atualizar cache de nomes com o pushName
-        setNameCache(prev => {
-          const newCache = new Map(prev);
-          if (message.chatId) {
-            newCache.set(message.chatId, {
-              pushName: message.pushName,
-              name: message.pushName,
-              originalName: message.pushName,
-              apiName: message.pushName
-            });
-            console.log('💾 Cache atualizado com pushName:', message.pushName);
-          }
-          return newCache;
-        });
-      }
-      
       // Processar como atualização de conversa
       handleChatUpdate(data);
       
       // Forçar atualização adicional se necessário
+      const message = data.data;
       if (message && message.chatId) {
         // Atualizar diretamente a última mensagem no estado
         setColumns(prev => {
@@ -957,21 +879,12 @@ const KanbanBoard = () => {
                                   message.content?.caption || 
                                   getMessageTypeDescription(message.messageType);
               
-              // Usar pushName do evento se disponível
-              const finalPushName = message.pushName || chat.pushName || chat.name || 'Contato';
-              
               newColumns[i].chats[chatIndex] = {
                 ...chat,
-                pushName: finalPushName,
-                name: finalPushName,
-                originalName: chat.originalName || chat.pushName || chat.name,
-                apiName: message.pushName || chat.apiName,
                 lastMessage,
                 lastMessageTime: message.timestamp,
                 lastActivity: message.timestamp
               };
-              
-              console.log(`📝 Chat atualizado com pushName: ${finalPushName}`);
               
               // Atualizar o chat na posição atual
               updated = true;

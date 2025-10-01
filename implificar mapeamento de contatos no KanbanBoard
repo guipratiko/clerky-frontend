@@ -1,0 +1,309 @@
+warning: in the working copy of 'src/components/KanbanBoard.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/components/KanbanBoard.js b/src/components/KanbanBoard.js[m
+[1mindex 6ad6b21..3325c9a 100644[m
+[1m--- a/src/components/KanbanBoard.js[m
+[1m+++ b/src/components/KanbanBoard.js[m
+[36m@@ -387,54 +387,17 @@[m [mconst KanbanBoard = () => {[m
+       if (response.success && response.data) {[m
+         // Criar mapa de número -> nome[m
+         const nameMap = {};[m
+[31m-        [m
+[31m-        // Verificar se response.data é um array[m
+[31m-        if (Array.isArray(response.data)) {[m
+[31m-          response.data.forEach(contact => {[m
+[31m-            if (contact.number && contact.name) {[m
+[31m-              nameMap[contact.number] = contact.name;[m
+[31m-            }[m
+[31m-          });[m
+[31m-        } else if (response.data && typeof response.data === 'object') {[m
+[31m-          // Se não é array, pode ser um objeto com números como chaves[m
+[31m-          Object.keys(response.data).forEach(number => {[m
+[31m-            if (response.data[number]) {[m
+[31m-              nameMap[number] = response.data[number];[m
+[31m-            }[m
+[31m-          });[m
+[31m-        }[m
+[32m+[m[32m        response.data.forEach(contact => {[m
+[32m+[m[32m          if (contact.number && contact.name) {[m
+[32m+[m[32m            nameMap[contact.number] = contact.name;[m
+[32m+[m[32m          }[m
+[32m+[m[32m        });[m
+         [m
+         console.log('📝 Mapa de nomes criado:', nameMap);[m
+[31m-        [m
+[31m-        // Se a API retornou array vazio ou objeto vazio, usar pushName como fallback[m
+[31m-        if ((Array.isArray(response.data) && response.data.length === 0) || [m
+[31m-            (typeof response.data === 'object' && Object.keys(response.data).length === 0)) {[m
+[31m-          console.log('🔄 API retornou dados vazios, usando pushName como fallback');[m
+[31m-          chats.forEach(chat => {[m
+[31m-            const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');[m
+[31m-            if (phoneNumber && chat.pushName) {[m
+[31m-              nameMap[phoneNumber] = chat.pushName;[m
+[31m-              console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);[m
+[31m-            }[m
+[31m-          });[m
+[31m-        }[m
+[31m-        [m
+         return nameMap;[m
+       }[m
+     } catch (error) {[m
+       console.error('Erro ao buscar nomes dos contatos:', error);[m
+[31m-      [m
+[31m-      // Em caso de erro, também usar pushName como fallback[m
+[31m-      console.log('🔄 Erro na API, usando pushName como fallback');[m
+[31m-      const nameMap = {};[m
+[31m-      chats.forEach(chat => {[m
+[31m-        const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');[m
+[31m-        if (phoneNumber && chat.pushName) {[m
+[31m-          nameMap[phoneNumber] = chat.pushName;[m
+[31m-          console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);[m
+[31m-        }[m
+[31m-      });[m
+[31m-      return nameMap;[m
+     }[m
+     [m
+     return {};[m
+[36m@@ -458,18 +421,11 @@[m [mconst KanbanBoard = () => {[m
+             lastActivity: chat.lastActivity[m
+           });[m
+           [m
+[31m-          // Extrair número do chatId para usar como nome temporário[m
+[31m-          const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');[m
+[31m-          const tempName = chat.pushName || chat.name || phoneNumber || 'Contato';[m
+[31m-          [m
+           return {[m
+             ...chat,[m
+             id: chat._id || chat.chatId,[m
+             remoteJid: chat.chatId,[m
+[31m-            pushName: tempName,[m
+[31m-            name: tempName,[m
+[31m-            originalName: chat.pushName || chat.name,[m
+[31m-            apiName: null,[m
+[32m+[m[32m            pushName: chat.pushName || chat.name,[m
+             lastMessage: chat.lastMessage?.content || 'Nenhuma mensagem',[m
+             lastMessageTime: chat.lastMessage?.timestamp || chat.lastActivity[m
+           };[m
+[36m@@ -483,8 +439,8 @@[m [mconst KanbanBoard = () => {[m
+           const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');[m
+           const apiName = nameMap[phoneNumber];[m
+           [m
+[31m-          // Priorizar: API > pushName > name > número > 'Contato'[m
+[31m-          const finalName = apiName || chat.pushName || chat.name || phoneNumber || 'Contato';[m
+[32m+[m[32m          // Priorizar nome salvo localmente, depois API, depois dados originais[m
+[32m+[m[32m          const finalName = chat.pushName || chat.name || apiName || 'Contato';[m
+           [m
+           // Debug: verificar se o nome está sendo aplicado corretamente[m
+           if (finalName === 'Contato' && chat.chatId) {[m
+[36m@@ -493,21 +449,13 @@[m [mconst KanbanBoard = () => {[m
+               pushName: chat.pushName,[m
+               name: chat.name,[m
+               apiName: apiName,[m
+[31m-              phoneNumber: phoneNumber,[m
+               finalName: finalName[m
+             });[m
+[31m-          } else {[m
+[31m-            console.log('✅ refreshChats - Nome aplicado:', {[m
+[31m-              chatId: chat.chatId,[m
+[31m-              finalName: finalName,[m
+[31m-              source: apiName ? 'API' : chat.pushName ? 'pushName' : chat.name ? 'name' : 'phoneNumber'[m
+[31m-            });[m
+           }[m
+           [m
+           const chatWithName = {[m
+             ...chat,[m
+             pushName: finalName,[m
+[31m-            name: finalName,[m
+             originalName: chat.pushName || chat.name,[m
+             apiName: apiName[m
+           };[m
+[36m@@ -727,93 +675,88 @@[m [mconst KanbanBoard = () => {[m
+         });[m
+       }[m
+       [m
+[31m-      // Priorizar cache de pushName se disponível[m
+[31m-      const cachedName = nameCache.get(updatedChat.chatId);[m
+[31m-      if (cachedName && cachedName.pushName && cachedName.pushName !== 'Contato') {[m
+[31m-        console.log('💾 Usando pushName do cache:', cachedName.pushName);[m
+[31m-        finalName = cachedName.pushName;[m
+[31m-        finalPushName = cachedName.pushName;[m
+[31m-        finalOriginalName = cachedName.originalName || cachedName.pushName;[m
+[31m-        finalApiName = cachedName.apiName || cachedName.pushName;[m
+[31m-      } else if (currentChat) {[m
+[32m+[m[32m      if (currentChat) {[m
+         // Usar dados do chat atual[m
+         finalName = updatedChat.name || currentChat.name || currentChat.pushName || 'Contato';[m
+         finalPushName = updatedChat.name || currentChat.pushName || currentChat.name || 'Contato';[m
+         finalOriginalName = currentChat.originalName || currentChat.pushName || currentChat.name;[m
+         finalApiName = currentChat.apiName;[m
+[31m-      } else if (cachedName) {[m
+[31m-        // Tentar usar cache mesmo que seja 'Contato'[m
+[31m-        finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';[m
+[31m-        finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';[m
+[31m-        finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;[m
+[31m-        finalApiName = cachedName.apiName;[m
+[31m-        console.log('💾 Usando nome do cache:', cachedName);[m
+       } else {[m
+[31m-        // Se não tem cache, usar uma estratégia mais robusta[m
+[31m-        console.log('🔄 Cache vazio, aplicando estratégia de fallback...');[m
+[31m-        [m
+[31m-        // Estratégia 1: Tentar buscar na API externa[m
+[31m-        try {[m
+[31m-          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');[m
+[31m-          console.log('🔍 Buscando nome para:', phoneNumber);[m
+[31m-          const nameResponse = await getContactNames([phoneNumber]);[m
+[31m-          console.log('📡 Resposta da API:', nameResponse);[m
+[31m-          [m
+[31m-          // Usar a mesma lógica da função fetchContactNames[m
+[31m-          let apiName = null;[m
+[31m-          if (nameResponse.success && nameResponse.data) {[m
+[31m-            const contact = nameResponse.data.find(c => c.number === phoneNumber);[m
+[31m-            apiName = contact?.name;[m
+[31m-          } else if (Array.isArray(nameResponse)) {[m
+[31m-            const contact = nameResponse.find(c => c.number === phoneNumber);[m
+[31m-            apiName = contact?.name;[m
+[31m-          } else if (nameResponse && typeof nameResponse === 'object') {[m
+[31m-            apiName = nameResponse[phoneNumber];[m
+[31m-          }[m
+[31m-          [m
+[31m-          console.log('📝 Nome encontrado:', apiName);[m
+[32m+[m[32m        // Tentar usar cache[m
+[32m+[m[32m        const cachedName = nameCache.get(updatedChat.chatId);[m
+[32m+[m[32m        if (cachedName) {[m
+[32m+[m[32m          finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';[m
+[32m+[m[32m          finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';[m
+[32m+[m[32m          finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;[m
+[32m+[m[32m          finalApiName = cachedName.apiName;[m
+[32m+[m[32m          console.log('💾 Usando nome do cache:', cachedName);[m
+[32m+[m[32m        } else {[m
+[32m+[m[32m          // Se não tem cache, usar uma estratégia mais robusta[m
+[32m+[m[32m          console.log('🔄 Cache vazio, aplicando estratégia de fallback...');[m
+           [m
+[31m-          if (apiName) {[m
+[31m-            finalName = apiName;[m
+[31m-            finalPushName = apiName;[m
+[31m-            finalOriginalName = apiName;[m
+[31m-            finalApiName = apiName;[m
+[32m+[m[32m          // Estratégia 1: Tentar buscar na API externa[m
+[32m+[m[32m          try {[m
+[32m+[m[32m            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');[m
+[32m+[m[32m            console.log('🔍 Buscando nome para:', phoneNumber);[m
+[32m+[m[32m            const nameResponse = await getContactNames([phoneNumber]);[m
+[32m+[m[32m            console.log('📡 Resposta da API:', nameResponse);[m
+             [m
+[31m-            // Atualizar cache com o nome encontrado[m
+[31m-            setNameCache(prev => {[m
+[31m-              const newCache = new Map(prev);[m
+[31m-              newCache.set(updatedChat.chatId, {[m
+[31m-                pushName: apiName,[m
+[31m-                name: apiName,[m
+[31m-                originalName: apiName,[m
+[31m-                apiName: apiName[m
+[31m-              });[m
+[31m-              return newCache;[m
+[31m-            });[m
+[32m+[m[32m            // Usar a mesma lógica da função fetchContactNames[m
+[32m+[m[32m            let apiName = null;[m
+[32m+[m[32m            if (nameResponse.success && nameResponse.data) {[m
+[32m+[m[32m              const contact = nameResponse.data.find(c => c.number === phoneNumber);[m
+[32m+[m[32m              apiName = contact?.name;[m
+[32m+[m[32m            } else if (Array.isArray(nameResponse)) {[m
+[32m+[m[32m              const contact = nameResponse.find(c => c.number === phoneNumber);[m
+[32m+[m[32m              apiName = contact?.name;[m
+[32m+[m[32m            } else if (nameResponse && typeof nameResponse === 'object') {[m
+[32m+[m[32m              apiName = nameResponse[phoneNumber];[m
+[32m+[m[32m            }[m
+[32m+[m[41m            [m
+[32m+[m[32m            console.log('📝 Nome encontrado:', apiName);[m
+             [m
+[31m-            console.log('✅ Nome encontrado na API externa:', apiName);[m
+[31m-          } else {[m
+[31m-            console.log('❌ Nome não encontrado na API externa para:', phoneNumber);[m
+[32m+[m[32m            if (apiName) {[m
+[32m+[m[32m              finalName = apiName;[m
+[32m+[m[32m              finalPushName = apiName;[m
+[32m+[m[32m              finalOriginalName = apiName;[m
+[32m+[m[32m              finalApiName = apiName;[m
+[32m+[m[41m              [m
+[32m+[m[32m              // Atualizar cache com o nome encontrado[m
+[32m+[m[32m              setNameCache(prev => {[m
+[32m+[m[32m                const newCache = new Map(prev);[m
+[32m+[m[32m                newCache.set(updatedChat.chatId, {[m
+[32m+[m[32m                  pushName: apiName,[m
+[32m+[m[32m                  name: apiName,[m
+[32m+[m[32m                  originalName: apiName,[m
+[32m+[m[32m                  apiName: apiName[m
+[32m+[m[32m                });[m
+[32m+[m[32m                return newCache;[m
+[32m+[m[32m              });[m
+[32m+[m[41m              [m
+[32m+[m[32m              console.log('✅ Nome encontrado na API externa:', apiName);[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m              console.log('❌ Nome não encontrado na API externa para:', phoneNumber);[m
+[32m+[m[41m              [m
+[32m+[m[32m              // Estratégia 2: Usar o número como nome temporário[m
+[32m+[m[32m              finalName = phoneNumber;[m
+[32m+[m[32m              finalPushName = phoneNumber;[m
+[32m+[m[32m              finalOriginalName = phoneNumber;[m
+[32m+[m[32m              finalApiName = null;[m
+[32m+[m[41m              [m
+[32m+[m[32m              console.log('📱 Usando número como nome temporário:', phoneNumber);[m
+[32m+[m[32m            }[m
+[32m+[m[32m          } catch (error) {[m
+[32m+[m[32m            console.error('❌ Erro ao buscar nome na API externa:', error);[m
+             [m
+[31m-            // Estratégia 2: Usar o número como nome temporário[m
+[32m+[m[32m            // Estratégia 3: Usar número como fallback final[m
+[32m+[m[32m            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');[m
+             finalName = phoneNumber;[m
+             finalPushName = phoneNumber;[m
+             finalOriginalName = phoneNumber;[m
+             finalApiName = null;[m
+             [m
+[31m-            console.log('📱 Usando número como nome temporário:', phoneNumber);[m
+[32m+[m[32m            console.log('📱 Fallback final - usando número:', phoneNumber);[m
+           }[m
+[31m-        } catch (error) {[m
+[31m-          console.error('❌ Erro ao buscar nome na API externa:', error);[m
+[31m-          [m
+[31m-          // Estratégia 3: Usar número como fallback final[m
+[31m-          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');[m
+[31m-          finalName = phoneNumber;[m
+[31m-          finalPushName = phoneNumber;[m
+[31m-          finalOriginalName = phoneNumber;[m
+[31m-          finalApiName = null;[m
+[31m-          [m
+[31m-          console.log('📱 Fallback final - usando número:', phoneNumber);[m
+         }[m
+       }[m
+       [m
+[36m@@ -914,32 +857,11 @@[m [mconst KanbanBoard = () => {[m
+     // Nova mensagem[m
+     const handleNewMessage = (data) => {[m
+       console.log('💬 Recebido new-message via WebSocket:', data);[m
+[31m-      [m
+[31m-      // Capturar pushName do evento se disponível[m
+[31m-      const message = data.data;[m
+[31m-      if (message && message.pushName) {[m
+[31m-        console.log('📱 PushName capturado do evento:', message.pushName);[m
+[31m-        [m
+[31m-        // Atualizar cache de nomes com o pushName[m
+[31m-        setNameCache(prev => {[m
+[31m-          const newCache = new Map(prev);[m
+[31m-          if (message.chatId) {[m
+[31m-            newCache.set(message.chatId, {[m
+[31m-              pushName: message.pushName,[m
+[31m-              name: message.pushName,[m
+[31m-              originalName: message.pushName,[m
+[31m-              apiName: message.pushName[m
+[31m-            });[m
+[31m-            console.log('💾 Cache atualizado com pushName:', message.pushName);[m
+[31m-          }[m
+[31m-          return newCache;[m
+[31m-        });[m
+[31m-      }[m
+[31m-      [m
+       // Processar como atualização de conversa[m
+       handleChatUpdate(data);[m
+       [m
+       // Forçar atualização adicional se necessário[m
+[32m
