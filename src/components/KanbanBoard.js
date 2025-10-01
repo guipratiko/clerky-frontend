@@ -700,88 +700,93 @@ const KanbanBoard = () => {
         });
       }
       
-      if (currentChat) {
+      // Priorizar cache de pushName se disponível
+      const cachedName = nameCache.get(updatedChat.chatId);
+      if (cachedName && cachedName.pushName && cachedName.pushName !== 'Contato') {
+        console.log('💾 Usando pushName do cache:', cachedName.pushName);
+        finalName = cachedName.pushName;
+        finalPushName = cachedName.pushName;
+        finalOriginalName = cachedName.originalName || cachedName.pushName;
+        finalApiName = cachedName.apiName || cachedName.pushName;
+      } else if (currentChat) {
         // Usar dados do chat atual
         finalName = updatedChat.name || currentChat.name || currentChat.pushName || 'Contato';
         finalPushName = updatedChat.name || currentChat.pushName || currentChat.name || 'Contato';
         finalOriginalName = currentChat.originalName || currentChat.pushName || currentChat.name;
         finalApiName = currentChat.apiName;
+      } else if (cachedName) {
+        // Tentar usar cache mesmo que seja 'Contato'
+        finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';
+        finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';
+        finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;
+        finalApiName = cachedName.apiName;
+        console.log('💾 Usando nome do cache:', cachedName);
       } else {
-        // Tentar usar cache
-        const cachedName = nameCache.get(updatedChat.chatId);
-        if (cachedName) {
-          finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';
-          finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';
-          finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;
-          finalApiName = cachedName.apiName;
-          console.log('💾 Usando nome do cache:', cachedName);
-        } else {
-          // Se não tem cache, usar uma estratégia mais robusta
-          console.log('🔄 Cache vazio, aplicando estratégia de fallback...');
+        // Se não tem cache, usar uma estratégia mais robusta
+        console.log('🔄 Cache vazio, aplicando estratégia de fallback...');
+        
+        // Estratégia 1: Tentar buscar na API externa
+        try {
+          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
+          console.log('🔍 Buscando nome para:', phoneNumber);
+          const nameResponse = await getContactNames([phoneNumber]);
+          console.log('📡 Resposta da API:', nameResponse);
           
-          // Estratégia 1: Tentar buscar na API externa
-          try {
-            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
-            console.log('🔍 Buscando nome para:', phoneNumber);
-            const nameResponse = await getContactNames([phoneNumber]);
-            console.log('📡 Resposta da API:', nameResponse);
+          // Usar a mesma lógica da função fetchContactNames
+          let apiName = null;
+          if (nameResponse.success && nameResponse.data) {
+            const contact = nameResponse.data.find(c => c.number === phoneNumber);
+            apiName = contact?.name;
+          } else if (Array.isArray(nameResponse)) {
+            const contact = nameResponse.find(c => c.number === phoneNumber);
+            apiName = contact?.name;
+          } else if (nameResponse && typeof nameResponse === 'object') {
+            apiName = nameResponse[phoneNumber];
+          }
+          
+          console.log('📝 Nome encontrado:', apiName);
+          
+          if (apiName) {
+            finalName = apiName;
+            finalPushName = apiName;
+            finalOriginalName = apiName;
+            finalApiName = apiName;
             
-            // Usar a mesma lógica da função fetchContactNames
-            let apiName = null;
-            if (nameResponse.success && nameResponse.data) {
-              const contact = nameResponse.data.find(c => c.number === phoneNumber);
-              apiName = contact?.name;
-            } else if (Array.isArray(nameResponse)) {
-              const contact = nameResponse.find(c => c.number === phoneNumber);
-              apiName = contact?.name;
-            } else if (nameResponse && typeof nameResponse === 'object') {
-              apiName = nameResponse[phoneNumber];
-            }
-            
-            console.log('📝 Nome encontrado:', apiName);
-            
-            if (apiName) {
-              finalName = apiName;
-              finalPushName = apiName;
-              finalOriginalName = apiName;
-              finalApiName = apiName;
-              
-              // Atualizar cache com o nome encontrado
-              setNameCache(prev => {
-                const newCache = new Map(prev);
-                newCache.set(updatedChat.chatId, {
-                  pushName: apiName,
-                  name: apiName,
-                  originalName: apiName,
-                  apiName: apiName
-                });
-                return newCache;
+            // Atualizar cache com o nome encontrado
+            setNameCache(prev => {
+              const newCache = new Map(prev);
+              newCache.set(updatedChat.chatId, {
+                pushName: apiName,
+                name: apiName,
+                originalName: apiName,
+                apiName: apiName
               });
-              
-              console.log('✅ Nome encontrado na API externa:', apiName);
-            } else {
-              console.log('❌ Nome não encontrado na API externa para:', phoneNumber);
-              
-              // Estratégia 2: Usar o número como nome temporário
-              finalName = phoneNumber;
-              finalPushName = phoneNumber;
-              finalOriginalName = phoneNumber;
-              finalApiName = null;
-              
-              console.log('📱 Usando número como nome temporário:', phoneNumber);
-            }
-          } catch (error) {
-            console.error('❌ Erro ao buscar nome na API externa:', error);
+              return newCache;
+            });
             
-            // Estratégia 3: Usar número como fallback final
-            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
+            console.log('✅ Nome encontrado na API externa:', apiName);
+          } else {
+            console.log('❌ Nome não encontrado na API externa para:', phoneNumber);
+            
+            // Estratégia 2: Usar o número como nome temporário
             finalName = phoneNumber;
             finalPushName = phoneNumber;
             finalOriginalName = phoneNumber;
             finalApiName = null;
             
-            console.log('📱 Fallback final - usando número:', phoneNumber);
+            console.log('📱 Usando número como nome temporário:', phoneNumber);
           }
+        } catch (error) {
+          console.error('❌ Erro ao buscar nome na API externa:', error);
+          
+          // Estratégia 3: Usar número como fallback final
+          const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
+          finalName = phoneNumber;
+          finalPushName = phoneNumber;
+          finalOriginalName = phoneNumber;
+          finalApiName = null;
+          
+          console.log('📱 Fallback final - usando número:', phoneNumber);
         }
       }
       
@@ -882,11 +887,32 @@ const KanbanBoard = () => {
     // Nova mensagem
     const handleNewMessage = (data) => {
       console.log('💬 Recebido new-message via WebSocket:', data);
+      
+      // Capturar pushName do evento se disponível
+      const message = data.data;
+      if (message && message.pushName) {
+        console.log('📱 PushName capturado do evento:', message.pushName);
+        
+        // Atualizar cache de nomes com o pushName
+        setNameCache(prev => {
+          const newCache = new Map(prev);
+          if (message.chatId) {
+            newCache.set(message.chatId, {
+              pushName: message.pushName,
+              name: message.pushName,
+              originalName: message.pushName,
+              apiName: message.pushName
+            });
+            console.log('💾 Cache atualizado com pushName:', message.pushName);
+          }
+          return newCache;
+        });
+      }
+      
       // Processar como atualização de conversa
       handleChatUpdate(data);
       
       // Forçar atualização adicional se necessário
-      const message = data.data;
       if (message && message.chatId) {
         // Atualizar diretamente a última mensagem no estado
         setColumns(prev => {
@@ -904,12 +930,21 @@ const KanbanBoard = () => {
                                   message.content?.caption || 
                                   getMessageTypeDescription(message.messageType);
               
+              // Usar pushName do evento se disponível
+              const finalPushName = message.pushName || chat.pushName || chat.name || 'Contato';
+              
               newColumns[i].chats[chatIndex] = {
                 ...chat,
+                pushName: finalPushName,
+                name: finalPushName,
+                originalName: chat.originalName || chat.pushName || chat.name,
+                apiName: message.pushName || chat.apiName,
                 lastMessage,
                 lastMessageTime: message.timestamp,
                 lastActivity: message.timestamp
               };
+              
+              console.log(`📝 Chat atualizado com pushName: ${finalPushName}`);
               
               // Atualizar o chat na posição atual
               updated = true;
