@@ -568,6 +568,7 @@ const KanbanBoard = () => {
       console.log('💬 handleNewMessage - Dados recebidos:', {
         chatId: message.chatId || message.key?.remoteJid,
         pushName: message.pushName,
+        fromMe: message.fromMe,
         content: message.message?.conversation || message.content?.text
       });
       
@@ -575,8 +576,10 @@ const KanbanBoard = () => {
       const chatId = message.chatId || message.key?.remoteJid;
       const pushName = message.pushName;
       const content = message.message?.conversation || message.content?.text || 'Mensagem';
+      const fromMe = message.fromMe;
       
-      if (chatId && pushName) {
+      // Atualizar chat com nova mensagem
+      if (chatId) {
         setColumns(prev => {
           const newColumns = [...prev];
           let updated = false;
@@ -591,17 +594,28 @@ const KanbanBoard = () => {
             if (chatIndex !== -1) {
               const chat = newColumns[i].chats[chatIndex];
               
-              // Atualizar nome com pushName da mensagem
-              newColumns[i].chats[chatIndex] = {
-                ...chat,
-                pushName: pushName,
-                name: pushName,
-                lastMessage: content,
-                lastMessageTime: message.timestamp || new Date(),
-                lastActivity: message.timestamp || new Date()
-              };
+              // Se a mensagem NÃO for enviada pelo sistema E tiver pushName, atualizar o nome
+              if (!fromMe && pushName) {
+                newColumns[i].chats[chatIndex] = {
+                  ...chat,
+                  pushName: pushName,
+                  name: pushName,
+                  lastMessage: content,
+                  lastMessageTime: message.timestamp || new Date(),
+                  lastActivity: message.timestamp || new Date()
+                };
+                console.log('✅ Chat atualizado com pushName:', pushName);
+              } else {
+                // Apenas atualizar última mensagem sem alterar o nome
+                newColumns[i].chats[chatIndex] = {
+                  ...chat,
+                  lastMessage: content,
+                  lastMessageTime: message.timestamp || new Date(),
+                  lastActivity: message.timestamp || new Date()
+                };
+                console.log('📝 Chat atualizado apenas com nova mensagem');
+              }
               
-              console.log('✅ Chat atualizado com pushName:', pushName);
               updated = true;
               chatFound = true;
               break;
@@ -614,8 +628,8 @@ const KanbanBoard = () => {
               chatId: chatId,
               id: chatId,
               remoteJid: chatId,
-              pushName: pushName,
-              name: pushName,
+              pushName: !fromMe && pushName ? pushName : null,
+              name: !fromMe && pushName ? pushName : chatId.replace('@s.whatsapp.net', ''),
               lastMessage: content,
               lastMessageTime: message.timestamp || new Date(),
               lastActivity: message.timestamp || new Date(),
@@ -623,7 +637,7 @@ const KanbanBoard = () => {
             };
             
             newColumns[0].chats.unshift(newChat);
-            console.log('🆕 Novo chat criado com pushName:', pushName);
+            console.log('🆕 Novo chat criado');
             updated = true;
           }
           
