@@ -394,10 +394,35 @@ const KanbanBoard = () => {
         });
         
         console.log('📝 Mapa de nomes criado:', nameMap);
+        
+        // Se a API retornou array vazio, usar pushName como fallback
+        if (response.data.length === 0) {
+          console.log('🔄 API retornou array vazio, usando pushName como fallback');
+          chats.forEach(chat => {
+            const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
+            if (phoneNumber && chat.pushName) {
+              nameMap[phoneNumber] = chat.pushName;
+              console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);
+            }
+          });
+        }
+        
         return nameMap;
       }
     } catch (error) {
       console.error('Erro ao buscar nomes dos contatos:', error);
+      
+      // Em caso de erro, também usar pushName como fallback
+      console.log('🔄 Erro na API, usando pushName como fallback');
+      const nameMap = {};
+      chats.forEach(chat => {
+        const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
+        if (phoneNumber && chat.pushName) {
+          nameMap[phoneNumber] = chat.pushName;
+          console.log(`📱 Usando pushName como fallback para ${phoneNumber}: ${chat.pushName}`);
+        }
+      });
+      return nameMap;
     }
     
     return {};
