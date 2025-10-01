@@ -565,15 +565,27 @@ const KanbanBoard = () => {
     const handleNewMessage = (data) => {
       const message = data.data;
       
-      // Se a mensagem tem pushName, atualizar o contato
-      if (message && message.pushName && message.chatId) {
+      console.log('💬 handleNewMessage - Dados recebidos:', {
+        chatId: message.chatId || message.key?.remoteJid,
+        pushName: message.pushName,
+        content: message.message?.conversation || message.content?.text
+      });
+      
+      // Extrair chatId e pushName do payload
+      const chatId = message.chatId || message.key?.remoteJid;
+      const pushName = message.pushName;
+      const content = message.message?.conversation || message.content?.text || 'Mensagem';
+      
+      if (chatId && pushName) {
         setColumns(prev => {
           const newColumns = [...prev];
           let updated = false;
+          let chatFound = false;
           
+          // Procurar o chat em todas as colunas
           for (let i = 0; i < newColumns.length; i++) {
             const chatIndex = newColumns[i].chats.findIndex(chat => 
-              chat.chatId === message.chatId || chat.remoteJid === message.chatId
+              chat.chatId === chatId || chat.remoteJid === chatId
             );
             
             if (chatIndex !== -1) {
@@ -582,16 +594,39 @@ const KanbanBoard = () => {
               // Atualizar nome com pushName da mensagem
               newColumns[i].chats[chatIndex] = {
                 ...chat,
-                pushName: message.pushName,
-                name: message.pushName,
-                lastMessage: message.content?.text || message.content?.caption || 'Mensagem',
-                lastMessageTime: message.timestamp,
-                lastActivity: message.timestamp
+                pushName: pushName,
+                name: pushName,
+                lastMessage: content,
+                lastMessageTime: message.timestamp || new Date(),
+                lastActivity: message.timestamp || new Date()
               };
               
+              console.log('✅ Chat atualizado com pushName:', pushName);
               updated = true;
+              chatFound = true;
               break;
             }
+          }
+          
+          // Se não encontrou o chat, criar na primeira coluna
+          if (!chatFound && newColumns[0]) {
+            const phoneNumber = chatId.replace('@s.whatsapp.net', '');
+            
+            const newChat = {
+              chatId: chatId,
+              id: chatId,
+              remoteJid: chatId,
+              pushName: pushName,
+              name: pushName,
+              lastMessage: content,
+              lastMessageTime: message.timestamp || new Date(),
+              lastActivity: message.timestamp || new Date(),
+              kanbanColumn: 'novo'
+            };
+            
+            newColumns[0].chats.unshift(newChat);
+            console.log('🆕 Novo chat criado com pushName:', pushName);
+            updated = true;
           }
           
           // Ordenar todas as colunas por lastActivity
