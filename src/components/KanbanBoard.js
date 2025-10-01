@@ -387,17 +387,29 @@ const KanbanBoard = () => {
       if (response.success && response.data) {
         // Criar mapa de número -> nome
         const nameMap = {};
-        response.data.forEach(contact => {
-          if (contact.number && contact.name) {
-            nameMap[contact.number] = contact.name;
-          }
-        });
+        
+        // Verificar se response.data é um array
+        if (Array.isArray(response.data)) {
+          response.data.forEach(contact => {
+            if (contact.number && contact.name) {
+              nameMap[contact.number] = contact.name;
+            }
+          });
+        } else if (response.data && typeof response.data === 'object') {
+          // Se não é array, pode ser um objeto com números como chaves
+          Object.keys(response.data).forEach(number => {
+            if (response.data[number]) {
+              nameMap[number] = response.data[number];
+            }
+          });
+        }
         
         console.log('📝 Mapa de nomes criado:', nameMap);
         
-        // Se a API retornou array vazio, usar pushName como fallback
-        if (response.data.length === 0) {
-          console.log('🔄 API retornou array vazio, usando pushName como fallback');
+        // Se a API retornou array vazio ou objeto vazio, usar pushName como fallback
+        if ((Array.isArray(response.data) && response.data.length === 0) || 
+            (typeof response.data === 'object' && Object.keys(response.data).length === 0)) {
+          console.log('🔄 API retornou dados vazios, usando pushName como fallback');
           chats.forEach(chat => {
             const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
             if (phoneNumber && chat.pushName) {
@@ -446,11 +458,18 @@ const KanbanBoard = () => {
             lastActivity: chat.lastActivity
           });
           
+          // Extrair número do chatId para usar como nome temporário
+          const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
+          const tempName = chat.pushName || chat.name || phoneNumber || 'Contato';
+          
           return {
             ...chat,
             id: chat._id || chat.chatId,
             remoteJid: chat.chatId,
-            pushName: chat.pushName || chat.name,
+            pushName: tempName,
+            name: tempName,
+            originalName: chat.pushName || chat.name,
+            apiName: null,
             lastMessage: chat.lastMessage?.content || 'Nenhuma mensagem',
             lastMessageTime: chat.lastMessage?.timestamp || chat.lastActivity
           };
@@ -464,8 +483,8 @@ const KanbanBoard = () => {
           const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
           const apiName = nameMap[phoneNumber];
           
-          // Priorizar nome salvo localmente, depois API, depois dados originais
-          const finalName = chat.pushName || chat.name || apiName || 'Contato';
+          // Priorizar: API > pushName > name > número > 'Contato'
+          const finalName = apiName || chat.pushName || chat.name || phoneNumber || 'Contato';
           
           // Debug: verificar se o nome está sendo aplicado corretamente
           if (finalName === 'Contato' && chat.chatId) {
@@ -474,13 +493,21 @@ const KanbanBoard = () => {
               pushName: chat.pushName,
               name: chat.name,
               apiName: apiName,
+              phoneNumber: phoneNumber,
               finalName: finalName
+            });
+          } else {
+            console.log('✅ refreshChats - Nome aplicado:', {
+              chatId: chat.chatId,
+              finalName: finalName,
+              source: apiName ? 'API' : chat.pushName ? 'pushName' : chat.name ? 'name' : 'phoneNumber'
             });
           }
           
           const chatWithName = {
             ...chat,
             pushName: finalName,
+            name: finalName,
             originalName: chat.pushName || chat.name,
             apiName: apiName
           };
