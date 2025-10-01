@@ -50,12 +50,12 @@ import { useSocket } from '../contexts/SocketContext';
 import { useI18n } from '../contexts/I18nContext';
 import ChatWindow from './ChatWindow';
 import toast from 'react-hot-toast';
-import api, { getContactNames } from '../services/api';
+import api from '../services/api';
 
 // Componente para renderizar o item sendo arrastado
 const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
   const { t } = useI18n();
-  const displayName = chat.pushName || chat.name || chat.originalName || chat.apiName || t('crm.contact');
+  const displayName = chat.pushName || chat.name || chat.originalName || t('crm.contact');
   const initials = displayName.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
   
   // Debug: verificar se o nome está sendo perdido
@@ -65,7 +65,6 @@ const DragItem = React.memo(({ provided, snapshot, chat, onClick }) => {
       pushName: chat.pushName,
       name: chat.name,
       originalName: chat.originalName,
-      apiName: chat.apiName,
       finalDisplayName: displayName
     });
   }
@@ -320,7 +319,6 @@ const KanbanBoard = () => {
   const [chatDialogOpen, setChatDialogOpen] = useState(false);
   const [settingsMenuAnchor, setSettingsMenuAnchor] = useState(null);
   const [editingColumn, setEditingColumn] = useState(null);
-  const [lastToastTime, setLastToastTime] = useState(0);
   const [columnSettingsOpen, setColumnSettingsOpen] = useState(false);
   const [tempColumnNames, setTempColumnNames] = useState({});
   const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
@@ -345,7 +343,7 @@ const KanbanBoard = () => {
     } catch (error) {
       console.error(t('crm.errorLoadingColumns'), error);
     }
-  }, [instanceName]);
+  }, [instanceName, t]);
 
   // Função para salvar nomes das colunas no localStorage
   const saveColumnNames = useCallback((columnNames) => {
@@ -354,7 +352,7 @@ const KanbanBoard = () => {
     } catch (error) {
       console.error(t('crm.errorSavingColumns'), error);
     }
-  }, [instanceName]);
+  }, [instanceName, t]);
 
   // Carregar dados da instância e conversas
   const loadInstance = useCallback(async () => {
@@ -370,38 +368,7 @@ const KanbanBoard = () => {
     }
   }, [instanceName, getInstance]);
 
-  // Função para buscar nomes dos contatos
-  const fetchContactNames = useCallback(async (chats) => {
-    try {
-      // Extrair números dos chats (remover @s.whatsapp.net)
-      const numbers = chats
-        .map(chat => chat.chatId?.replace('@s.whatsapp.net', ''))
-        .filter(number => number && number.length > 0);
-      
-      if (numbers.length === 0) return {};
-      
-      console.log('🔍 Buscando nomes para números:', numbers);
-      
-      const response = await getContactNames(numbers);
-      
-      if (response.success && response.data) {
-        // Criar mapa de número -> nome
-        const nameMap = {};
-        response.data.forEach(contact => {
-          if (contact.number && contact.name) {
-            nameMap[contact.number] = contact.name;
-          }
-        });
-        
-        console.log('📝 Mapa de nomes criado:', nameMap);
-        return nameMap;
-      }
-    } catch (error) {
-      console.error('Erro ao buscar nomes dos contatos:', error);
-    }
-    
-    return {};
-  }, []);
+  // Função simplificada - nomes vêm apenas de CONTACTS_UPSERT e MESSAGES_UPSERT
 
   // Recarregar conversas
   const refreshChats = useCallback(async () => {
@@ -431,33 +398,16 @@ const KanbanBoard = () => {
           };
         });
 
-        // Buscar nomes dos contatos
-        const nameMap = await fetchContactNames(mappedChats);
-        
-        // Aplicar nomes encontrados aos chats
+        // Aplicar nomes dos contatos (sem busca externa - apenas dados locais)
         const chatsWithNames = mappedChats.map(chat => {
-          const phoneNumber = chat.chatId?.replace('@s.whatsapp.net', '');
-          const apiName = nameMap[phoneNumber];
-          
-          // Priorizar nome salvo localmente, depois API, depois dados originais
-          const finalName = chat.pushName || chat.name || apiName || 'Contato';
-          
-          // Debug: verificar se o nome está sendo aplicado corretamente
-          if (finalName === 'Contato' && chat.chatId) {
-            console.log('🚨 refreshChats - Nome perdido:', {
-              chatId: chat.chatId,
-              pushName: chat.pushName,
-              name: chat.name,
-              apiName: apiName,
-              finalName: finalName
-            });
-          }
+          // Usar apenas dados já disponíveis: pushName, name ou número
+          const finalName = chat.pushName || chat.name || chat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
           
           const chatWithName = {
             ...chat,
             pushName: finalName,
             originalName: chat.pushName || chat.name,
-            apiName: apiName
+            apiName: null // Não usar mais API externa
           };
           
           // Atualizar cache com o nome
@@ -467,7 +417,7 @@ const KanbanBoard = () => {
               pushName: finalName,
               name: finalName,
               originalName: chat.pushName || chat.name,
-              apiName: apiName
+              apiName: null
             });
             return newCache;
           });
@@ -521,7 +471,7 @@ const KanbanBoard = () => {
     } finally {
       setLoading(false);
     }
-  }, [instanceName, fetchContactNames]);
+  }, [instanceName]);
 
   // Join/Leave instância para WebSocket
   useEffect(() => {
@@ -541,17 +491,21 @@ const KanbanBoard = () => {
     if (!instanceName || !socket) return;
 
     // Nova conversa
-    const handleNewChat = async (data) => {
+    // Nova conversa - nomes vêm apenas de CONTACTS_UPSERT e MESSAGES_UPSERT
+    const handleNewChat = (data) => {
       const newChat = data.data;
       setColumns(prev => {
         const newColumns = [...prev];
         // Adicionar na primeira coluna se não existir
         if (!newColumns[0].chats.find(c => c.chatId === newChat.chatId)) {
+          const finalName = newChat.pushName || newChat.name || newChat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
+          
           const mappedChat = {
             ...newChat,
             id: newChat._id || newChat.chatId,
             remoteJid: newChat.chatId,
-            pushName: newChat.name,
+            pushName: finalName,
+            name: finalName,
             lastMessage: newChat.lastMessage?.content || 'Nova conversa',
             lastMessageTime: newChat.lastMessage?.timestamp || newChat.lastActivity
           };
@@ -566,304 +520,53 @@ const KanbanBoard = () => {
         }
         return newColumns;
       });
-      
-      // Buscar nome do novo contato
-      try {
-        const phoneNumber = newChat.chatId?.replace('@s.whatsapp.net', '');
-        if (phoneNumber) {
-          const response = await getContactNames([phoneNumber]);
-          if (response.success && response.data && response.data.length > 0) {
-            const contactData = response.data[0];
-            if (contactData.name) {
-              setColumns(prev => {
-                const newColumns = [...prev];
-                const chatIndex = newColumns[0].chats.findIndex(c => c.chatId === newChat.chatId);
-                if (chatIndex !== -1) {
-                  newColumns[0].chats[chatIndex] = {
-                    ...newColumns[0].chats[chatIndex],
-                    pushName: contactData.name,
-                    originalName: newColumns[0].chats[chatIndex].pushName
-                  };
-                }
-                return newColumns;
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao buscar nome do novo contato:', error);
-      }
     };
 
-    // Conversa atualizada (também processa novas mensagens)
-    const handleChatUpdate = async (data) => {
-      console.log('🔄 Recebido chat-updated via WebSocket:', data);
+    // Conversa atualizada - nomes vêm apenas de CONTACTS_UPSERT e MESSAGES_UPSERT
+    const handleChatUpdate = (data) => {
       const updatedChat = data.data;
       
-      // Aguardar um pouco para permitir que a atualização local seja concluída
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      console.log('📝 Dados do chat atualizado:', JSON.stringify({
-        chatId: updatedChat.chatId,
-        name: updatedChat.name,
-        lastMessage: updatedChat.lastMessage,
-        lastActivity: updatedChat.lastActivity
-      }, null, 2));
-      
-      // Encontrar o chat atual para preservar o nome existente
-      let currentChat = null;
-      for (const column of columns) {
-        currentChat = column.chats.find(c => c.chatId === updatedChat.chatId);
-        if (currentChat) {
-          console.log('✅ Chat encontrado na coluna:', column.title);
-          break;
-        }
-      }
-      
-      if (!currentChat) {
-        console.log('❌ Chat não encontrado em nenhuma coluna:', updatedChat.chatId);
-        console.log('📋 Colunas disponíveis:', JSON.stringify(columns.map(col => ({
-          title: col.title,
-          chatIds: col.chats.map(c => c.chatId),
-          chatCount: col.chats.length
-        })), null, 2));
-        
-        // Tentar usar o cache de nomes
-        const cachedName = nameCache.get(updatedChat.chatId);
-        if (cachedName) {
-          console.log('💾 Usando nome do cache:', cachedName);
-        }
-      } else {
-        console.log('🔍 Chat atual encontrado:', {
-          chatId: currentChat.chatId,
-          pushName: currentChat.pushName,
-          name: currentChat.name,
-          originalName: currentChat.originalName,
-          apiName: currentChat.apiName
-        });
-        
-        // Atualizar cache com o nome atual
-        setNameCache(prev => {
-          const newCache = new Map(prev);
-          newCache.set(currentChat.chatId, {
-            pushName: currentChat.pushName,
-            name: currentChat.name,
-            originalName: currentChat.originalName,
-            apiName: currentChat.apiName
-          });
-          return newCache;
-        });
-      }
-      
-      // Determinar o nome a ser usado
-      let finalName = 'Contato';
-      let finalPushName = 'Contato';
-      let finalOriginalName = null;
-      let finalApiName = null;
-      
-      // Debug: verificar se o nome está sendo determinado corretamente
-      if (updatedChat.chatId && updatedChat.chatId.includes('556285074477')) {
-        console.log('🔍 WebSocket - Determinando nome para Thiago:', {
-          chatId: updatedChat.chatId,
-          currentChat: currentChat ? {
-            pushName: currentChat.pushName,
-            name: currentChat.name,
-            originalName: currentChat.originalName,
-            apiName: currentChat.apiName
-          } : 'NÃO ENCONTRADO',
-          cachedName: nameCache.get(updatedChat.chatId)
-        });
-      }
-      
-      if (currentChat) {
-        // Usar dados do chat atual
-        finalName = updatedChat.name || currentChat.name || currentChat.pushName || 'Contato';
-        finalPushName = updatedChat.name || currentChat.pushName || currentChat.name || 'Contato';
-        finalOriginalName = currentChat.originalName || currentChat.pushName || currentChat.name;
-        finalApiName = currentChat.apiName;
-      } else {
-        // Tentar usar cache
-        const cachedName = nameCache.get(updatedChat.chatId);
-        if (cachedName) {
-          finalName = updatedChat.name || cachedName.name || cachedName.pushName || 'Contato';
-          finalPushName = updatedChat.name || cachedName.pushName || cachedName.name || 'Contato';
-          finalOriginalName = cachedName.originalName || cachedName.pushName || cachedName.name;
-          finalApiName = cachedName.apiName;
-          console.log('💾 Usando nome do cache:', cachedName);
-        } else {
-          // Se não tem cache, usar uma estratégia mais robusta
-          console.log('🔄 Cache vazio, aplicando estratégia de fallback...');
-          
-          // Estratégia 1: Tentar buscar na API externa
-          try {
-            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
-            console.log('🔍 Buscando nome para:', phoneNumber);
-            const nameResponse = await getContactNames([phoneNumber]);
-            console.log('📡 Resposta da API:', nameResponse);
-            
-            // Usar a mesma lógica da função fetchContactNames
-            let apiName = null;
-            if (nameResponse.success && nameResponse.data) {
-              const contact = nameResponse.data.find(c => c.number === phoneNumber);
-              apiName = contact?.name;
-            } else if (Array.isArray(nameResponse)) {
-              const contact = nameResponse.find(c => c.number === phoneNumber);
-              apiName = contact?.name;
-            } else if (nameResponse && typeof nameResponse === 'object') {
-              apiName = nameResponse[phoneNumber];
-            }
-            
-            console.log('📝 Nome encontrado:', apiName);
-            
-            if (apiName) {
-              finalName = apiName;
-              finalPushName = apiName;
-              finalOriginalName = apiName;
-              finalApiName = apiName;
-              
-              // Atualizar cache com o nome encontrado
-              setNameCache(prev => {
-                const newCache = new Map(prev);
-                newCache.set(updatedChat.chatId, {
-                  pushName: apiName,
-                  name: apiName,
-                  originalName: apiName,
-                  apiName: apiName
-                });
-                return newCache;
-              });
-              
-              console.log('✅ Nome encontrado na API externa:', apiName);
-            } else {
-              console.log('❌ Nome não encontrado na API externa para:', phoneNumber);
-              
-              // Estratégia 2: Usar o número como nome temporário
-              finalName = phoneNumber;
-              finalPushName = phoneNumber;
-              finalOriginalName = phoneNumber;
-              finalApiName = null;
-              
-              console.log('📱 Usando número como nome temporário:', phoneNumber);
-            }
-          } catch (error) {
-            console.error('❌ Erro ao buscar nome na API externa:', error);
-            
-            // Estratégia 3: Usar número como fallback final
-            const phoneNumber = updatedChat.chatId?.replace('@s.whatsapp.net', '');
-            finalName = phoneNumber;
-            finalPushName = phoneNumber;
-            finalOriginalName = phoneNumber;
-            finalApiName = null;
-            
-            console.log('📱 Fallback final - usando número:', phoneNumber);
-          }
-        }
-      }
-      
-      const mappedChat = {
-        ...updatedChat,
-        id: updatedChat._id || updatedChat.chatId,
-        remoteJid: updatedChat.chatId,
-        pushName: finalPushName,
-        name: finalName,
-        originalName: finalOriginalName,
-        apiName: finalApiName,
-        lastMessage: updatedChat.lastMessage?.content || updatedChat.lastMessage || currentChat?.lastMessage || 'Nenhuma mensagem',
-        lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity
-      };
-      
-      console.log('🗺️ Chat mapeado:', JSON.stringify({
-        chatId: mappedChat.chatId,
-        pushName: mappedChat.pushName,
-        name: mappedChat.name,
-        originalName: mappedChat.originalName,
-        apiName: mappedChat.apiName,
-        preservedFromCurrent: !!currentChat,
-        usedCache: !currentChat && !!nameCache.get(updatedChat.chatId)
-      }, null, 2));
-
-      let isNewActivity = false;
-
       setColumns(prev => {
         const newColumns = [...prev];
         
         // Procurar a conversa em todas as colunas
-        let foundInColumn = -1;
-        let chatIndex = -1;
-        
         for (let i = 0; i < newColumns.length; i++) {
-          chatIndex = newColumns[i].chats.findIndex(chat => 
+          const chatIndex = newColumns[i].chats.findIndex(chat => 
             chat.chatId === updatedChat.chatId
           );
           
           if (chatIndex !== -1) {
-            foundInColumn = i;
+            // Atualizar chat existente - preservar nome atual
+            const currentChat = newColumns[i].chats[chatIndex];
+            const finalName = updatedChat.name || currentChat.pushName || currentChat.name || updatedChat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
+            
+            newColumns[i].chats[chatIndex] = {
+              ...currentChat,
+              ...updatedChat,
+              id: updatedChat._id || updatedChat.chatId,
+              remoteJid: updatedChat.chatId,
+              pushName: finalName,
+              name: finalName,
+              lastMessage: updatedChat.lastMessage?.content || currentChat.lastMessage || 'Nenhuma mensagem',
+              lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity
+            };
+            
+            // Ordenar por última atividade
+            newColumns[i].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
             break;
           }
         }
         
-        if (foundInColumn !== -1) {
-          // Verificar se houve nova atividade
-          const oldLastMessageTime = new Date(newColumns[foundInColumn].chats[chatIndex].lastMessageTime || 0);
-          const newLastMessageTime = new Date(mappedChat.lastMessageTime || 0);
-          
-          if (newLastMessageTime > oldLastMessageTime) {
-            isNewActivity = true;
-          }
-          
-          // Remover da coluna atual
-          newColumns[foundInColumn].chats.splice(chatIndex, 1);
-          
-          // Determinar a nova coluna baseada no kanbanColumn
-          let targetColumnIndex = foundInColumn; // Por padrão, manter na mesma coluna
-          
-          if (updatedChat.kanbanColumn) {
-            // Mapear kanbanColumn para índice da coluna
-            const columnMapping = {
-              'novo': 0,
-              'andamento': 1,
-              'carrinho': 2,
-              'aprovado': 3,
-              'reprovado': 4
-            };
-            
-            const newColumnIndex = columnMapping[updatedChat.kanbanColumn];
-            if (newColumnIndex !== undefined) {
-              targetColumnIndex = newColumnIndex;
-              console.log(`🔄 Movendo chat de coluna ${foundInColumn} para coluna ${targetColumnIndex} (${updatedChat.kanbanColumn})`);
-            }
-          }
-          
-          // Adicionar à nova coluna
-          newColumns[targetColumnIndex].chats.push(mappedChat);
-          
-          // Ordenar a coluna por lastActivity (mais recentes primeiro)
-          newColumns[targetColumnIndex].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
-        }
-        
         return newColumns;
       });
-
-      // Toast apenas se houve nova atividade e não foi recente
-      if (isNewActivity) {
-        const now = Date.now();
-        if (now - lastToastTime > 3000) { // Evitar spam de toasts
-          toast.success(`Nova mensagem de ${mappedChat.pushName || 'Contato'}`);
-          setLastToastTime(now);
-        }
-      }
     };
 
-    // Nova mensagem
+    // Nova mensagem - captura pushName do MESSAGES_UPSERT
     const handleNewMessage = (data) => {
-      console.log('💬 Recebido new-message via WebSocket:', data);
-      // Processar como atualização de conversa
-      handleChatUpdate(data);
-      
-      // Forçar atualização adicional se necessário
       const message = data.data;
-      if (message && message.chatId) {
-        // Atualizar diretamente a última mensagem no estado
+      
+      // Se a mensagem tem pushName, atualizar o contato
+      if (message && message.pushName && message.chatId) {
         setColumns(prev => {
           const newColumns = [...prev];
           let updated = false;
@@ -875,24 +578,23 @@ const KanbanBoard = () => {
             
             if (chatIndex !== -1) {
               const chat = newColumns[i].chats[chatIndex];
-              const lastMessage = message.content?.text || 
-                                  message.content?.caption || 
-                                  getMessageTypeDescription(message.messageType);
               
+              // Atualizar nome com pushName da mensagem
               newColumns[i].chats[chatIndex] = {
                 ...chat,
-                lastMessage,
+                pushName: message.pushName,
+                name: message.pushName,
+                lastMessage: message.content?.text || message.content?.caption || 'Mensagem',
                 lastMessageTime: message.timestamp,
                 lastActivity: message.timestamp
               };
               
-              // Atualizar o chat na posição atual
               updated = true;
               break;
             }
           }
           
-          // Ordenar todas as colunas por lastActivity (mais recentes primeiro)
+          // Ordenar todas as colunas por lastActivity
           if (updated) {
             newColumns.forEach(column => {
               column.chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
@@ -902,22 +604,6 @@ const KanbanBoard = () => {
           return updated ? newColumns : prev;
         });
       }
-    };
-    
-    // Função auxiliar para descrição do tipo de mensagem
-    const getMessageTypeDescription = (messageType) => {
-      const descriptions = {
-        image: '📷 Imagem',
-        video: '🎥 Vídeo', 
-        audio: '🎵 Áudio',
-        ptt: '🎤 Áudio',
-        document: '📄 Documento',
-        sticker: '🙂 Figurinha',
-        location: '📍 Localização',
-        contact: '👤 Contato'
-      };
-      
-      return descriptions[messageType] || 'Mensagem';
     };
 
     // Registrar listeners
@@ -958,7 +644,7 @@ const KanbanBoard = () => {
       off('contact-updated', handleContactUpdate);
       off('new-message', handleNewMessage);
     };
-  }, [socket, instanceName, on, off, lastToastTime, columns, nameCache]);
+  }, [socket, instanceName, on, off, columns, nameCache]);
 
   // Carregar dados iniciais
   useEffect(() => {
