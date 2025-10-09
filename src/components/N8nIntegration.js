@@ -1336,7 +1336,8 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
                   value={aiFormData.prompt}
                   onChange={(e) => setAiFormData({ ...aiFormData, prompt: e.target.value })}
                   placeholder={t('n8nIntegration.aiWorkflows.promptPlaceholder')}
-                  helperText={t('n8nIntegration.aiWorkflows.promptHelp')}
+                  helperText={`${aiFormData.prompt.length}/500.000 caracteres - ${t('n8nIntegration.aiWorkflows.promptHelp')}`}
+                  inputProps={{ maxLength: 500000 }}
                   required
                 />
               </Grid>
