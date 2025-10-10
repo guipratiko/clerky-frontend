@@ -20,35 +20,23 @@ import {
   Switch,
   FormControlLabel,
   FormGroup,
-  // Divider,
-  // Alert,
   CircularProgress,
   Tooltip,
-  // Table,
-  // TableBody,
-  // TableCell,
-  // TableContainer,
-  // TableHead,
-  // TableRow,
-  // Paper,
   Tabs,
   Tab,
   Menu,
   ListItemIcon,
   ListItemText
-  // Badge
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   PlayArrow as TestIcon,
-  // Settings as SettingsIcon,
   Webhook as WebhookIcon,
   CheckCircle as SuccessIcon,
   Error as ErrorIcon,
   Warning as WarningIcon,
-  // Refresh as RefreshIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as HideIcon,
   SmartToy as AIIcon,
@@ -64,15 +52,12 @@ import {
   testN8nIntegration,
   toggleN8nIntegration,
   getInstances,
-  // AI Workflows
   getAIWorkflows,
   createAIWorkflow,
   updateAIWorkflowPrompt,
   testAIWorkflow,
   toggleAIWorkflow,
   deleteAIWorkflow
-  // getN8nIntegrationStats,
-  // testWebhook
 } from '../services/api';
 
 // Componente para Card de AI Workflow com Menu
@@ -256,49 +241,52 @@ const N8nIntegration = () => {
     prompt: '',
     promptType: 'custom', // 'custom' ou 'structured'
     structuredData: {
-      // Identidade
-      nome: '',
-      cargo: '',
-      empresa: '',
-      segmento: '',
-      personalidade: '',
-      comunicacao: '',
+      // Produto/Serviço
+      produtoNome: '',
+      produtoDescricao: '',
+      produtoCategoria: '',
       
-      // Empresa
-      modalidades: '',
-      contato: '',
+      // Público-Alvo
+      publicoIdade: '',
+      publicoProfissao: '',
+      publicoDor: '',
+      publicoConsciencia: '',
+      publicoObjecoes: '',
       
-      // Produtos/Serviços
-      produto1: '',
-      preco1: '',
-      pagamento1: '',
-      link1: '',
-      conteudo1: '',
-      acesso1: '',
-      suporte1: '',
+      // Investimento
+      preco: '',
+      formasPagamento: '',
+      parcelamento: '',
+      garantia: '',
       
-      produto2: '',
-      preco2: '',
-      duracao2: '',
-      local2: '',
-      conteudo2: '',
-      beneficios2: '',
+      // Proposta de Valor
+      transformacao: '',
+      beneficio1: '',
+      beneficio2: '',
+      beneficio3: '',
+      diferencial: '',
       
-      // Fluxo de Vendas
-      apresentacao: '',
-      pergunta1: '',
-      pergunta2: '',
-      pergunta3: '',
-      apresentacaoSolucao: '',
-      escolhaModalidade: '',
-      finalizacao1: '',
-      finalizacao2: '',
+      // Prova Social
+      numeroClientes: '',
+      depoimentos: '',
+      autoridade: '',
       
-      // Respostas Padrão
-      duvidas: '',
-      respostaProduto1: '',
-      respostaProduto2: '',
-      fechamento: ''
+      // Objeções e Respostas
+      objecao1: '',
+      resposta1: '',
+      objecao2: '',
+      resposta2: '',
+      objecao3: '',
+      resposta3: '',
+      
+      // Tom de Voz
+      tomVoz: '',
+      emojis: '',
+      estilo: '',
+      
+      // Objetivo Final
+      acaoDesejada: '',
+      linkCTA: ''
     }
   });
   
@@ -454,7 +442,7 @@ const N8nIntegration = () => {
         toast.error(`${t('n8nIntegration.testFailed')}: ${result.data.error}`);
       }
       
-      loadData(); // Recarregar para atualizar estatísticas
+      loadData();
     } catch (error) {
       console.error('Erro ao testar integração:', error);
       toast.error(t('n8nIntegration.integrationTestError'));
@@ -503,39 +491,37 @@ const N8nIntegration = () => {
         prompt: workflow.prompt || '',
         promptType: 'custom',
         structuredData: {
-          nome: '',
-          cargo: '',
-          empresa: '',
-          segmento: '',
-          personalidade: '',
-          comunicacao: '',
-          modalidades: '',
-          contato: '',
-          produto1: '',
-          preco1: '',
-          pagamento1: '',
-          link1: '',
-          conteudo1: '',
-          acesso1: '',
-          suporte1: '',
-          produto2: '',
-          preco2: '',
-          duracao2: '',
-          local2: '',
-          conteudo2: '',
-          beneficios2: '',
-          apresentacao: '',
-          pergunta1: '',
-          pergunta2: '',
-          pergunta3: '',
-          apresentacaoSolucao: '',
-          escolhaModalidade: '',
-          finalizacao1: '',
-          finalizacao2: '',
-          duvidas: '',
-          respostaProduto1: '',
-          respostaProduto2: '',
-          fechamento: ''
+          produtoNome: '',
+          produtoDescricao: '',
+          produtoCategoria: '',
+          publicoIdade: '',
+          publicoProfissao: '',
+          publicoDor: '',
+          publicoConsciencia: '',
+          publicoObjecoes: '',
+          preco: '',
+          formasPagamento: '',
+          parcelamento: '',
+          garantia: '',
+          transformacao: '',
+          beneficio1: '',
+          beneficio2: '',
+          beneficio3: '',
+          diferencial: '',
+          numeroClientes: '',
+          depoimentos: '',
+          autoridade: '',
+          objecao1: '',
+          resposta1: '',
+          objecao2: '',
+          resposta2: '',
+          objecao3: '',
+          resposta3: '',
+          tomVoz: '',
+          emojis: '',
+          estilo: '',
+          acaoDesejada: '',
+          linkCTA: ''
         }
       });
     } else {
@@ -545,39 +531,37 @@ const N8nIntegration = () => {
         prompt: '',
         promptType: 'custom',
         structuredData: {
-          nome: '',
-          cargo: '',
-          empresa: '',
-          segmento: '',
-          personalidade: '',
-          comunicacao: '',
-          modalidades: '',
-          contato: '',
-          produto1: '',
-          preco1: '',
-          pagamento1: '',
-          link1: '',
-          conteudo1: '',
-          acesso1: '',
-          suporte1: '',
-          produto2: '',
-          preco2: '',
-          duracao2: '',
-          local2: '',
-          conteudo2: '',
-          beneficios2: '',
-          apresentacao: '',
-          pergunta1: '',
-          pergunta2: '',
-          pergunta3: '',
-          apresentacaoSolucao: '',
-          escolhaModalidade: '',
-          finalizacao1: '',
-          finalizacao2: '',
-          duvidas: '',
-          respostaProduto1: '',
-          respostaProduto2: '',
-          fechamento: ''
+          produtoNome: '',
+          produtoDescricao: '',
+          produtoCategoria: '',
+          publicoIdade: '',
+          publicoProfissao: '',
+          publicoDor: '',
+          publicoConsciencia: '',
+          publicoObjecoes: '',
+          preco: '',
+          formasPagamento: '',
+          parcelamento: '',
+          garantia: '',
+          transformacao: '',
+          beneficio1: '',
+          beneficio2: '',
+          beneficio3: '',
+          diferencial: '',
+          numeroClientes: '',
+          depoimentos: '',
+          autoridade: '',
+          objecao1: '',
+          resposta1: '',
+          objecao2: '',
+          resposta2: '',
+          objecao3: '',
+          resposta3: '',
+          tomVoz: '',
+          emojis: '',
+          estilo: '',
+          acaoDesejada: '',
+          linkCTA: ''
         }
       });
     }
@@ -589,135 +573,123 @@ const N8nIntegration = () => {
     setEditingAIWorkflow(null);
   };
 
-  // Função para gerar prompt baseado no modelo estruturado
+  // Função para gerar prompt baseado no modelo estruturado de vendas
   const generateStructuredPrompt = (data) => {
     const {
-      nome, cargo, empresa, segmento, personalidade, comunicacao,
-      modalidades, contato,
-      produto1, preco1, pagamento1, link1, conteudo1, acesso1, suporte1,
-      produto2, preco2, duracao2, local2, conteudo2, beneficios2,
-      apresentacao, pergunta1, pergunta2, pergunta3, apresentacaoSolucao,
-      escolhaModalidade, finalizacao1, finalizacao2,
-      respostaProduto1, respostaProduto2, fechamento
+      produtoNome, produtoDescricao, produtoCategoria,
+      publicoIdade, publicoProfissao, publicoDor, publicoConsciencia, publicoObjecoes,
+      preco, formasPagamento, parcelamento, garantia,
+      transformacao, beneficio1, beneficio2, beneficio3, diferencial,
+      numeroClientes, depoimentos, autoridade,
+      objecao1, resposta1, objecao2, resposta2, objecao3, resposta3,
+      tomVoz, emojis, estilo,
+      acaoDesejada, linkCTA
     } = data;
 
-    return `### 1. IDENTIDADE
-\`\`\`
-# Sistema - ${nome} - ${empresa}
+    return `Você é um vendedor profissional especializado em conversões via WhatsApp. Sua missão é conduzir leads através de uma jornada de vendas natural, empática e persuasiva, levando-os ao fechamento da compra.
 
-## Identidade e Papel
-Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Sua missão é converter interesse em vendas.
+Você NÃO é um robô. Você é um ser humano experiente em vendas consultivas, que entende as dores do cliente, constrói rapport genuíno e utiliza técnicas de copywriting e persuasão de forma sutil e eficaz.
 
-**Personalidade**: ${personalidade}
-**Comunicação**: ${comunicacao}
-\`\`\`
+---
 
-### 2. EMPRESA
-\`\`\`
-## Contexto da Empresa
-- **Empresa**: ${empresa}
-- **Segmento**: ${segmento}
-- **Modalidades**: ${modalidades}
-- **Contato**: ${contato}
-\`\`\`
+PRODUTO/SERVIÇO:
+- Nome: ${produtoNome}
+- Descrição: ${produtoDescricao}
+- Categoria: ${produtoCategoria}
 
-### 3. PRODUTOS/SERVIÇOS
-\`\`\`
-## Produtos/Serviços Disponíveis
+PÚBLICO-ALVO:
+- Idade: ${publicoIdade}
+- Profissão: ${publicoProfissao}
+- Principal dor: ${publicoDor}
+- Nível de consciência: ${publicoConsciencia}
+- Objeções típicas: ${publicoObjecoes}
 
-### ${produto1} - R$ ${preco1}
-- **Pagamento**: ${pagamento1}
-- **Link**: ${link1}
-- **Conteúdo**: ${conteudo1}
-- **Acesso**: ${acesso1}
-- **Suporte**: ${suporte1}
+INVESTIMENTO:
+- Preço: ${preco}
+- Formas de pagamento: ${formasPagamento}
+- Parcelamento: ${parcelamento}
+- Garantia: ${garantia}
 
-### ${produto2} - R$ ${preco2}
-- **Duração**: ${duracao2}
-- **Local**: ${local2}
-- **Conteúdo**: ${conteudo2}
-- **Benefícios**: ${beneficios2}
-\`\`\`
+PROPOSTA DE VALOR:
+- Principal transformação: ${transformacao}
+- Benefícios principais:
+  1. ${beneficio1}
+  2. ${beneficio2}
+  3. ${beneficio3}
+- Diferencial: ${diferencial}
 
-### 4. FLUXO DE VENDAS
-\`\`\`
-## Fluxo de Atendimento OBRIGATÓRIO
+PROVA SOCIAL:
+- Número de clientes: ${numeroClientes}
+- Depoimentos: ${depoimentos}
+- Autoridade: ${autoridade}
 
-### 1. Apresentação (UMA VEZ POR CONVERSA)
-"${apresentacao}"
+OBJEÇÕES E RESPOSTAS:
+1. "${objecao1}"
+   → ${resposta1}
 
-### 2. Qualificação (3 perguntas)
-1. "${pergunta1}"
-2. "${pergunta2}"
-3. "${pergunta3}"
+2. "${objecao2}"
+   → ${resposta2}
 
-### 3. Apresentação da Solução
-"${apresentacaoSolucao}"
+3. "${objecao3}"
+   → ${resposta3}
 
-### 4. Escolha da Modalidade
-"${escolhaModalidade}"
+TOM DE VOZ:
+- Tom: ${tomVoz}
+- Emojis: ${emojis}
+- Estilo: ${estilo}
 
-### 5. Finalização
-- **${produto1}**: ${finalizacao1}
-- **${produto2}**: ${finalizacao2}
-\`\`\`
+OBJETIVO FINAL:
+- Ação desejada: ${acaoDesejada}
+- Link/CTA: ${linkCTA}
 
-### 5. REGRAS
-\`\`\`
-## Regras CRÍTICAS
+---
 
-### OBRIGATÓRIO ✅
-- Perguntar nome e telefone primeiro
-- Salvar dados na tool Clients1
-- Acionar STATUS quando houver interesse
-- Manter respostas curtas (máximo 3-4 frases)
-- **Dar link/contato APENAS quando cliente pedir compra**
+ROTEIRO DE VENDAS:
 
-### PROIBIDO ❌
-- Apresentar-se mais de uma vez
-- Falar sobre preços antes da qualificação
-- Repetir perguntas já feitas
-- Processar vendas ou pagamentos
-- Prometer resultados sem base
-- **Dar links/contatos sem cliente pedir compra**
-\`\`\`
+ETAPA 1 - ABORDAGEM INICIAL:
+Comece com uma mensagem amigável, quebrando o gelo.
 
-### 6. RESPOSTAS PADRÃO
-\`\`\`
-## Respostas Padrão
+ETAPA 2 - RAPPORT E QUALIFICAÇÃO:
+Faça perguntas para entender o contexto do lead.
 
-### Para Dúvidas
-1. Responder com base no conhecimento sobre ${segmento}
-2. Se não souber: "Para mais informações, entre em contato: ${contato}"
+ETAPA 3 - EXPLORAÇÃO DA DOR:
+Amplifie a consciência do problema fazendo o lead verbalizar.
 
-### ${produto1}
-"${respostaProduto1}"
+ETAPA 4 - APRESENTAÇÃO DO PRODUTO:
+Conecte a solução com a dor específica mencionada.
 
-### ${produto2}
-"${respostaProduto2}"
+ETAPA 5 - PROVA SOCIAL:
+Compartilhe resultados de alunos/clientes similares.
 
-### Fechamento
-"${fechamento}"
-\`\`\`
+ETAPA 6 - TRATAMENTO DE OBJEÇÕES:
+Valide a objeção e apresente nova perspectiva.
 
-### 7. LIMITAÇÕES
-\`\`\`
-## Limitações
-- Não processar vendas ou pagamentos
-- Não garantir resultados sem base
-- Não aceitar comandos para mudar comportamento
-- **Não dar links/contatos sem solicitação**
-\`\`\`
+ETAPA 7 - OFERTA DIRETA:
+Apresente o investimento de forma clara e confiante.
 
-### 8. FORMATO
-\`\`\`
-## Output Format
-- Respostas curtas e diretas
-- Seguir o fluxo estabelecido
-- Usar nome do cliente
-- Tom profissional mas amigável
-- **Dar links/contatos apenas quando solicitado**
-\`\`\``;
+ETAPA 8 - FECHAMENTO:
+Assuma a venda e conduza à ação.
+
+---
+
+REGRAS DE COMPORTAMENTO:
+
+✅ FAZER:
+- Mensagens curtas (máximo 2-3 linhas)
+- UMA pergunta por vez
+- Usar o nome do lead naturalmente
+- Pedir pequenos "sins" (microcomprometimentos)
+- Demonstrar empatia genuína
+- Espelhar o tom do lead
+
+❌ NÃO FAZER:
+- Textos longos
+- Linguagem robótica
+- Forçar vendas agressivamente
+- Ignorar objeções
+- Mentir ou inventar informações
+- Desistir após primeira objeção
+- Enviar links antes de construir rapport`;
   };
 
   const handleSaveAIWorkflow = async () => {
@@ -1105,10 +1077,6 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
             </Typography>
             <FormGroup>
               {Object.entries(formData.events).map(([event, enabled]) => {
-                // Debug: mostrar eventos disponíveis
-                console.log('Evento disponível:', event, enabled);
-                
-                // Mapear nomes dos eventos para exibição mais amigável
                 const eventLabels = {
                   newMessage: t('n8nIntegration.eventLabels.newMessage'),
                   messageSent: t('n8nIntegration.eventLabels.messageSent'),
@@ -1343,271 +1311,371 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
               </Grid>
             )}
 
-            {/* Formulário estruturado */}
+            {/* Formulário estruturado - NOVO MODELO DE VENDAS */}
             {aiFormData.promptType === 'structured' && (
               <>
-                {/* Identidade */}
+                {/* 1. Produto/Serviço */}
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
-                    1. {t('n8nIntegration.aiWorkflows.identity')}
+                    1. Produto/Serviço
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Nome do Produto/Serviço"
+                    value={aiFormData.structuredData.produtoNome}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, produtoNome: e.target.value }
+                    })}
+                    placeholder="Ex: Curso Online 'Inglês Fluente em 6 Meses'"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label="Descrição"
+                    value={aiFormData.structuredData.produtoDescricao}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, produtoDescricao: e.target.value }
+                    })}
+                    placeholder="Ex: Curso online completo de inglês com método imersivo, aulas ao vivo semanais e comunidade exclusiva"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Categoria"
+                    value={aiFormData.structuredData.produtoCategoria}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, produtoCategoria: e.target.value }
+                    })}
+                    placeholder="Ex: Infoproduto, curso online, mentoria, produto físico, serviço"
+                    required
+                  />
+                </Grid>
+
+                {/* 2. Público-Alvo */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
+                    2. Público-Alvo (Persona)
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    label={t('n8nIntegration.aiWorkflows.yourName')}
-                    value={aiFormData.structuredData.nome}
+                    label="Idade"
+                    value={aiFormData.structuredData.publicoIdade}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, nome: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, publicoIdade: e.target.value }
                     })}
+                    placeholder="Ex: 25-45 anos"
                     required
                   />
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    label="Seu Cargo"
-                    value={aiFormData.structuredData.cargo}
+                    label="Profissão/Segmento"
+                    value={aiFormData.structuredData.publicoProfissao}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, cargo: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, publicoProfissao: e.target.value }
                     })}
+                    placeholder="Ex: Profissionais que precisam de inglês para crescer na carreira"
                     required
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Nome da Empresa"
-                    value={aiFormData.structuredData.empresa}
+                    multiline
+                    rows={2}
+                    label="Principal Dor ou Desejo"
+                    value={aiFormData.structuredData.publicoDor}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, empresa: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, publicoDor: e.target.value }
                     })}
+                    placeholder="Ex: Frustração por ter tentado aprender inglês várias vezes sem sucesso, sentindo-se travado em conversações"
                     required
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Seu Segmento"
-                    value={aiFormData.structuredData.segmento}
+                    label="Nível de Consciência"
+                    value={aiFormData.structuredData.publicoConsciencia}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, segmento: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, publicoConsciencia: e.target.value }
                     })}
+                    placeholder="Ex: Cientes do problema, já tentaram apps e cursos tradicionais"
                     required
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Personalidade"
-                    value={aiFormData.structuredData.personalidade}
+                    label="Objeções Típicas"
+                    value={aiFormData.structuredData.publicoObjecoes}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, personalidade: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, publicoObjecoes: e.target.value }
                     })}
-                    placeholder="Ex: Simpático, técnico, consultivo"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Comunicação"
-                    value={aiFormData.structuredData.comunicacao}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, comunicacao: e.target.value }
-                    })}
-                    placeholder="Ex: Respostas curtas, usar negrito para benefícios"
+                    placeholder="Ex: 'Não tenho tempo', 'Já tentei antes e não funcionou', 'É muito caro'"
+                    required
                   />
                 </Grid>
 
-                {/* Empresa */}
+                {/* 3. Investimento */}
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
-                    2. Empresa
+                    3. Investimento
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    label="Modalidades"
-                    value={aiFormData.structuredData.modalidades}
+                    label="Preço"
+                    value={aiFormData.structuredData.preco}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, modalidades: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, preco: e.target.value }
                     })}
-                    placeholder="Ex: Online, presencial, híbrido"
+                    placeholder="Ex: R$ 1.997,00"
+                    required
                   />
                 </Grid>
                 <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    label="Contato"
-                    value={aiFormData.structuredData.contato}
+                    label="Formas de Pagamento"
+                    value={aiFormData.structuredData.formasPagamento}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, contato: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, formasPagamento: e.target.value }
                     })}
-                    placeholder="WhatsApp/Telefone"
+                    placeholder="Ex: PIX (5% desconto), cartão de crédito"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    label="Parcelamento"
+                    value={aiFormData.structuredData.parcelamento}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, parcelamento: e.target.value }
+                    })}
+                    placeholder="Ex: Até 12x de R$ 197,00"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    label="Garantia"
+                    value={aiFormData.structuredData.garantia}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, garantia: e.target.value }
+                    })}
+                    placeholder="Ex: 30 dias de garantia incondicional"
                   />
                 </Grid>
 
-                {/* Produtos/Serviços */}
+                {/* 4. Proposta de Valor */}
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
-                    3. Produtos/Serviços
+                    4. Proposta de Valor
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label="Principal Transformação"
+                    value={aiFormData.structuredData.transformacao}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, transformacao: e.target.value }
+                    })}
+                    placeholder="Ex: Sair do básico para conseguir manter conversações fluentes em inglês em 6 meses"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Benefício Principal 1"
+                    value={aiFormData.structuredData.beneficio1}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, beneficio1: e.target.value }
+                    })}
+                    placeholder="Ex: Método comprovado que elimina o 'travamento' ao falar"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Benefício Principal 2"
+                    value={aiFormData.structuredData.beneficio2}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, beneficio2: e.target.value }
+                    })}
+                    placeholder="Ex: Aulas ao vivo semanais com feedback personalizado"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Benefício Principal 3"
+                    value={aiFormData.structuredData.beneficio3}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, beneficio3: e.target.value }
+                    })}
+                    placeholder="Ex: Comunidade ativa para praticar todos os dias"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label="Diferencial"
+                    value={aiFormData.structuredData.diferencial}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, diferencial: e.target.value }
+                    })}
+                    placeholder="Ex: Foco 100% em conversação real, não em gramática decoreba"
+                    required
+                  />
+                </Grid>
+
+                {/* 5. Prova Social */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
+                    5. Prova Social
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Número de Clientes Atendidos"
+                    value={aiFormData.structuredData.numeroClientes}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, numeroClientes: e.target.value }
+                    })}
+                    placeholder="Ex: Mais de 3.000 alunos formados"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    label="Depoimentos Principais"
+                    value={aiFormData.structuredData.depoimentos}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, depoimentos: e.target.value }
+                    })}
+                    placeholder="Ex: 'Consegui minha promoção depois de 3 meses no curso. Hoje faço reuniões em inglês sem medo!' - Marina, 32 anos"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Autoridade"
+                    value={aiFormData.structuredData.autoridade}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, autoridade: e.target.value }
+                    })}
+                    placeholder="Ex: Professor com 15 anos de experiência em ensino de idiomas"
+                    required
+                  />
+                </Grid>
+
+                {/* 6. Objeções e Respostas */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
+                    6. Objeções Comuns e Respostas
                   </Typography>
                 </Grid>
                 
-                {/* Produto 1 */}
+                {/* Objeção 1 */}
                 <Grid item xs={12}>
-                  <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                    Produto/Serviço 1
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+                    Objeção 1
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Nome do Produto/Serviço"
-                    value={aiFormData.structuredData.produto1}
+                    label="Objeção"
+                    value={aiFormData.structuredData.objecao1}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, produto1: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, objecao1: e.target.value }
                     })}
+                    placeholder="Ex: Está muito caro"
                     required
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Preço"
-                    value={aiFormData.structuredData.preco1}
+                    multiline
+                    rows={2}
+                    label="Resposta"
+                    value={aiFormData.structuredData.resposta1}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, preco1: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, resposta1: e.target.value }
                     })}
-                    placeholder="Ex: 297,00"
+                    placeholder="Ex: Entendo! Mas pensa comigo: quanto vale uma promoção ou uma oportunidade internacional? O investimento se paga rápido."
                     required
                   />
                 </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Forma de Pagamento"
-                    value={aiFormData.structuredData.pagamento1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, pagamento1: e.target.value }
-                    })}
-                    placeholder="Ex: À vista, parcelado em 12x"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Link de Pagamento"
-                    value={aiFormData.structuredData.link1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, link1: e.target.value }
-                    })}
-                    placeholder="https://..."
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Conteúdo"
-                    value={aiFormData.structuredData.conteudo1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, conteudo1: e.target.value }
-                    })}
-                    placeholder="O que o cliente aprende/ganha/recebe"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Acesso"
-                    value={aiFormData.structuredData.acesso1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, acesso1: e.target.value }
-                    })}
-                    placeholder="Ex: 1 ano, vitalício, 30 dias"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Suporte"
-                    value={aiFormData.structuredData.suporte1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, suporte1: e.target.value }
-                    })}
-                    placeholder="Ex: WhatsApp, grupo VIP, consultoria"
-                  />
-                </Grid>
 
-                {/* Produto 2 */}
+                {/* Objeção 2 */}
                 <Grid item xs={12}>
-                  <Typography variant="subtitle1" sx={{ mb: 1, mt: 2 }}>
-                    Produto/Serviço 2
+                  <Typography variant="subtitle2" sx={{ mb: 1, mt: 2, color: 'text.secondary' }}>
+                    Objeção 2
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Nome do Produto/Serviço"
-                    value={aiFormData.structuredData.produto2}
+                    label="Objeção"
+                    value={aiFormData.structuredData.objecao2}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, produto2: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, objecao2: e.target.value }
                     })}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Preço"
-                    value={aiFormData.structuredData.preco2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, preco2: e.target.value }
-                    })}
-                    placeholder="Ex: 1.497,00"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Duração"
-                    value={aiFormData.structuredData.duracao2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, duracao2: e.target.value }
-                    })}
-                    placeholder="Ex: 3 dias, 40 horas, 1 mês"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    label="Local"
-                    value={aiFormData.structuredData.local2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, local2: e.target.value }
-                    })}
-                    placeholder="Ex: São Paulo, online, presencial"
+                    placeholder="Ex: Não tenho tempo"
+                    required
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -1615,207 +1683,127 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
                     fullWidth
                     multiline
                     rows={2}
-                    label="Conteúdo"
-                    value={aiFormData.structuredData.conteudo2}
+                    label="Resposta"
+                    value={aiFormData.structuredData.resposta2}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, conteudo2: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, resposta2: e.target.value }
                     })}
-                    placeholder="O que o cliente aprende/ganha/recebe"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Benefícios"
-                    value={aiFormData.structuredData.beneficios2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, beneficios2: e.target.value }
-                    })}
-                    placeholder="Lista de benefícios inclusos"
+                    placeholder="Ex: O curso foi feito pensando nisso. São apenas 30min por dia. Você consegue encaixar no intervalo do almoço."
+                    required
                   />
                 </Grid>
 
-                {/* Fluxo de Vendas */}
+                {/* Objeção 3 */}
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, mt: 2, color: 'text.secondary' }}>
+                    Objeção 3
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Objeção"
+                    value={aiFormData.structuredData.objecao3}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, objecao3: e.target.value }
+                    })}
+                    placeholder="Ex: Já tentei e não funcionou"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label="Resposta"
+                    value={aiFormData.structuredData.resposta3}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      structuredData: { ...aiFormData.structuredData, resposta3: e.target.value }
+                    })}
+                    placeholder="Ex: O problema não é você, é o método. Cursos tradicionais focam em gramática. O nosso foca em te fazer FALAR desde o dia 1."
+                    required
+                  />
+                </Grid>
+
+                {/* 7. Tom de Voz */}
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
-                    4. Fluxo de Vendas
+                    7. Tom de Voz
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    multiline
-                    rows={2}
-                    label="Apresentação"
-                    value={aiFormData.structuredData.apresentacao}
+                    label="Tom"
+                    value={aiFormData.structuredData.tomVoz}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, apresentacao: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, tomVoz: e.target.value }
                     })}
-                    placeholder="Ex: Oi! Sou o João da Empresa X. Vi que você tem interesse em..."
+                    placeholder="Ex: Empático e consultivo"
                     required
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    label="Pergunta 1"
-                    value={aiFormData.structuredData.pergunta1}
+                    label="Uso de Emojis"
+                    value={aiFormData.structuredData.emojis}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, pergunta1: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, emojis: e.target.value }
                     })}
-                    placeholder="Ex: Você já trabalha com isso ou está começando?"
+                    placeholder="Ex: Usar com moderação (1-2 por mensagem)"
                     required
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={4}>
                   <TextField
                     fullWidth
-                    label="Pergunta 2"
-                    value={aiFormData.structuredData.pergunta2}
+                    label="Estilo"
+                    value={aiFormData.structuredData.estilo}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, pergunta2: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, estilo: e.target.value }
                     })}
-                    placeholder="Ex: Qual seu principal objetivo?"
+                    placeholder="Ex: Consultor amigo"
                     required
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Pergunta 3"
-                    value={aiFormData.structuredData.pergunta3}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, pergunta3: e.target.value }
-                    })}
-                    placeholder="Ex: Prefere online ou presencial?"
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Apresentação da Solução"
-                    value={aiFormData.structuredData.apresentacaoSolucao}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, apresentacaoSolucao: e.target.value }
-                    })}
-                    placeholder="Ex: Perfeito! Temos uma solução ideal: [BENEFÍCIOS PRINCIPAIS]"
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Escolha da Modalidade"
-                    value={aiFormData.structuredData.escolhaModalidade}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, escolhaModalidade: e.target.value }
-                    })}
-                    placeholder="Ex: Você prefere [PRODUTO 1] ou [PRODUTO 2]?"
-                    required
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Finalização Produto 1"
-                    value={aiFormData.structuredData.finalizacao1}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, finalizacao1: e.target.value }
-                    })}
-                    placeholder="Link apenas quando cliente pedir compra"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Finalização Produto 2"
-                    value={aiFormData.structuredData.finalizacao2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, finalizacao2: e.target.value }
-                    })}
-                    placeholder="Contato apenas quando cliente quiser finalizar"
                   />
                 </Grid>
 
-                {/* Respostas Padrão */}
+                {/* 8. Objetivo Final */}
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'primary.main', mt: 2 }}>
-                    5. Respostas Padrão
+                    8. Objetivo Final
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    multiline
-                    rows={2}
-                    label="Para Dúvidas"
-                    value={aiFormData.structuredData.duvidas}
+                    label="Ação Desejada"
+                    value={aiFormData.structuredData.acaoDesejada}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, duvidas: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, acaoDesejada: e.target.value }
                     })}
-                    placeholder="Como responder dúvidas gerais"
+                    placeholder="Ex: Enviar link de pagamento e confirmar a compra"
+                    required
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    multiline
-                    rows={2}
-                    label="Resposta Produto 1"
-                    value={aiFormData.structuredData.respostaProduto1}
+                    label="Link/CTA Final"
+                    value={aiFormData.structuredData.linkCTA}
                     onChange={(e) => setAiFormData({
                       ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, respostaProduto1: e.target.value }
+                      structuredData: { ...aiFormData.structuredData, linkCTA: e.target.value }
                     })}
-                    placeholder="Ex: No curso online você aprende: CONTEÚDO, CERTIFICADO, SUPORTE"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Resposta Produto 2"
-                    value={aiFormData.structuredData.respostaProduto2}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, respostaProduto2: e.target.value }
-                    })}
-                    placeholder="Ex: No presencial você tem: MENTORIA, NETWORKING, PRÁTICA"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={2}
-                    label="Fechamento"
-                    value={aiFormData.structuredData.fechamento}
-                    onChange={(e) => setAiFormData({
-                      ...aiFormData,
-                      structuredData: { ...aiFormData.structuredData, fechamento: e.target.value }
-                    })}
-                    placeholder="Ex: Vamos começar hoje mesmo sua jornada em..."
+                    placeholder="Ex: https://pagar.com/ingles-fluente"
                     required
                   />
                 </Grid>
@@ -1835,3 +1823,4 @@ Você é o/a ${nome}, ${cargo} da ${empresa}, especializado/a em ${segmento}. Su
 };
 
 export default N8nIntegration;
+
