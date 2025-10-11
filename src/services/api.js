@@ -214,6 +214,28 @@ export const updateAIWorkflowPrompt = async (workflowId, prompt) => {
   }
 };
 
+// Atualizar tempo de espera (Wait Time)
+export const updateAIWorkflowWaitTime = async (workflowId, waitTime) => {
+  try {
+    const response = await api.put(`/api/ai-workflows/${workflowId}/wait-time`, { waitTime });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar Wait Time do workflow:', error);
+    throw error;
+  }
+};
+
+// Atualizar configurações da tool de Kanban
+export const updateAIWorkflowKanbanTool = async (workflowId, kanbanToolConfig) => {
+  try {
+    const response = await api.put(`/api/ai-workflows/${workflowId}/kanban-tool`, kanbanToolConfig);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar Kanban Tool do workflow:', error);
+    throw error;
+  }
+};
+
 // Testar workflow
 export const testAIWorkflow = async (workflowId, testMessage) => {
   try {

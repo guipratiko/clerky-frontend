@@ -55,6 +55,8 @@ import {
   getAIWorkflows,
   createAIWorkflow,
   updateAIWorkflowPrompt,
+  updateAIWorkflowWaitTime,
+  updateAIWorkflowKanbanTool,
   testAIWorkflow,
   toggleAIWorkflow,
   deleteAIWorkflow
@@ -240,6 +242,12 @@ const N8nIntegration = () => {
     instanceName: '',
     prompt: '',
     promptType: 'custom', // 'custom' ou 'structured'
+    waitTime: 13, // Tempo de espera em segundos (0-60)
+    kanbanTool: {
+      enabled: false,
+      authToken: '',
+      targetColumn: 2 // 1=novo, 2=andamento, 3=carrinho, 4=aprovado, 5=reprovado
+    },
     structuredData: {
       // Produto/Serviço
       produtoNome: '',
@@ -490,6 +498,12 @@ const N8nIntegration = () => {
         instanceName: workflow.instanceName || '',
         prompt: workflow.prompt || '',
         promptType: 'custom',
+        waitTime: workflow.waitTime !== undefined && workflow.waitTime !== null ? workflow.waitTime : 13,
+        kanbanTool: {
+          enabled: workflow.kanbanTool?.enabled === true,
+          authToken: workflow.kanbanTool?.authToken || '',
+          targetColumn: workflow.kanbanTool?.targetColumn || 2
+        },
         structuredData: {
           produtoNome: '',
           produtoDescricao: '',
@@ -530,6 +544,12 @@ const N8nIntegration = () => {
         instanceName: '',
         prompt: '',
         promptType: 'custom',
+        waitTime: 13,
+        kanbanTool: {
+          enabled: false,
+          authToken: '',
+          targetColumn: 2
+        },
         structuredData: {
           produtoNome: '',
           produtoDescricao: '',
@@ -694,6 +714,17 @@ REGRAS DE COMPORTAMENTO:
 
   const handleSaveAIWorkflow = async () => {
     try {
+      // Validações
+      if (aiFormData.waitTime < 0 || aiFormData.waitTime > 60) {
+        toast.error('O tempo de espera deve estar entre 0 e 60 segundos');
+        return;
+      }
+
+      if (aiFormData.kanbanTool.enabled && !aiFormData.kanbanTool.authToken) {
+        toast.error('Token de autenticação é obrigatório quando a tool de Kanban está ativada');
+        return;
+      }
+
       // Gerar prompt baseado no tipo selecionado
       let finalPrompt = aiFormData.prompt;
       if (aiFormData.promptType === 'structured') {
@@ -701,7 +732,21 @@ REGRAS DE COMPORTAMENTO:
       }
 
       if (editingAIWorkflow) {
+        // Atualizar prompt
         await updateAIWorkflowPrompt(editingAIWorkflow._id, finalPrompt);
+        
+        // Atualizar waitTime (com valor padrão se não fornecido)
+        const waitTimeToUpdate = aiFormData.waitTime !== undefined ? aiFormData.waitTime : 13;
+        await updateAIWorkflowWaitTime(editingAIWorkflow._id, waitTimeToUpdate);
+        
+        // Atualizar kanbanTool (com valores padrão se não fornecidos)
+        const kanbanToolToUpdate = {
+          enabled: aiFormData.kanbanTool?.enabled || false,
+          authToken: aiFormData.kanbanTool?.authToken || '',
+          targetColumn: aiFormData.kanbanTool?.targetColumn || 2
+        };
+        await updateAIWorkflowKanbanTool(editingAIWorkflow._id, kanbanToolToUpdate);
+        
         toast.success(t('n8nIntegration.aiWorkflows.workflowUpdated'));
       } else {
         if (!aiFormData.instanceName) {
@@ -711,7 +756,9 @@ REGRAS DE COMPORTAMENTO:
         
         await createAIWorkflow({ 
           instanceName: aiFormData.instanceName, 
-          prompt: finalPrompt 
+          prompt: finalPrompt,
+          waitTime: aiFormData.waitTime,
+          kanbanTool: aiFormData.kanbanTool
         });
         toast.success(t('n8nIntegration.aiWorkflows.workflowCreated'));
       }
@@ -1291,6 +1338,101 @@ REGRAS DE COMPORTAMENTO:
                   <MenuItem value="structured">{t('n8nIntegration.aiWorkflows.structuredPrompt')}</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+
+            {/* Configurações do Workflow */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>
+                ⚙️ Configurações do Workflow
+              </Typography>
+            </Grid>
+
+            {/* Tempo de Espera */}
+            <Grid item xs={12}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Tempo de Espera (Wait Time): {aiFormData.waitTime}s
+              </Typography>
+              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                Tempo que o agente aguarda para agrupar mensagens antes de responder (evita responder mensagem por mensagem)
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <input
+                  type="range"
+                  min="0"
+                  max="60"
+                  value={aiFormData.waitTime}
+                  onChange={(e) => setAiFormData({ ...aiFormData, waitTime: parseInt(e.target.value) })}
+                  style={{ width: '100%' }}
+                />
+              </Box>
+            </Grid>
+
+            {/* Tool de Kanban */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                📊 Tool de Mudança de Coluna no Kanban
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={aiFormData.kanbanTool.enabled}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      kanbanTool: { ...aiFormData.kanbanTool, enabled: e.target.checked }
+                    })}
+                  />
+                }
+                label="Ativar tool de mudança de coluna"
+              />
+              <Typography variant="caption" color="text.secondary" display="block">
+                Permite que o agente mova o contato de coluna quando houver interesse no produto/serviço
+              </Typography>
+            </Grid>
+
+            {aiFormData.kanbanTool.enabled && (
+              <>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Token de Autenticação"
+                    value={aiFormData.kanbanTool.authToken}
+                    onChange={(e) => setAiFormData({
+                      ...aiFormData,
+                      kanbanTool: { ...aiFormData.kanbanTool, authToken: e.target.value }
+                    })}
+                    placeholder="Cole seu token JWT aqui"
+                    helperText="Token fornecido no card de integração. Exemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel>Coluna de Destino</InputLabel>
+                    <Select
+                      value={aiFormData.kanbanTool.targetColumn}
+                      onChange={(e) => setAiFormData({
+                        ...aiFormData,
+                        kanbanTool: { ...aiFormData.kanbanTool, targetColumn: parseInt(e.target.value) }
+                      })}
+                      label="Coluna de Destino"
+                    >
+                      <MenuItem value={1}>Coluna 1 - Novo</MenuItem>
+                      <MenuItem value={2}>Coluna 2 - Andamento</MenuItem>
+                      <MenuItem value={3}>Coluna 3 - Carrinho</MenuItem>
+                      <MenuItem value={4}>Coluna 4 - Aprovado</MenuItem>
+                      <MenuItem value={5}>Coluna 5 - Reprovado</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </>
+            )}
+
+            <Grid item xs={12}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', my: 2 }} />
             </Grid>
 
             {/* Prompt personalizado */}
