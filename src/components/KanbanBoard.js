@@ -530,6 +530,11 @@ const KanbanBoard = () => {
       
       setColumns(prev => {
         const newColumns = [...prev];
+        let chatFound = false;
+        let needsColumnMove = false;
+        let sourceColumnIndex = -1;
+        let destColumnIndex = -1;
+        let chatToMove = null;
         
         // Procurar a conversa em todas as colunas
         for (let i = 0; i < newColumns.length; i++) {
@@ -538,25 +543,65 @@ const KanbanBoard = () => {
           );
           
           if (chatIndex !== -1) {
-            // Atualizar chat existente - preservar nome atual
+            chatFound = true;
+            sourceColumnIndex = i;
             const currentChat = newColumns[i].chats[chatIndex];
             const finalName = updatedChat.name || currentChat.pushName || currentChat.name || updatedChat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
             
-            newColumns[i].chats[chatIndex] = {
-              ...currentChat,
-              ...updatedChat,
-              id: updatedChat._id || updatedChat.chatId,
-              remoteJid: updatedChat.chatId,
-              pushName: finalName,
-              name: finalName,
-              lastMessage: updatedChat.lastMessage?.content || currentChat.lastMessage || 'Nenhuma mensagem',
-              lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity
-            };
-            
-            // Ordenar por última atividade
-            newColumns[i].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+            // Verificar se a coluna mudou
+            const newColumnId = updatedChat.kanbanColumn || newColumns[i].id;
+            if (newColumnId !== newColumns[i].id) {
+              // Precisa mover para outra coluna
+              needsColumnMove = true;
+              destColumnIndex = newColumns.findIndex(col => col.id === newColumnId);
+              
+              // Preparar chat atualizado para mover
+              chatToMove = {
+                ...currentChat,
+                ...updatedChat,
+                id: updatedChat._id || updatedChat.chatId,
+                remoteJid: updatedChat.chatId,
+                pushName: finalName,
+                name: finalName,
+                lastMessage: updatedChat.lastMessage?.content || currentChat.lastMessage || 'Nenhuma mensagem',
+                lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity,
+                kanbanColumn: newColumnId
+              };
+              
+              // Remover da coluna atual
+              newColumns[i].chats.splice(chatIndex, 1);
+            } else {
+              // Apenas atualizar na mesma coluna
+              newColumns[i].chats[chatIndex] = {
+                ...currentChat,
+                ...updatedChat,
+                id: updatedChat._id || updatedChat.chatId,
+                remoteJid: updatedChat.chatId,
+                pushName: finalName,
+                name: finalName,
+                lastMessage: updatedChat.lastMessage?.content || currentChat.lastMessage || 'Nenhuma mensagem',
+                lastMessageTime: updatedChat.lastMessage?.timestamp || updatedChat.lastActivity
+              };
+              
+              // Ordenar por última atividade
+              newColumns[i].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+            }
             break;
           }
+        }
+        
+        // Se precisa mover para outra coluna, adicionar na nova coluna
+        if (needsColumnMove && destColumnIndex !== -1 && chatToMove) {
+          newColumns[destColumnIndex].chats.push(chatToMove);
+          // Ordenar a coluna de destino
+          newColumns[destColumnIndex].chats.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+          
+          console.log('✅ Chat movido via WebSocket:', {
+            chatId: chatToMove.chatId,
+            from: newColumns[sourceColumnIndex]?.id,
+            to: newColumns[destColumnIndex].id,
+            name: chatToMove.name
+          });
         }
         
         return newColumns;
