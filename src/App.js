@@ -8,6 +8,7 @@ import { Layout } from './components/Layout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import LoginPage from './components/Auth/LoginPage';
 import RegisterPage from './components/Auth/RegisterPage';
+import SetPasswordPage from './components/Auth/SetPasswordPage';
 import AdminPanel from './components/Admin/AdminPanel';
 import HomePage from './components/HomePage';
 import WhatsAppMain from './components/WhatsAppMain';
@@ -32,6 +33,7 @@ function App() {
             {/* Rotas públicas (sem autenticação) */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/complete-registration/:userId" element={<SetPasswordPage />} />
             
             {/* Rotas protegidas */}
             <Route path="/*" element={

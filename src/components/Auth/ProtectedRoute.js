@@ -50,7 +50,7 @@ const ProtectedRoute = ({
         >
           <strong>Conta Pendente de Aprovação</strong>
           <br />
-          Sua conta ainda está aguardando aprovação do administrador.
+          Para acessar o sistema, você precisa aderir a um plano de assinatura. Após a confirmação do pagamento, seu acesso será liberado automaticamente.
           <br />
           Entre em contato com o suporte se necessário.
         </Alert>

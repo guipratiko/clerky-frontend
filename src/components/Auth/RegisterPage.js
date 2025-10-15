@@ -194,14 +194,19 @@ const RegisterPage = () => {
               sx={{ color: 'rgba(255,255,255,0.8)', mb: 3 }}
               gutterBottom
             >
-              Sua conta foi criada com sucesso e está aguardando aprovação do administrador.
+              Sua conta foi criada com sucesso!
+            </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{ color: 'rgba(255,255,255,0.6)', mb: 2 }}
+            >
+              Para liberar o acesso ao sistema, você precisa aderir a um plano de assinatura.
             </Typography>
             <Typography 
               variant="body1" 
               sx={{ color: 'rgba(255,255,255,0.6)', mb: 4 }}
             >
-              Você receberá uma notificação por email quando sua conta for aprovada.
-              Após a aprovação, você poderá fazer login e começar a usar o sistema.
+              Após a confirmação do pagamento, você receberá um link para ativar sua conta e começar a usar o sistema.
             </Typography>
             <Button
               component={RouterLink}
@@ -557,23 +562,6 @@ const RegisterPage = () => {
                 Faça login
               </Link>
             </Typography>
-            
-            <Alert 
-              severity="info" 
-              sx={{ 
-                mt: 2,
-                backgroundColor: 'rgba(33,150,243,0.1)',
-                color: '#2196f3',
-                border: '1px solid rgba(33,150,243,0.3)',
-                '& .MuiAlert-icon': {
-                  color: '#2196f3'
-                }
-              }}
-            >
-              <Typography variant="caption">
-                Sua conta precisará ser aprovada por um administrador antes de poder ser utilizada.
-              </Typography>
-            </Alert>
           </Box>
         </Paper>
       </Container>

@@ -530,6 +530,7 @@ const KanbanBoard = () => {
       
       setColumns(prev => {
         const newColumns = [...prev];
+        let chatFound = false;
         let needsColumnMove = false;
         let sourceColumnIndex = -1;
         let destColumnIndex = -1;
@@ -542,6 +543,7 @@ const KanbanBoard = () => {
           );
           
           if (chatIndex !== -1) {
+            chatFound = true;
             sourceColumnIndex = i;
             const currentChat = newColumns[i].chats[chatIndex];
             const finalName = updatedChat.name || currentChat.pushName || currentChat.name || updatedChat.chatId?.replace('@s.whatsapp.net', '') || 'Contato';
