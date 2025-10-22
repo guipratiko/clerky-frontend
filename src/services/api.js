@@ -40,6 +40,15 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
+    } else if (error.response?.status === 402 && error.response?.data?.code === 'TRIAL_EXPIRED') {
+      // Trial expirou - desconectar usuário e redirecionar
+      console.log('🔒 Trial expirado - desconectando usuário');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Redirecionar para página de login com mensagem de trial expirado
+      localStorage.setItem('trialExpiredMessage', error.response.data.error);
+      window.location.href = '/login?trial=expired';
     } else if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
       // Erro de rede - mostrar mensagem amigável
       console.error('Erro de conexão com o servidor');

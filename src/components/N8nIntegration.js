@@ -26,7 +26,8 @@ import {
   Tab,
   Menu,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Paper
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -44,6 +45,7 @@ import {
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
 import {
   getN8nIntegrations,
   createN8nIntegration,
@@ -225,6 +227,7 @@ const AIWorkflowCard = ({ workflow, onToggle, onEdit, onTest, onDelete, testingW
 
 const N8nIntegration = () => {
   const { t } = useI18n();
+  const { user, isInTrial, getTrialDaysRemaining, isAdmin } = useAuth();
   const [integrations, setIntegrations] = useState([]);
   const [instances, setInstances] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -328,10 +331,20 @@ const N8nIntegration = () => {
     }
   });
 
-  // Carregar dados iniciais
+  // Carregar dados iniciais (apenas se não estiver em trial ou for admin)
   useEffect(() => {
+    // Aguardar usuário estar carregado
+    if (!user) return;
+    
+    // Não carregar dados se usuário estiver em trial (exceto admins)
+    if (!isAdmin() && isInTrial()) {
+      console.log('⚠️ Usuário em trial - dados N8N não carregados');
+      setLoading(false);
+      return;
+    }
+    
     loadData();
-  }, []);
+  }, [user]);
 
   const loadData = async () => {
     try {
@@ -830,6 +843,10 @@ REGRAS DE COMPORTAMENTO:
     </div>
   );
 
+  // Verificar se usuário está em trial (exceto admins)
+  const showTrialWarning = !isAdmin() && isInTrial();
+  const trialDaysRemaining = getTrialDaysRemaining();
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -840,6 +857,41 @@ REGRAS DE COMPORTAMENTO:
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Aviso de Trial */}
+      {showTrialWarning && (
+        <Paper sx={{ 
+          p: 3, 
+          mb: 3, 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          border: '2px solid #fff',
+          boxShadow: '0 8px 32px 0 rgba(102, 126, 234, 0.37)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <WarningIcon sx={{ fontSize: 40, color: '#fff' }} />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 1 }}>
+                🎯 Período de Teste - Funcionalidade Restrita
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 1 }}>
+                Você está no período de teste de 7 dias e esta funcionalidade não está disponível durante este período.
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                ⏰ <strong>{trialDaysRemaining} dias restantes</strong> | Após a aprovação completa da sua conta, você terá acesso total à Integração N8N e AI Workflows.
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      )}
+
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1">
           {t('n8nIntegration.title')}

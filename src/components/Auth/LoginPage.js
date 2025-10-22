@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -21,7 +21,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useI18n } from '../../contexts/I18nContext';
 import LanguageSelector from '../LanguageSelector';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -30,10 +30,23 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [trialExpiredWarning, setTrialExpiredWarning] = useState('');
   
   const { login, loading } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Verificar se foi redirecionado por trial expirado
+  useEffect(() => {
+    const trialExpired = searchParams.get('trial') === 'expired';
+    const message = localStorage.getItem('trialExpiredMessage');
+    
+    if (trialExpired && message) {
+      setTrialExpiredWarning(message);
+      localStorage.removeItem('trialExpiredMessage');
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     setFormData({
@@ -119,6 +132,31 @@ const LoginPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
+            {trialExpiredWarning && (
+              <Alert 
+                severity="warning" 
+                sx={{ 
+                  mb: 2,
+                  backgroundColor: 'rgba(255, 152, 0, 0.15)',
+                  color: '#ff9800',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                  '& .MuiAlert-icon': {
+                    color: '#ff9800'
+                  }
+                }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                  🔒 Período de Teste Expirado
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
+                  {trialExpiredWarning}
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
+                  Para continuar usando o sistema, você precisa adquirir uma assinatura. Entre em contato com o administrador.
+                </Typography>
+              </Alert>
+            )}
+            
             {error && (
               <Alert 
                 severity="error" 

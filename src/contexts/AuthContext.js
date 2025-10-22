@@ -75,13 +75,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Registro
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, cpf, phone) => {
     try {
       setLoading(true);
       const response = await api.post('/api/auth/register', {
         name,
         email,
-        password
+        password,
+        cpf,
+        phone
       });
 
       toast.success(response.data.message);
@@ -103,6 +105,21 @@ export const AuthProvider = ({ children }) => {
   // Verificar se está aprovado
   const isApproved = () => {
     return user?.status === 'approved';
+  };
+
+  // Verificar se está em período de trial
+  const isInTrial = () => {
+    return user?.isInTrial === true;
+  };
+
+  // Obter dias restantes do trial
+  const getTrialDaysRemaining = () => {
+    if (!user?.trialEndsAt) return 0;
+    const now = new Date();
+    const endDate = new Date(user.trialEndsAt);
+    const diffTime = endDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
   };
 
   // Obter usuários pendentes (admin)
@@ -153,6 +170,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAdmin,
     isApproved,
+    isInTrial,
+    getTrialDaysRemaining,
     getPendingUsers,
     approveUser,
     getAllUsers

@@ -19,7 +19,8 @@ import {
   Email,
   Lock,
   Person,
-  // WhatsApp,
+  Phone,
+  Badge,
   CheckCircle
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -31,6 +32,8 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    cpf: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
@@ -43,10 +46,37 @@ const RegisterPage = () => {
   const { t } = useI18n();
 
   const handleChange = (e) => {
+    let { name, value } = e.target;
+    
+    // Formatação automática de CPF
+    if (name === 'cpf') {
+      value = value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+    }
+    
+    // Formatação automática de telefone
+    if (name === 'phone') {
+      value = value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        if (value.length <= 10) {
+          value = value.replace(/(\d{2})(\d)/, '($1) $2');
+          value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+          value = value.replace(/(\d{2})(\d)/, '($1) $2');
+          value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        }
+      }
+    }
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
     if (error) setError('');
   };
 
@@ -63,6 +93,28 @@ const RegisterPage = () => {
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       setError(t('auth.emailInvalid'));
+      return false;
+    }
+
+    if (!formData.cpf.trim()) {
+      setError('CPF é obrigatório');
+      return false;
+    }
+
+    const cpfClean = formData.cpf.replace(/\D/g, '');
+    if (cpfClean.length !== 11) {
+      setError('CPF inválido. Digite 11 dígitos');
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      setError('Telefone é obrigatório');
+      return false;
+    }
+
+    const phoneClean = formData.phone.replace(/\D/g, '');
+    if (phoneClean.length < 10 || phoneClean.length > 11) {
+      setError('Telefone inválido. Digite DDD + número');
       return false;
     }
 
@@ -91,27 +143,27 @@ const RegisterPage = () => {
       return;
     }
 
-    const result = await register(formData.name, formData.email, formData.password);
+    const result = await register(
+      formData.name, 
+      formData.email, 
+      formData.password, 
+      formData.cpf, 
+      formData.phone
+    );
     
     if (result.success) {
       setSuccess(true);
       setFormData({
         name: '',
         email: '',
+        cpf: '',
+        phone: '',
         password: '',
         confirmPassword: ''
       });
     } else {
       setError(result.error);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const getPasswordStrength = () => {
@@ -144,6 +196,7 @@ const RegisterPage = () => {
     return 'success';
   };
 
+  // Tela de sucesso
   if (success) {
     return (
       <Box
@@ -157,7 +210,6 @@ const RegisterPage = () => {
         }}
       >
         <Container maxWidth="sm">
-          {/* Language Selector */}
           <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
             <LanguageSelector />
           </Box>
@@ -185,28 +237,32 @@ const RegisterPage = () => {
               component="h1" 
               fontWeight="bold"
               sx={{ color: '#fff', mb: 2 }}
-              gutterBottom
             >
               {t('auth.registerSuccess')}
             </Typography>
             <Typography 
               variant="h6" 
               sx={{ color: 'rgba(255,255,255,0.8)', mb: 3 }}
-              gutterBottom
             >
-              Sua conta foi criada com sucesso!
+              Sua conta foi criada com sucesso! 🎉
             </Typography>
             <Typography 
               variant="body1" 
               sx={{ color: 'rgba(255,255,255,0.6)', mb: 2 }}
             >
-              Para liberar o acesso ao sistema, você precisa aderir a um plano de assinatura.
+              Você ganhou <strong style={{ color: '#00a884' }}>7 dias de teste grátis</strong> para explorar o sistema!
             </Typography>
             <Typography 
               variant="body1" 
-              sx={{ color: 'rgba(255,255,255,0.6)', mb: 4 }}
+              sx={{ color: 'rgba(255,255,255,0.6)', mb: 1 }}
             >
-              Após a confirmação do pagamento, você receberá um link para ativar sua conta e começar a usar o sistema.
+              ✅ Acesso total ao WhatsApp, Chats e Kanban
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ color: 'rgba(255,255,255,0.4)', mb: 4 }}
+            >
+              *Disparo em Massa e Integração N8N disponíveis após trial
             </Typography>
             <Button
               component={RouterLink}
@@ -235,34 +291,53 @@ const RegisterPage = () => {
     );
   }
 
+  // Formulário de registro
   return (
     <Box
       sx={{
         minHeight: '100vh',
+        height: '100vh',
         background: 'linear-gradient(135deg, #111b21 0%, #1a1a2e 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 2
+        overflow: 'auto',
+        py: 3,
+        '&::-webkit-scrollbar': {
+          width: '10px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'rgba(0,0,0,0.2)',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'rgba(0, 168, 132, 0.6)',
+          borderRadius: '5px',
+          '&:hover': {
+            background: 'rgba(0, 168, 132, 0.8)',
+          },
+        },
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center', minHeight: '100%' }}>
+        <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+          <LanguageSelector />
+        </Box>
+
         <Paper
           elevation={24}
           sx={{
-            padding: 4,
+            width: '100%',
+            padding: { xs: 3, sm: 4 },
             borderRadius: 3,
             background: 'linear-gradient(180deg, #1e1e2e 0%, #2d2d44 100%)',
             border: '1px solid rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            my: 2
           }}
         >
-          {/* Header */}
+          {/* Logo e Subtítulo */}
           <Box textAlign="center" mb={4}>
             <Box
               component="img"
               src="/img/logo.png"
-              alt="Clerky CRM Logo"
+              alt="Clerky CRM"
               sx={{
                 height: { xs: 60, sm: 80 },
                 width: 'auto',
@@ -276,29 +351,26 @@ const RegisterPage = () => {
               }}
             />
             <Typography 
-              variant="h4" 
-              component="h1" 
-              fontWeight="bold"
-              sx={{ color: '#fff', mb: 1 }}
-              gutterBottom
+              variant="body1" 
+              sx={{ color: 'rgba(255,255,255,0.7)', mb: 0.5 }}
             >
-              Criar Conta
+              Registre-se para começar
             </Typography>
             <Typography 
-              variant="body2" 
-              sx={{ color: 'rgba(255,255,255,0.6)' }}
+              variant="caption" 
+              sx={{ color: 'rgba(255,255,255,0.5)' }}
             >
-              Registre-se para acessar o sistema WhatsApp
+              7 dias de teste grátis
             </Typography>
           </Box>
 
-          {/* Form */}
+          {/* Formulário */}
           <form onSubmit={handleSubmit}>
             {error && (
               <Alert 
                 severity="error" 
                 sx={{ 
-                  mb: 2,
+                  mb: 3,
                   backgroundColor: 'rgba(241,92,109,0.1)',
                   color: '#f15c6d',
                   border: '1px solid rgba(241,92,109,0.3)',
@@ -311,13 +383,13 @@ const RegisterPage = () => {
               </Alert>
             )}
 
+            {/* Nome Completo */}
             <TextField
               fullWidth
               name="name"
               label="Nome Completo"
               value={formData.name}
               onChange={handleChange}
-              margin="normal"
               required
               disabled={loading}
               InputProps={{
@@ -331,25 +403,18 @@ const RegisterPage = () => {
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
                   color: '#fff',
-                  '& fieldset': {
-                    borderColor: 'rgba(255,255,255,0.2)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#00a884',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#00a884',
-                  },
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
                 },
                 '& .MuiInputLabel-root': {
                   color: 'rgba(255,255,255,0.6)',
-                  '&.Mui-focused': {
-                    color: '#00a884',
-                  },
+                  '&.Mui-focused': { color: '#00a884' },
                 },
               }}
             />
 
+            {/* Email */}
             <TextField
               fullWidth
               name="email"
@@ -357,7 +422,6 @@ const RegisterPage = () => {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              margin="normal"
               required
               disabled={loading}
               InputProps={{
@@ -371,25 +435,84 @@ const RegisterPage = () => {
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
                   color: '#fff',
-                  '& fieldset': {
-                    borderColor: 'rgba(255,255,255,0.2)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#00a884',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#00a884',
-                  },
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
                 },
                 '& .MuiInputLabel-root': {
                   color: 'rgba(255,255,255,0.6)',
-                  '&.Mui-focused': {
-                    color: '#00a884',
-                  },
+                  '&.Mui-focused': { color: '#00a884' },
                 },
               }}
             />
 
+            {/* CPF */}
+            <TextField
+              fullWidth
+              name="cpf"
+              label="CPF"
+              value={formData.cpf}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              placeholder="000.000.000-00"
+              inputProps={{ maxLength: 14 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Badge sx={{ color: 'rgba(255,255,255,0.6)' }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ 
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255,255,255,0.6)',
+                  '&.Mui-focused': { color: '#00a884' },
+                },
+              }}
+            />
+
+            {/* Telefone */}
+            <TextField
+              fullWidth
+              name="phone"
+              label="Telefone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              placeholder="(00) 00000-0000"
+              inputProps={{ maxLength: 15 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone sx={{ color: 'rgba(255,255,255,0.6)' }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ 
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255,255,255,0.6)',
+                  '&.Mui-focused': { color: '#00a884' },
+                },
+              }}
+            />
+
+            {/* Senha */}
             <TextField
               fullWidth
               name="password"
@@ -397,7 +520,6 @@ const RegisterPage = () => {
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={handleChange}
-              margin="normal"
               required
               disabled={loading}
               InputProps={{
@@ -409,7 +531,7 @@ const RegisterPage = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={togglePasswordVisibility}
+                      onClick={() => setShowPassword(!showPassword)}
                       edge="end"
                       disabled={loading}
                       sx={{ color: 'rgba(255,255,255,0.6)' }}
@@ -423,25 +545,18 @@ const RegisterPage = () => {
                 mb: 1,
                 '& .MuiOutlinedInput-root': {
                   color: '#fff',
-                  '& fieldset': {
-                    borderColor: 'rgba(255,255,255,0.2)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#00a884',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#00a884',
-                  },
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
                 },
                 '& .MuiInputLabel-root': {
                   color: 'rgba(255,255,255,0.6)',
-                  '&.Mui-focused': {
-                    color: '#00a884',
-                  },
+                  '&.Mui-focused': { color: '#00a884' },
                 },
               }}
             />
 
+            {/* Indicador de Força da Senha */}
             {formData.password && (
               <Box sx={{ mb: 2 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -458,6 +573,7 @@ const RegisterPage = () => {
               </Box>
             )}
 
+            {/* Confirmar Senha */}
             <TextField
               fullWidth
               name="confirmPassword"
@@ -465,7 +581,6 @@ const RegisterPage = () => {
               type={showConfirmPassword ? 'text' : 'password'}
               value={formData.confirmPassword}
               onChange={handleChange}
-              margin="normal"
               required
               disabled={loading}
               InputProps={{
@@ -477,7 +592,7 @@ const RegisterPage = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={toggleConfirmPasswordVisibility}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       edge="end"
                       disabled={loading}
                       sx={{ color: 'rgba(255,255,255,0.6)' }}
@@ -491,25 +606,18 @@ const RegisterPage = () => {
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
                   color: '#fff',
-                  '& fieldset': {
-                    borderColor: 'rgba(255,255,255,0.2)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#00a884',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#00a884',
-                  },
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
                 },
                 '& .MuiInputLabel-root': {
                   color: 'rgba(255,255,255,0.6)',
-                  '&.Mui-focused': {
-                    color: '#00a884',
-                  },
+                  '&.Mui-focused': { color: '#00a884' },
                 },
               }}
             />
 
+            {/* Botão de Registro */}
             <Button
               type="submit"
               fullWidth
@@ -536,12 +644,12 @@ const RegisterPage = () => {
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                'Criar Conta'
+                'Registrar'
               )}
             </Button>
           </form>
 
-          {/* Footer */}
+          {/* Link para Login */}
           <Box textAlign="center" mt={3}>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
               Já tem uma conta?{' '}

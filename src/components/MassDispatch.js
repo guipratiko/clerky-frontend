@@ -39,6 +39,7 @@ import {
   AttachFile as AttachIcon,
   Visibility as ViewIcon,
   Schedule as ScheduleIcon,
+  Warning as WarningIcon,
   // AccessTime as TimeIcon,
   // CalendarToday as CalendarIcon,
   PlayCircleOutline as PlayCircleIcon,
@@ -47,6 +48,7 @@ import {
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -54,6 +56,7 @@ const MassDispatch = () => {
   const { instances } = useInstance();
   const { socket } = useSocket();
   const { t } = useI18n();
+  const { user, isInTrial, getTrialDaysRemaining, isAdmin } = useAuth();
   
   // Estados principais
   const [dispatches, setDispatches] = useState([]);
@@ -162,13 +165,22 @@ const MassDispatch = () => {
     }
   };
 
-  // Carregar dados iniciais
+  // Carregar dados iniciais (apenas se não estiver em trial ou for admin)
   useEffect(() => {
+    // Aguardar usuário estar carregado
+    if (!user) return;
+    
+    // Não carregar dados se usuário estiver em trial (exceto admins)
+    if (!isAdmin() && isInTrial()) {
+      console.log('⚠️ Usuário em trial - dados de disparo não carregados');
+      return;
+    }
+    
     loadDispatches();
     loadTemplates();
     loadStats();
     loadScheduledDispatches();
-  }, []);
+  }, [user]);
 
   // Carregar colunas do Kanban quando a instância mudar
   useEffect(() => {
@@ -639,8 +651,47 @@ const MassDispatch = () => {
     return icons[type] || <FileIcon />;
   };
 
+  // Verificar se usuário está em trial (exceto admins)
+  const showTrialWarning = !isAdmin() && isInTrial();
+  const trialDaysRemaining = getTrialDaysRemaining();
+
   return (
     <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
+      {/* Aviso de Trial */}
+      {showTrialWarning && (
+        <Paper sx={{ 
+          p: 3, 
+          mb: 3, 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          border: '2px solid #fff',
+          boxShadow: '0 8px 32px 0 rgba(102, 126, 234, 0.37)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <WarningIcon sx={{ fontSize: 40, color: '#fff' }} />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 1 }}>
+                🎯 Período de Teste - Funcionalidade Restrita
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 1 }}>
+                Você está no período de teste de 7 dias e esta funcionalidade não está disponível durante este período.
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                ⏰ <strong>{trialDaysRemaining} dias restantes</strong> | Após a aprovação completa da sua conta, você terá acesso total ao Disparo em Massa.
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      )}
+
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box>
