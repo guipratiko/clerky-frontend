@@ -89,7 +89,7 @@ const MassDispatch = () => {
       validateNumbers: true,
       removeNinthDigit: true,
       personalization: {
-        enabled: false,
+        enabled: true,
         defaultName: 'Cliente'
       },
       schedule: {
@@ -375,7 +375,7 @@ const MassDispatch = () => {
         validateNumbers: true,
         removeNinthDigit: true,
         personalization: {
-          enabled: false,
+          enabled: true,
           defaultName: 'Cliente'
         },
         schedule: {
@@ -1458,72 +1458,48 @@ const MassDispatch = () => {
               🎭 Personalização de Mensagens
             </Typography>
             
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.settings.personalization.enabled}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    settings: { 
-                      ...prev.settings, 
-                      personalization: { 
-                        ...prev.settings.personalization, 
-                        enabled: e.target.checked 
-                      }
-                    }
-                  }))}
-                  color="primary"
-                />
-              }
-              label="Ativar personalização com nomes dos contatos"
+            <TextField
+              fullWidth
+              label="Nome padrão (quando contato não tem nome)"
+              value={formData.settings.personalization.defaultName}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                settings: { 
+                  ...prev.settings, 
+                  personalization: { 
+                    ...prev.settings.personalization, 
+                    defaultName: e.target.value 
+                  }
+                }
+              }))}
+              placeholder="Ex: Cliente, Amigo, Senhor(a)"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: '#e9edef',
+                  '& fieldset': { borderColor: '#313d43' },
+                  '&:hover fieldset': { borderColor: '#00a884' },
+                  '&.Mui-focused fieldset': { borderColor: '#00a884' }
+                },
+                '& .MuiInputLabel-root': { color: '#8696a0' },
+                '& .MuiInputLabel-root.Mui-focused': { color: '#00a884' }
+              }}
             />
-
-            {formData.settings.personalization.enabled && (
-              <Box sx={{ mt: 2 }}>
-                <TextField
-                  fullWidth
-                  label="Nome padrão (quando contato não tem nome)"
-                  value={formData.settings.personalization.defaultName}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    settings: { 
-                      ...prev.settings, 
-                      personalization: { 
-                        ...prev.settings.personalization, 
-                        defaultName: e.target.value 
-                      }
-                    }
-                  }))}
-                  placeholder="Ex: Cliente, Amigo, Senhor(a)"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: '#e9edef',
-                      '& fieldset': { borderColor: '#313d43' },
-                      '&:hover fieldset': { borderColor: '#00a884' },
-                      '&.Mui-focused fieldset': { borderColor: '#00a884' }
-                    },
-                    '& .MuiInputLabel-root': { color: '#8696a0' },
-                    '& .MuiInputLabel-root.Mui-focused': { color: '#00a884' }
-                  }}
-                />
-                
-                <Box sx={{ mt: 2, p: 2, bgcolor: '#1e2428', borderRadius: 1 }}>
-                  <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                    📝 Variáveis disponíveis no template:
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
-                    $name - Nome completo do contato<br/>
-                    $firstName - Primeiro nome<br/>
-                    $lastName - Último nome<br/>
-                    $number - Número formatado<br/>
-                    $originalNumber - Número original
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
-                    Exemplo: "Olá $firstName! Seu número $number foi cadastrado com sucesso."
-                  </Typography>
-                </Box>
-              </Box>
-            )}
+            
+            <Box sx={{ mt: 2, p: 2, bgcolor: '#1e2428', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                📝 Variáveis disponíveis no template:
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                $name - Nome completo do contato<br/>
+                $firstName - Primeiro nome<br/>
+                $lastName - Último nome<br/>
+                $number - Número formatado<br/>
+                $originalNumber - Número original
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+                Exemplo: "Olá $firstName! Seu número $number foi cadastrado com sucesso."
+              </Typography>
+            </Box>
           </Box>
 
           {/* Seção de Agendamento */}
@@ -1879,6 +1855,23 @@ const MassDispatch = () => {
               )}
             </Box>
           )}
+
+          {/* Informações sobre variáveis disponíveis */}
+          <Box sx={{ mt: 3, p: 2, bgcolor: '#1e2428', borderRadius: 1, border: '1px solid #313d43' }}>
+            <Typography variant="body2" sx={{ color: '#8696a0', mb: 1, fontWeight: 'bold' }}>
+              📝 Variáveis disponíveis no template:
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace', mb: 1 }}>
+              $name - Nome completo do contato<br/>
+              $firstName - Primeiro nome<br/>
+              $lastName - Último nome<br/>
+              $number - Número formatado<br/>
+              $originalNumber - Número original
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#8696a0', fontStyle: 'italic' }}>
+              Exemplo: "Olá $firstName! Seu número $number foi cadastrado com sucesso."
+            </Typography>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTemplateDialogOpen(false)}>
