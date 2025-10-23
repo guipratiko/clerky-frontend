@@ -113,6 +113,13 @@ const MassDispatch = () => {
     media: null
   });
 
+  // Estados para sequência de mensagens
+  const [sequenceMessages, setSequenceMessages] = useState([
+    { order: 1, type: 'text', text: '', delay: 5 },
+    { order: 2, type: 'text', text: '', delay: 5 },
+    { order: 3, type: 'text', text: '', delay: 5 }
+  ]);
+
   // Estados para agendamento
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
   const [scheduleData, setScheduleData] = useState({
@@ -303,7 +310,11 @@ const MassDispatch = () => {
         instanceName: formData.instanceName,
         template: {
           type: selectedTemplate.type,
-          content: selectedTemplate.content
+          content: selectedTemplate.content,
+          // Incluir sequência se for template de sequência
+          ...(selectedTemplate.type === 'sequence' && {
+            sequence: selectedTemplate.sequence
+          })
         },
         settings: formData.settings,
         // Adicionar dados de agendamento se ativado
@@ -324,7 +335,8 @@ const MassDispatch = () => {
       console.log('📅 Criando disparo com dados:', {
         schedulingEnabled,
         scheduleData,
-        dispatchData: schedulingEnabled ? dispatchData.schedule : 'Não agendado'
+        dispatchData: schedulingEnabled ? dispatchData.schedule : 'Não agendado',
+        templateData: dispatchData.template
       });
 
       const createResponse = await api.post('/api/mass-dispatch', dispatchData);
@@ -522,21 +534,62 @@ const MassDispatch = () => {
     try {
       setLoading(true);
 
-      const templateData = new FormData();
-      templateData.append('name', templateForm.name);
-      templateData.append('description', templateForm.description);
-      templateData.append('type', templateForm.type);
+      if (templateForm.type === 'sequence') {
+        // Criar template de sequência
+        const templateData = new FormData();
+        templateData.append('name', templateForm.name);
+        templateData.append('description', templateForm.description);
+        templateData.append('type', 'sequence');
+        
+        // Adicionar sequência de mensagens
+        templateData.append('sequence', JSON.stringify({
+          messages: sequenceMessages.map(msg => ({
+            order: msg.order,
+            type: msg.type,
+            delay: msg.delay,
+            content: {
+              text: msg.text || '',
+              caption: msg.text || ''
+            }
+          }))
+        }));
 
-      if (templateForm.text) templateData.append('text', templateForm.text);
-      if (templateForm.caption) templateData.append('caption', templateForm.caption);
-      if (templateForm.fileName) templateData.append('fileName', templateForm.fileName);
-      if (templateForm.media) templateData.append('media', templateForm.media);
+        // Adicionar arquivos de mídia
+        sequenceMessages.forEach((msg, index) => {
+          if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+            templateData.append('media', msg.media);
+          }
+        });
 
-      await api.post('/api/mass-dispatch/templates', templateData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+        console.log('🔍 Debug frontend - Template de sequência:', {
+          templateName: templateForm.name,
+          sequenceMessages: sequenceMessages,
+          mediaFiles: sequenceMessages.filter(msg => msg.media).length
+        });
+
+        await api.post('/api/mass-dispatch/templates/sequence', templateData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } else {
+        // Criar template simples
+        const templateData = new FormData();
+        templateData.append('name', templateForm.name);
+        templateData.append('description', templateForm.description);
+        templateData.append('type', templateForm.type);
+
+        if (templateForm.text) templateData.append('text', templateForm.text);
+        if (templateForm.caption) templateData.append('caption', templateForm.caption);
+        if (templateForm.fileName) templateData.append('fileName', templateForm.fileName);
+        if (templateForm.media) templateData.append('media', templateForm.media);
+
+        await api.post('/api/mass-dispatch/templates', templateData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
 
       toast.success(t('massDispatch.templateCreated'));
       setTemplateDialogOpen(false);
@@ -549,6 +602,11 @@ const MassDispatch = () => {
         fileName: '',
         media: null
       });
+      setSequenceMessages([
+        { order: 1, type: 'text', text: '', delay: 5 },
+        { order: 2, type: 'text', text: '', delay: 5 },
+        { order: 3, type: 'text', text: '', delay: 5 }
+      ]);
       loadTemplates();
 
     } catch (error) {
@@ -1781,6 +1839,7 @@ const MassDispatch = () => {
               <MenuItem value="audio">{t('massDispatch.templateTypes.audio')}</MenuItem>
               <MenuItem value="file">{t('massDispatch.templateTypes.file')}</MenuItem>
               <MenuItem value="file_caption">{t('massDispatch.templateTypes.fileCaption')}</MenuItem>
+              <MenuItem value="sequence">📝 Sequência de Mensagens</MenuItem>
             </Select>
           </FormControl>
 
@@ -1829,7 +1888,7 @@ const MassDispatch = () => {
             />
           )}
 
-          {templateForm.type !== 'text' && (
+          {templateForm.type !== 'text' && templateForm.type !== 'sequence' && (
             <Box sx={{ mt: 2 }}>
               <Button
                 variant="outlined"
@@ -1853,6 +1912,138 @@ const MassDispatch = () => {
                   Arquivo selecionado: {templateForm.media.name}
                 </Typography>
               )}
+            </Box>
+          )}
+
+          {/* Interface para sequência de mensagens */}
+          {templateForm.type === 'sequence' && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, color: '#00a884' }}>
+                📝 Sequência de Mensagens (até 3 mensagens)
+              </Typography>
+              
+              {sequenceMessages.map((message, index) => (
+                <Box key={index} sx={{ mb: 3, p: 2, border: '1px solid #313d43', borderRadius: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" sx={{ color: '#00a884', mr: 2 }}>
+                      Mensagem {message.order}
+                    </Typography>
+                    <FormControl sx={{ minWidth: 120, mr: 2 }}>
+                      <InputLabel sx={{ color: '#8696a0' }}>Tipo</InputLabel>
+                      <Select
+                        value={message.type}
+                        onChange={(e) => {
+                          const newMessages = [...sequenceMessages];
+                          newMessages[index].type = e.target.value;
+                          setSequenceMessages(newMessages);
+                        }}
+                        sx={{
+                          color: '#e9edef',
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' }
+                        }}
+                      >
+                        <MenuItem value="text">Texto</MenuItem>
+                        <MenuItem value="image">Imagem</MenuItem>
+                        <MenuItem value="image_caption">Imagem + Legenda</MenuItem>
+                        <MenuItem value="audio">Áudio</MenuItem>
+                        <MenuItem value="file">Arquivo</MenuItem>
+                        <MenuItem value="file_caption">Arquivo + Legenda</MenuItem>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      label="Delay (segundos)"
+                      type="number"
+                      value={message.delay}
+                      onChange={(e) => {
+                        const newMessages = [...sequenceMessages];
+                        newMessages[index].delay = parseInt(e.target.value) || 5;
+                        setSequenceMessages(newMessages);
+                      }}
+                      sx={{
+                        width: 120,
+                        '& .MuiInputLabel-root': { color: '#8696a0' },
+                        '& .MuiOutlinedInput-root': {
+                          color: '#e9edef',
+                          '& fieldset': { borderColor: '#313d43' },
+                          '&:hover fieldset': { borderColor: '#00a884' },
+                          '&.Mui-focused fieldset': { borderColor: '#00a884' }
+                        }
+                      }}
+                    />
+                  </Box>
+
+                  {/* Campo de texto */}
+                  {(message.type === 'text' || message.type.includes('caption')) && (
+                    <TextField
+                      fullWidth
+                      label={message.type === 'text' ? 'Texto da mensagem' : 'Legenda'}
+                      value={message.text}
+                      onChange={(e) => {
+                        const newMessages = [...sequenceMessages];
+                        newMessages[index].text = e.target.value;
+                        setSequenceMessages(newMessages);
+                      }}
+                      multiline
+                      rows={2}
+                      placeholder={message.type === 'text' ? 'Digite a mensagem...' : 'Digite a legenda...'}
+                      sx={{
+                        '& .MuiInputLabel-root': { color: '#8696a0' },
+                        '& .MuiOutlinedInput-root': {
+                          color: '#e9edef',
+                          '& fieldset': { borderColor: '#313d43' },
+                          '&:hover fieldset': { borderColor: '#00a884' },
+                          '&.Mui-focused fieldset': { borderColor: '#00a884' }
+                        }
+                      }}
+                    />
+                  )}
+
+                  {/* Upload de arquivo para tipos que precisam */}
+                  {message.type !== 'text' && (
+                    <Box sx={{ mt: 2 }}>
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        startIcon={<CloudUploadIcon />}
+                        size="small"
+                      >
+                        Escolher Arquivo
+                        <input
+                          type="file"
+                          hidden
+                          accept={
+                            message.type.includes('image') ? 'image/*' :
+                            message.type.includes('audio') ? 'audio/*' : '*/*'
+                          }
+                          onChange={(e) => {
+                            const newMessages = [...sequenceMessages];
+                            newMessages[index].media = e.target.files[0];
+                            setSequenceMessages(newMessages);
+                          }}
+                        />
+                      </Button>
+                      {message.media && (
+                        <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+                          Arquivo: {message.media.name}
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+              ))}
+
+              <Box sx={{ mt: 2, p: 2, bgcolor: '#1e2428', borderRadius: 1 }}>
+                <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                  💡 Exemplo de sequência:
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                  1. "Oi $firstName, como vai você?" (delay: 5s)<br/>
+                  2. "Ficou sabendo da novidade?" (delay: 5s)<br/>
+                  3. "Entre já no link www.teste.com" (delay: 0s)
+                </Typography>
+              </Box>
             </Box>
           )}
 
