@@ -44,12 +44,19 @@ const StatusPage = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para produção
       
-      // Usar URL direta sempre em produção para evitar problemas de proxy
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `${config.API_URL}/api/status`
-        : '/api/status';
+      // Determinar URL baseada no hostname
+      let apiUrl;
+      if (window.location.hostname === 'app.clerky.com.br') {
+        apiUrl = 'https://back.clerky.com.br/api/status';
+      } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        apiUrl = '/api/status';
+      } else {
+        // Fallback para desenvolvimento
+        apiUrl = '/api/status';
+      }
       
       console.log('🔍 Buscando status em:', apiUrl);
+      console.log('🌐 Hostname atual:', window.location.hostname);
       
       const response = await fetch(apiUrl, {
         signal: controller.signal,
