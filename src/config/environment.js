@@ -1,7 +1,7 @@
 // Configuração de ambiente para produção
 const config = {
   development: {
-    API_URL: 'http://localhost:4700',
+    API_URL: 'http://localhost:4500',
     FRONTEND_URL: 'http://localhost:3500'
   },
   production: {
