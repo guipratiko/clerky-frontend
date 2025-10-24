@@ -5,9 +5,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
 
-// Suprimir warnings de deprecação do webpack dev server
-import './suppressWarnings';
-
 // Tema personalizado do WhatsApp
 const theme = createTheme({
   palette: {
