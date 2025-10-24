@@ -17,6 +17,7 @@ import KanbanBoard from './components/KanbanBoard';
 import MassDispatch from './components/MassDispatch';
 import N8nIntegration from './components/N8nIntegration';
 import WebhookDocumentation from './components/WebhookDocumentation';
+import StatusPage from './components/StatusPage';
 import './App.css';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/complete-registration/:userId" element={<SetPasswordPage />} />
+            <Route path="/status" element={<StatusPage />} />
             
             {/* Rotas protegidas */}
             <Route path="/*" element={
