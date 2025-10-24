@@ -17,18 +17,16 @@ import {
   IconButton,
   Tooltip
 } from '@mui/material';
-import {
-  CheckCircle,
-  Error,
-  Warning,
-  Refresh,
-  Storage,
-  Api,
-  Computer,
-  Memory,
-  Speed,
-  Cloud
-} from '@mui/icons-material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import WarningIcon from '@mui/icons-material/Warning';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import StorageIcon from '@mui/icons-material/Storage';
+import ApiIcon from '@mui/icons-material/Api';
+import ComputerIcon from '@mui/icons-material/Computer';
+import MemoryIcon from '@mui/icons-material/Memory';
+import SpeedIcon from '@mui/icons-material/Speed';
+import CloudIcon from '@mui/icons-material/Cloud';
 import config from '../config/environment';
 
 const StatusPage = () => {
@@ -115,16 +113,16 @@ const StatusPage = () => {
     switch (status) {
       case 'online':
       case 'healthy':
-        return <CheckCircle color="success" />;
+        return <CheckCircleIcon color="success" />;
       case 'checking':
         return <CircularProgress size={20} />;
       case 'degraded':
-        return <Warning color="warning" />;
+        return <WarningIcon color="warning" />;
       case 'offline':
       case 'error':
-        return <Error color="error" />;
+        return <ErrorIcon color="error" />;
       default:
-        return <Warning color="warning" />;
+        return <WarningIcon color="warning" />;
     }
   };
 
@@ -197,7 +195,7 @@ const StatusPage = () => {
             )}
             <Tooltip title="Atualizar status">
               <IconButton onClick={fetchStatus} disabled={loading}>
-                <Refresh />
+                <RefreshIcon />
               </IconButton>
             </Tooltip>
           </Box>
@@ -248,7 +246,7 @@ const StatusPage = () => {
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                <Error color="error" />
+                <ErrorIcon color="error" />
                 <Typography variant="h5">
                   Serviços Indisponíveis
                 </Typography>
@@ -265,7 +263,7 @@ const StatusPage = () => {
                 <Button 
                   variant="contained" 
                   onClick={fetchStatus}
-                  startIcon={<Refresh />}
+                  startIcon={<RefreshIcon />}
                   disabled={loading}
                 >
                   {loading ? 'Verificando...' : 'Verificar Novamente'}
@@ -283,7 +281,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Api color="primary" />
+                    <ApiIcon color="primary" />
                     <Typography variant="h6">API Backend</Typography>
                     <Chip
                       label={status.services.api?.status}
@@ -295,7 +293,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Speed />
+                        <SpeedIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Uptime"
@@ -304,7 +302,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Versão"
@@ -313,7 +311,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Memory />
+                        <MemoryIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Memória"
@@ -330,7 +328,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Storage color="primary" />
+                    <StorageIcon color="primary" />
                     <Typography variant="h6">Database</Typography>
                     <Chip
                       label={status.services.database?.status}
@@ -342,7 +340,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Cloud />
+                        <CloudIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Estado da Conexão"
@@ -352,7 +350,7 @@ const StatusPage = () => {
                     {status.services.database?.responseTime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Tempo de Resposta"
@@ -363,7 +361,7 @@ const StatusPage = () => {
                     {status.services.database?.collections && (
                       <ListItem>
                         <ListItemIcon>
-                          <Storage />
+                          <StorageIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Coleções"
@@ -381,7 +379,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Api color="primary" />
+                    <ApiIcon color="primary" />
                     <Typography variant="h6">Evolution API</Typography>
                     <Chip
                       label={status.services.evolutionApi?.status}
@@ -393,7 +391,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Instâncias Totais"
@@ -404,7 +402,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <CheckCircle />
+                        <CheckCircleIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Instâncias Ativas"
@@ -416,7 +414,7 @@ const StatusPage = () => {
                     {status.services.evolutionApi?.responseTime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Tempo de Resposta"
@@ -434,14 +432,14 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Computer color="primary" />
+                    <ComputerIcon color="primary" />
                     <Typography variant="h6">Sistema</Typography>
                   </Box>
                   
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Plataforma"
@@ -450,7 +448,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Speed />
+                        <SpeedIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Node.js"
@@ -460,7 +458,7 @@ const StatusPage = () => {
                     {status.services.system?.memory && (
                       <ListItem>
                         <ListItemIcon>
-                          <Memory />
+                          <MemoryIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Memória"
@@ -471,7 +469,7 @@ const StatusPage = () => {
                     {status.services.system?.uptime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Uptime do Sistema"
@@ -490,7 +488,7 @@ const StatusPage = () => {
                 <Card>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Api color="primary" />
+                      <ApiIcon color="primary" />
                       <Typography variant="h6">Webhook</Typography>
                       <Chip
                         label={status.services.webhook?.status}
@@ -502,7 +500,7 @@ const StatusPage = () => {
                     <List dense>
                       <ListItem>
                         <ListItemIcon>
-                          <Cloud />
+                          <CloudIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="URL"
