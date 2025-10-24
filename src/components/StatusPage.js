@@ -111,7 +111,8 @@ const StatusPage = () => {
   }, []);
 
   const getStatusColor = (status) => {
-    switch (status) {
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
       case 'online':
       case 'healthy':
       case 'operational':
@@ -129,7 +130,8 @@ const StatusPage = () => {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
       case 'online':
       case 'healthy':
       case 'operational':
@@ -228,10 +230,10 @@ const StatusPage = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 {getStatusIcon(status.overall || status.overall?.status)}
                 <Typography variant="h5">
-                  Status Geral: {(status.overall || status.overall?.status || 'unknown').toUpperCase()}
+                  Status Geral: {String(status.overall || status.overall?.status || 'unknown').toUpperCase()}
                 </Typography>
                 <Chip
-                  label={status.overall || status.overall?.status || 'unknown'}
+                  label={String(status.overall || status.overall?.status || 'unknown')}
                   color={getStatusColor(status.overall || status.overall?.status)}
                   size="small"
                 />
