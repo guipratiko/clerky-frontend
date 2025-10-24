@@ -46,12 +46,14 @@ const StatusPage = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para produção
       
-      // Usar URL direta em produção para evitar problemas de proxy
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? `${config.API_URL}/api/status`
-        : '/api/status';
+      // Usar URL direta do backend sempre (proxy não está funcionando corretamente)
+      const apiUrl = `${config.API_URL}/api/status`;
       
       console.log('🔍 Buscando status em:', apiUrl);
+      console.log('🔧 Configuração:', { 
+        NODE_ENV: process.env.NODE_ENV, 
+        API_URL: config.API_URL 
+      });
       
       const response = await fetch(apiUrl, {
         signal: controller.signal,

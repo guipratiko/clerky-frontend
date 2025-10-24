@@ -10,4 +10,17 @@ const config = {
   }
 };
 
-export default config[process.env.NODE_ENV || 'development'];
+// Detectar ambiente automaticamente
+const detectEnvironment = () => {
+  // Se estamos rodando em localhost, é desenvolvimento
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'development';
+  }
+  // Caso contrário, é produção
+  return 'production';
+};
+
+const environment = process.env.NODE_ENV || detectEnvironment();
+console.log('🌍 Ambiente detectado:', environment);
+
+export default config[environment];
