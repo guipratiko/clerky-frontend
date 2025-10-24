@@ -18,7 +18,7 @@ import {
   Tooltip
 } from '@mui/material';
 import CheckCircle from '@mui/icons-material/CheckCircle';
-import Error from '@mui/icons-material/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 import Warning from '@mui/icons-material/Warning';
 import Refresh from '@mui/icons-material/Refresh';
 import Storage from '@mui/icons-material/Storage';
@@ -44,7 +44,7 @@ const StatusPage = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para produção
       
-      // Usar URL direta em produção para evitar problemas de proxy
+      // Usar URL direta sempre em produção para evitar problemas de proxy
       const apiUrl = process.env.NODE_ENV === 'production' 
         ? `${config.API_URL}/api/status`
         : '/api/status';
@@ -122,7 +122,7 @@ const StatusPage = () => {
         return <Warning color="warning" />;
       case 'offline':
       case 'error':
-        return <Error color="error" />;
+        return <ErrorIcon color="error" />;
       default:
         return <Warning color="warning" />;
     }
@@ -248,7 +248,7 @@ const StatusPage = () => {
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                <Error color="error" />
+                <ErrorIcon color="error" />
                 <Typography variant="h5">
                   Serviços Indisponíveis
                 </Typography>

@@ -5,7 +5,7 @@ const config = {
     FRONTEND_URL: 'http://localhost:3500'
   },
   production: {
-    API_URL: 'https://back.clerky.com.br:4500',
+    API_URL: 'https://back.clerky.com.br',
     FRONTEND_URL: 'https://app.clerky.com.br'
   }
 };

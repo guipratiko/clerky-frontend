@@ -3,7 +3,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 module.exports = function(app) {
   // Determinar a URL do backend baseada no ambiente
   const backendUrl = process.env.REACT_APP_API_URL || 
-                    (process.env.NODE_ENV === 'production' ? 'https://back.clerky.com.br:4500' : 'http://localhost:4700');
+                    (process.env.NODE_ENV === 'production' ? 'https://back.clerky.com.br' : 'http://localhost:4700');
   
   console.log('🔧 Proxy configurado para:', backendUrl);
   
