@@ -10,8 +10,6 @@ import {
   CircularProgress,
   Alert,
   Button,
-  Divider,
-  Paper,
   List,
   ListItem,
   ListItemIcon,

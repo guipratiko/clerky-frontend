@@ -344,7 +344,7 @@ const N8nIntegration = () => {
     }
     
     loadData();
-  }, [user]);
+  }, [user, isAdmin, isInTrial]);
 
   const loadData = async () => {
     try {

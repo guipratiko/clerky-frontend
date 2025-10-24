@@ -191,7 +191,7 @@ const MassDispatch = () => {
     loadTemplates();
     loadStats();
     loadScheduledDispatches();
-  }, [user]);
+  }, [user, isAdmin, isInTrial]);
 
   // Carregar colunas do Kanban quando a instância mudar
   useEffect(() => {
