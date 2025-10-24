@@ -31,6 +31,7 @@ import {
   Speed,
   Cloud
 } from '@mui/icons-material';
+import config from '../config/environment';
 
 const StatusPage = () => {
   const [status, setStatus] = useState(null);
@@ -43,9 +44,30 @@ const StatusPage = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/status');
+      // Usar timeout para evitar travamentos
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para produção
+      
+      // Usar URL direta em produção para evitar problemas de proxy
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `${config.API_URL}/api/status`
+        : '/api/status';
+      
+      console.log('🔍 Buscando status em:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
+        if (response.status === 504) {
+          throw new Error('Servidor backend não respondeu a tempo. Verifique se o servidor está online.');
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
@@ -54,7 +76,11 @@ const StatusPage = () => {
       setStatus(data);
       setLastUpdate(new Date());
     } catch (err) {
-      setError(`Erro ao carregar status dos serviços: ${err.message}`);
+      if (err.name === 'AbortError') {
+        setError('Timeout: Servidor não respondeu a tempo');
+      } else {
+        setError(`Erro ao carregar status dos serviços: ${err.message}`);
+      }
       console.error('Erro ao buscar status:', err);
     } finally {
       setLoading(false);
@@ -206,9 +232,49 @@ const StatusPage = () => {
 
         {/* Erro */}
         {error && (
-          <Alert severity="error" sx={{ mb: 4 }}>
+          <Alert 
+            severity="error" 
+            sx={{ mb: 4 }}
+            action={
+              <Button color="inherit" size="small" onClick={fetchStatus}>
+                Tentar Novamente
+              </Button>
+            }
+          >
             {error}
           </Alert>
+        )}
+
+        {/* Status offline quando há erro */}
+        {error && !status && (
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                <Error color="error" />
+                <Typography variant="h5">
+                  Serviços Indisponíveis
+                </Typography>
+                <Chip
+                  label="offline"
+                  color="error"
+                  size="small"
+                />
+              </Box>
+              <Typography variant="body1" color="text.secondary">
+                Não foi possível conectar aos serviços. Verifique se o servidor backend está rodando.
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Button 
+                  variant="contained" 
+                  onClick={fetchStatus}
+                  startIcon={<Refresh />}
+                  disabled={loading}
+                >
+                  {loading ? 'Verificando...' : 'Verificar Novamente'}
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
         )}
 
         {/* Serviços */}
