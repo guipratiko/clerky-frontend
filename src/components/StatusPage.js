@@ -71,6 +71,17 @@ const StatusPage = () => {
         if (response.status === 504) {
           throw new Error('Servidor backend não respondeu a tempo. Verifique se o servidor está online.');
         }
+        // Para status 503, ainda tentar processar os dados se disponíveis
+        if (response.status === 503) {
+          try {
+            const data = await response.json();
+            setStatus(data);
+            setLastUpdate(new Date());
+            return; // Não tratar como erro se conseguimos obter os dados
+          } catch (parseError) {
+            console.error('Erro ao fazer parse dos dados 503:', parseError);
+          }
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
@@ -233,6 +244,16 @@ const StatusPage = () => {
               </Typography>
             </CardContent>
           </Card>
+        )}
+
+        {/* Aviso para status 503 */}
+        {status && (status.overall === 'degraded' || status.overall?.status === 'degraded') && (
+          <Alert severity="warning" sx={{ mb: 4 }}>
+            <Typography variant="body2">
+              <strong>Atenção:</strong> Alguns serviços podem estar com problemas, mas o sistema continua funcionando. 
+              Verifique os detalhes abaixo para mais informações.
+            </Typography>
+          </Alert>
         )}
 
         {/* Erro */}
