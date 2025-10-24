@@ -17,16 +17,18 @@ import {
   IconButton,
   Tooltip
 } from '@mui/material';
-import CheckCircle from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import Warning from '@mui/icons-material/Warning';
-import Refresh from '@mui/icons-material/Refresh';
-import Storage from '@mui/icons-material/Storage';
-import Api from '@mui/icons-material/Api';
-import Computer from '@mui/icons-material/Computer';
-import Memory from '@mui/icons-material/Memory';
-import Speed from '@mui/icons-material/Speed';
-import Cloud from '@mui/icons-material/Cloud';
+import {
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
+  Warning as WarningIcon,
+  Refresh as RefreshIcon,
+  Storage as StorageIcon,
+  Api as ApiIcon,
+  Computer as ComputerIcon,
+  Memory as MemoryIcon,
+  Speed as SpeedIcon,
+  Cloud as CloudIcon
+} from '@mui/icons-material';
 import config from '../config/environment';
 
 const StatusPage = () => {
@@ -44,19 +46,12 @@ const StatusPage = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos para produção
       
-      // Determinar URL baseada no hostname
-      let apiUrl;
-      if (window.location.hostname === 'app.clerky.com.br') {
-        apiUrl = 'https://back.clerky.com.br/api/status';
-      } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        apiUrl = '/api/status';
-      } else {
-        // Fallback para desenvolvimento
-        apiUrl = '/api/status';
-      }
+      // Usar URL direta em produção para evitar problemas de proxy
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? `${config.API_URL}/api/status`
+        : '/api/status';
       
       console.log('🔍 Buscando status em:', apiUrl);
-      console.log('🌐 Hostname atual:', window.location.hostname);
       
       const response = await fetch(apiUrl, {
         signal: controller.signal,
@@ -70,17 +65,6 @@ const StatusPage = () => {
       if (!response.ok) {
         if (response.status === 504) {
           throw new Error('Servidor backend não respondeu a tempo. Verifique se o servidor está online.');
-        }
-        // Para status 503, ainda tentar processar os dados se disponíveis
-        if (response.status === 503) {
-          try {
-            const data = await response.json();
-            setStatus(data);
-            setLastUpdate(new Date());
-            return; // Não tratar como erro se conseguimos obter os dados
-          } catch (parseError) {
-            console.error('Erro ao fazer parse dos dados 503:', parseError);
-          }
         }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -111,11 +95,9 @@ const StatusPage = () => {
   }, []);
 
   const getStatusColor = (status) => {
-    const statusStr = String(status || '').toLowerCase();
-    switch (statusStr) {
+    switch (status) {
       case 'online':
       case 'healthy':
-      case 'operational':
         return 'success';
       case 'checking':
         return 'info';
@@ -130,21 +112,19 @@ const StatusPage = () => {
   };
 
   const getStatusIcon = (status) => {
-    const statusStr = String(status || '').toLowerCase();
-    switch (statusStr) {
+    switch (status) {
       case 'online':
       case 'healthy':
-      case 'operational':
-        return <CheckCircle color="success" />;
+        return <CheckCircleIcon color="success" />;
       case 'checking':
         return <CircularProgress size={20} />;
       case 'degraded':
-        return <Warning color="warning" />;
+        return <WarningIcon color="warning" />;
       case 'offline':
       case 'error':
         return <ErrorIcon color="error" />;
       default:
-        return <Warning color="warning" />;
+        return <WarningIcon color="warning" />;
     }
   };
 
@@ -217,7 +197,7 @@ const StatusPage = () => {
             )}
             <Tooltip title="Atualizar status">
               <IconButton onClick={fetchStatus} disabled={loading}>
-                <Refresh />
+                <RefreshIcon />
               </IconButton>
             </Tooltip>
           </Box>
@@ -228,34 +208,24 @@ const StatusPage = () => {
           <Card sx={{ mb: 4 }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                {getStatusIcon(status.overall || status.overall?.status)}
+                {getStatusIcon(status.overall?.status)}
                 <Typography variant="h5">
-                  Status Geral: {String(status.overall || status.overall?.status || 'unknown').toUpperCase()}
+                  Status Geral: {status.overall?.status?.toUpperCase()}
                 </Typography>
                 <Chip
-                  label={String(status.overall || status.overall?.status || 'unknown')}
-                  color={getStatusColor(status.overall || status.overall?.status)}
+                  label={status.overall?.status}
+                  color={getStatusColor(status.overall?.status)}
                   size="small"
                 />
               </Box>
               <Typography variant="body1" color="text.secondary">
-                {status.overall?.message || 'Sistema funcionando normalmente'}
+                {status.overall?.message}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
                 Verificado em: {new Date(status.timestamp).toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
-        )}
-
-        {/* Aviso para status 503 */}
-        {status && (status.overall === 'degraded' || status.overall?.status === 'degraded') && (
-          <Alert severity="warning" sx={{ mb: 4 }}>
-            <Typography variant="body2">
-              <strong>Atenção:</strong> Alguns serviços podem estar com problemas, mas o sistema continua funcionando. 
-              Verifique os detalhes abaixo para mais informações.
-            </Typography>
-          </Alert>
         )}
 
         {/* Erro */}
@@ -295,7 +265,7 @@ const StatusPage = () => {
                 <Button 
                   variant="contained" 
                   onClick={fetchStatus}
-                  startIcon={<Refresh />}
+                  startIcon={<RefreshIcon />}
                   disabled={loading}
                 >
                   {loading ? 'Verificando...' : 'Verificar Novamente'}
@@ -313,7 +283,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Api color="primary" />
+                    <ApiIcon color="primary" />
                     <Typography variant="h6">API Backend</Typography>
                     <Chip
                       label={status.services.api?.status}
@@ -325,7 +295,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Speed />
+                        <SpeedIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Uptime"
@@ -334,7 +304,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Versão"
@@ -343,7 +313,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Memory />
+                        <MemoryIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Memória"
@@ -360,7 +330,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Storage color="primary" />
+                    <StorageIcon color="primary" />
                     <Typography variant="h6">Database</Typography>
                     <Chip
                       label={status.services.database?.status}
@@ -372,7 +342,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Cloud />
+                        <CloudIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Estado da Conexão"
@@ -382,7 +352,7 @@ const StatusPage = () => {
                     {status.services.database?.responseTime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Tempo de Resposta"
@@ -393,7 +363,7 @@ const StatusPage = () => {
                     {status.services.database?.collections && (
                       <ListItem>
                         <ListItemIcon>
-                          <Storage />
+                          <StorageIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Coleções"
@@ -411,7 +381,7 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Api color="primary" />
+                    <ApiIcon color="primary" />
                     <Typography variant="h6">Evolution API</Typography>
                     <Chip
                       label={status.services.evolutionApi?.status}
@@ -423,7 +393,7 @@ const StatusPage = () => {
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Instâncias Totais"
@@ -446,7 +416,7 @@ const StatusPage = () => {
                     {status.services.evolutionApi?.responseTime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Tempo de Resposta"
@@ -464,14 +434,14 @@ const StatusPage = () => {
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Computer color="primary" />
+                    <ComputerIcon color="primary" />
                     <Typography variant="h6">Sistema</Typography>
                   </Box>
                   
                   <List dense>
                     <ListItem>
                       <ListItemIcon>
-                        <Computer />
+                        <ComputerIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Plataforma"
@@ -480,7 +450,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <Speed />
+                        <SpeedIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Node.js"
@@ -490,7 +460,7 @@ const StatusPage = () => {
                     {status.services.system?.memory && (
                       <ListItem>
                         <ListItemIcon>
-                          <Memory />
+                          <MemoryIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Memória"
@@ -501,7 +471,7 @@ const StatusPage = () => {
                     {status.services.system?.uptime && (
                       <ListItem>
                         <ListItemIcon>
-                          <Speed />
+                          <SpeedIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="Uptime do Sistema"
@@ -520,7 +490,7 @@ const StatusPage = () => {
                 <Card>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Api color="primary" />
+                      <ApiIcon color="primary" />
                       <Typography variant="h6">Webhook</Typography>
                       <Chip
                         label={status.services.webhook?.status}
@@ -532,7 +502,7 @@ const StatusPage = () => {
                     <List dense>
                       <ListItem>
                         <ListItemIcon>
-                          <Cloud />
+                          <CloudIcon />
                         </ListItemIcon>
                         <ListItemText
                           primary="URL"
