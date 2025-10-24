@@ -404,7 +404,7 @@ const StatusPage = () => {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
-                        <CheckCircle />
+                        <CheckCircleIcon />
                       </ListItemIcon>
                       <ListItemText
                         primary="Instâncias Ativas"
