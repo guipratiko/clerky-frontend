@@ -348,7 +348,11 @@ const StatusPage = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary="Estado da Conexão"
-                        secondary={status.services.database?.connection || 'N/A'}
+                        secondary={
+                          status.services.database?.connection 
+                            ? `${status.services.database.connection.host}:${status.services.database.connection.port}/${status.services.database.connection.name}`
+                            : 'N/A'
+                        }
                       />
                     </ListItem>
                     {status.services.database?.responseTime && (
