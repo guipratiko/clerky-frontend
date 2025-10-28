@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  // TextField,
+  TextField,
   FormControlLabel,
   Switch,
   CircularProgress,
@@ -64,6 +64,7 @@ const InstanceManager = () => {
   const [copiedToken, setCopiedToken] = useState(false);
   const [newlyCreatedInstance, setNewlyCreatedInstance] = useState(null);
   const [formData, setFormData] = useState({
+    displayName: '',
     rejectCall: false,
     groupsIgnore: true,
     alwaysOnline: false,
@@ -172,17 +173,20 @@ const InstanceManager = () => {
       // Marcar como nova instância para abrir popup automaticamente
       setNewlyCreatedInstance(randomInstanceName);
 
+      // Enviar displayName se fornecido, senão usar o nome gerado
       await createInstance({
         instanceName: randomInstanceName,
+        displayName: formData.displayName || randomInstanceName,
         settings,
       });
 
       setCreateDialogOpen(false);
       
       // Manter temporariamente o nome da instância para aguardar o QR code
-      const createdInstanceName = randomInstanceName;
+      const createdInstanceName = formData.displayName || randomInstanceName;
       
       setFormData({
+        displayName: '',
         rejectCall: false,
         groupsIgnore: true,
         alwaysOnline: false,
@@ -191,7 +195,7 @@ const InstanceManager = () => {
       });
 
       // Informar ao usuário que está aguardando o QR code
-      toast.success(`Instância ${createdInstanceName} criada! Nome gerado automaticamente. Aguardando QR Code...`);
+      toast.success(`Instância "${createdInstanceName}" criada! Aguardando QR Code...`);
 
     } catch (error) {
       console.error('Erro ao criar instância:', error);
@@ -362,11 +366,17 @@ const InstanceManager = () => {
                   
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" sx={{ color: '#e9edef', fontSize: '1rem' }}>
-                      {instance.instanceName}
+                      {instance.displayName || instance.instanceName}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#8696a0' }}>
                       {instance.phone || 'Não conectado'}
                     </Typography>
+                    {/* Mostrar nome interno apenas se for diferente do displayName */}
+                    {instance.displayName && instance.displayName !== instance.instanceName && (
+                      <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem' }}>
+                        ID: {instance.instanceName}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
 
@@ -558,9 +568,40 @@ const InstanceManager = () => {
         <DialogTitle>{t('instanceManager.createInstance')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ color: '#8696a0', mb: 2 }}>
-            O nome da instância será gerado automaticamente (7 caracteres aleatórios).
-            O token também será criado automaticamente pelo sistema.
+            O nome interno da instância será gerado automaticamente (7 caracteres aleatórios) 
+            para evitar conflitos. Você pode personalizar o nome de exibição.
           </Typography>
+
+          {/* Campo de Nome de Exibição */}
+          <TextField
+            fullWidth
+            label="Nome da Conexão (Opcional)"
+            value={formData.displayName}
+            onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+            placeholder="Ex: WhatsApp Vendas"
+            sx={{
+              mb: 3,
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                color: '#e9edef',
+                '& fieldset': {
+                  borderColor: '#313d43',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#8696a0',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#00a884',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#8696a0',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#00a884',
+              },
+            }}
+          />
 
           <Typography variant="h6" sx={{ mt: 3, mb: 2, color: '#e9edef' }}>
             Configurações

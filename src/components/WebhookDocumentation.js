@@ -42,7 +42,7 @@ import { useI18n } from '../contexts/I18nContext';
 // Códigos de exemplo para Kanban
 const kanbanJavaScriptCode = `const moveChatToColumn = async (instanceName, chatId, column, token) => {
   try {
-    const response = await fetch(\`\${process.env.REACT_APP_API_URL}/api/chats/\${instanceName}/\${chatId}/kanban-column\`, {
+    const response = await fetch(\`https://back.clerky.com.br/api/chats/\${instanceName}/\${chatId}/kanban-column\`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -67,9 +67,9 @@ const kanbanJavaScriptCode = `const moveChatToColumn = async (instanceName, chat
 };
 
 // Exemplo de uso
-const token = 'seu_token_aqui';
-const instanceName = 'teste2';
-const chatId = '556293557070@s.whatsapp.net';
+const token = 'SEU_TOKEN_DO_USUARIO_ADMIN';
+const instanceName = 'ID_DA_INSTANCIA';
+const chatId = 'DDI+DDD+NUMERO@s.whatsapp.net';
 const column = 'andamento';
 
 moveChatToColumn(instanceName, chatId, column, token);`;
@@ -78,7 +78,7 @@ const kanbanPythonCode = `import requests
 import json
 
 def move_chat_to_column(instance_name, chat_id, column, token):
-    url = f"{process.env.REACT_APP_API_URL}/api/chats/{instance_name}/{chat_id}/kanban-column"
+    url = f"https://back.clerky.com.br/api/chats/{instance_name}/{chat_id}/kanban-column"
     
     headers = {
         'Content-Type': 'application/json',
@@ -105,23 +105,23 @@ def move_chat_to_column(instance_name, chat_id, column, token):
         raise error
 
 # Exemplo de uso
-token = "seu_token_aqui"
-instance_name = "teste2"
-chat_id = "556293557070@s.whatsapp.net"
+token = "SEU_TOKEN_DO_USUARIO_ADMIN"
+instance_name = "ID_DA_INSTANCIA"
+chat_id = "DDI+DDD+NUMERO@s.whatsapp.net"
 column = "andamento"
 
 move_chat_to_column(instance_name, chat_id, column, token)`;
 
 const kanbanCurlCode = `# Mover chat para "Em Andamento"
-curl -X PUT "\${process.env.REACT_APP_API_URL}/api/chats/teste2/556293557070@s.whatsapp.net/kanban-column" \\
+curl -X PUT "https://back.clerky.com.br/api/chats/ID_DA_INSTANCIA/DDI+DDD+NUMERO@s.whatsapp.net/kanban-column" \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer SEU_TOKEN_AQUI" \\
+  -H "Authorization: Bearer SEU_TOKEN_DO_USUARIO_ADMIN" \\
   -d '{"column": "andamento"}'
 
 # Mover chat para "Aprovado"
-curl -X PUT "\${process.env.REACT_APP_API_URL}/api/chats/teste2/556293557070@s.whatsapp.net/kanban-column" \\
+curl -X PUT "https://back.clerky.com.br/api/chats/ID_DA_INSTANCIA/DDI+DDD+NUMERO@s.whatsapp.net/kanban-column" \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer SEU_TOKEN_AQUI" \\
+  -H "Authorization: Bearer SEU_TOKEN_DO_USUARIO_ADMIN" \\
   -d '{"column": "aprovado"}'`;
 
 const WebhookDocumentation = () => {
@@ -1026,7 +1026,7 @@ console.log('Token:', localStorage.getItem('token'));`}
 
             <CodeBlock 
               code={`{
-  "number": "556293557070@s.whatsapp.net",
+  "number": "DDI+DDD+NUMERO",
   "text": "Olá! Esta é uma mensagem enviada via API"
 }`}
               language="json"
@@ -1070,10 +1070,10 @@ const axios = require('axios');
 async function enviarMensagem() {
   try {
     const response = await axios.post(
-      \`\${process.env.REACT_APP_API_URL}/api/messages/teste2/text\`,
+      'https://back.clerky.com.br/api/messages/ID_DA_INSTANCIA/text',
       {
-        number: '556293557070@s.whatsapp.net',
-        text: 'Olá! Esta mensagem foi enviada via API da instância teste2'
+        number: 'DDI+DDD+NUMERO',
+        text: 'Olá! Esta mensagem foi enviada via API'
       },
       {
         headers: {
@@ -1100,7 +1100,7 @@ enviarMensagem();`}
 import requests
 
 def enviar_mensagem():
-    url = f"{process.env.REACT_APP_API_URL}/api/messages/teste2/text"
+    url = 'https://back.clerky.com.br/api/messages/ID_DA_INSTANCIA/text'
     
     headers = {
         'Authorization': 'Bearer SEU_TOKEN_DO_USUARIO_ADMIN',
@@ -1108,8 +1108,8 @@ def enviar_mensagem():
     }
     
     payload = {
-        'number': '556293557070@s.whatsapp.net',
-        'text': 'Olá! Esta mensagem foi enviada via API da instância teste2'
+        'number': 'DDI+DDD+NUMERO',
+        'text': 'Olá! Esta mensagem foi enviada via API'
     }
     
     try:
@@ -1127,17 +1127,27 @@ enviar_mensagem()`}
 
             <CodeBlock 
               code={`# Exemplo em cURL
-curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
+curl -X POST "https://back.clerky.com.br/api/messages/ID_DA_INSTANCIA/text" \\
   -H "Authorization: Bearer SEU_TOKEN_DO_USUARIO_ADMIN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "number": "556293557070@s.whatsapp.net",
+    "number": "DDI+DDD+NUMERO",
     "text": "Olá! Esta mensagem foi enviada via API da instância teste2"
   }'`}
               language="bash"
               id="example-send-curl"
               title="Exemplo em cURL"
             />
+            
+            <Alert severity="info" sx={{ mt: 2 }}>
+              <AlertTitle>💡 Dica</AlertTitle>
+              <Typography variant="body2">
+                • Substitua <strong>ID_DA_INSTANCIA</strong> pelo nome da sua instância<br/>
+                • Substitua <strong>DDI+DDD+NUMERO</strong> pelo telefone de quem irá receber (ex: 556293557070)<br/>
+                • Substitua <strong>SEU_TOKEN_DO_USUARIO_ADMIN</strong> pelo seu token de autenticação<br/>
+                • Certifique-se de usar HTTPS (https://back.clerky.com.br) em produção
+              </Typography>
+            </Alert>
           </CardContent>
         </Card>
 
@@ -1158,7 +1168,7 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
               </Typography>
               <CodeBlock 
                 code={`{
-  "number": "556293557070@s.whatsapp.net",
+  "number": "DDI+DDD+NUMERO",
   "text": "Mensagem de texto simples"
 }`}
                 language="json"
@@ -1183,8 +1193,8 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
   "success": true,
   "data": {
     "messageId": "3EB0C767D26B4A8F5A6F",
-    "number": "556293557070@s.whatsapp.net",
-    "text": "Olá! Esta mensagem foi enviada via API da instância teste2",
+    "number": "DDI+DDD+NUMERO",
+    "text": "Olá! Esta mensagem foi enviada via API",
     "timestamp": "2025-01-23T15:30:00.000Z",
     "status": "sent"
   },
@@ -1427,6 +1437,17 @@ curl -X POST "${process.env.REACT_APP_API_URL}/api/messages/teste2/text" \\
             </Box>
           </AccordionDetails>
         </Accordion>
+
+        <Alert severity="info" sx={{ mt: 3 }}>
+          <AlertTitle>💡 Dicas de Uso</AlertTitle>
+          <Typography variant="body2">
+            • Substitua <strong>ID_DA_INSTANCIA</strong> pelo nome da sua instância<br/>
+            • Substitua <strong>DDI+DDD+NUMERO</strong> pelo telefone no formato completo (ex: 556293557070)<br/>
+            • Substitua <strong>SEU_TOKEN_DO_USUARIO_ADMIN</strong> pelo seu token de autenticação<br/>
+            • Certifique-se de usar HTTPS (https://back.clerky.com.br) em produção<br/>
+            • O chatId deve estar no formato WhatsApp (ex: 556293557070@s.whatsapp.net)
+          </Typography>
+        </Alert>
 
         <Divider sx={{ my: 3 }} />
 

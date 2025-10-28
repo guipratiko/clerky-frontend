@@ -1127,7 +1127,7 @@ REGRAS DE COMPORTAMENTO:
                     <MenuItem value="">{t('n8nIntegration.allInstances')}</MenuItem>
                     {instances.map((instance) => (
                       <MenuItem key={instance.instanceName} value={instance.instanceName}>
-                        {instance.instanceName} ({instance.status})
+                        {instance.displayName || instance.instanceName} ({instance.status})
                       </MenuItem>
                     ))}
                   </Select>

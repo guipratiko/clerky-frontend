@@ -73,6 +73,10 @@ const StatusPage = () => {
       
       const data = await response.json();
       
+      console.log('📊 Dados recebidos da API:', data);
+      console.log('🧠 Memória API:', data.services?.api?.memory);
+      console.log('💻 Memória Sistema:', data.services?.system?.memory);
+      
       setStatus(data);
       setLastUpdate(new Date());
     } catch (err) {
@@ -130,13 +134,6 @@ const StatusPage = () => {
     }
   };
 
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   const formatUptime = (seconds) => {
     const days = Math.floor(seconds / 86400);
@@ -295,7 +292,7 @@ const StatusPage = () => {
 
         {/* Serviços */}
         {status?.services && (
-          <Grid container spacing={3}>
+          <Grid container spacing={3} alignItems="stretch">
             {/* API */}
             <Grid item xs={12} md={6}>
               <Card>
@@ -333,10 +330,10 @@ const StatusPage = () => {
                       <ListItemIcon>
                         <MemoryIcon />
                       </ListItemIcon>
-                      <ListItemText
-                        primary="Memória"
-                        secondary={`${formatBytes(status.services.api?.memory?.rss || 0)} RSS`}
-                      />
+                        <ListItemText
+                          primary="Memória"
+                          secondary={`${status.services.api?.memory?.rss || 0} MB RSS`}
+                        />
                     </ListItem>
                   </List>
                 </CardContent>
@@ -364,11 +361,7 @@ const StatusPage = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary="Estado da Conexão"
-                        secondary={
-                          status.services.database?.connection 
-                            ? `${status.services.database.connection.host}:${status.services.database.connection.port}/${status.services.database.connection.name}`
-                            : 'N/A'
-                        }
+                        secondary="Conectado"
                       />
                     </ListItem>
                     {status.services.database?.responseTime && (
@@ -400,11 +393,11 @@ const StatusPage = () => {
 
             {/* Evolution API */}
             <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <ApiIcon color="primary" />
-                    <Typography variant="h6">Evolution API</Typography>
+                    <Typography variant="h6">API Externa</Typography>
                     <Chip
                       label={status.services.evolutionApi?.status}
                       color={getStatusColor(status.services.evolutionApi?.status)}
@@ -453,8 +446,8 @@ const StatusPage = () => {
 
             {/* Sistema */}
             <Grid item xs={12} md={6}>
-              <Card>
-                <CardContent>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <ComputerIcon color="primary" />
                     <Typography variant="h6">Sistema</Typography>

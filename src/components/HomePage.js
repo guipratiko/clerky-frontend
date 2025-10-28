@@ -409,7 +409,7 @@ const HomePage = () => {
                         </Avatar>
                         <Box sx={{ flex: 1, textAlign: 'left' }}>
                           <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600 }}>
-                            {instance.instanceName}
+                            {instance.displayName || instance.instanceName}
                           </Typography>
                           <Chip
                             size="small"

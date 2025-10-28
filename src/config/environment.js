@@ -1,7 +1,7 @@
 // Configuração de ambiente para produção
 const config = {
   development: {
-    API_URL: 'http://localhost:4500',
+    API_URL: 'http://localhost:4700',
     FRONTEND_URL: 'http://localhost:3500'
   },
   production: {
@@ -22,21 +22,21 @@ const detectEnvironment = () => {
   // Verificar o hostname
   const hostname = window.location.hostname;
   
+  // Se estamos rodando em localhost, é desenvolvimento (prioridade máxima)
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    console.log('💻 Localhost detectado:', hostname);
+    return 'development';
+  }
+  
   // Se estamos em um domínio de produção, é produção
   if (hostname === 'app.clerky.com.br' || hostname.includes('clerky.com.br')) {
     console.log('🌐 Domínio de produção detectado:', hostname);
     return 'production';
   }
   
-  // Se estamos rodando em localhost, é desenvolvimento
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    console.log('💻 Localhost detectado:', hostname);
-    return 'development';
-  }
-  
-  // Caso contrário, assumir produção
-  console.log('🌍 Hostname desconhecido, assumindo produção:', hostname);
-  return 'production';
+  // Caso contrário, assumir desenvolvimento para testes locais
+  console.log('🌍 Hostname desconhecido, assumindo desenvolvimento:', hostname);
+  return 'development';
 };
 
 const environment = process.env.NODE_ENV || detectEnvironment();

@@ -113,6 +113,21 @@ const MassDispatch = () => {
     media: null
   });
 
+  // Função para inserir variável no template
+  const insertVariable = (variable, field = 'text') => {
+    if (field === 'text') {
+      setTemplateForm(prev => ({ 
+        ...prev, 
+        text: prev.text + variable 
+      }));
+    } else if (field === 'caption') {
+      setTemplateForm(prev => ({ 
+        ...prev, 
+        caption: prev.caption + variable 
+      }));
+    }
+  };
+
   // Estados para sequência de mensagens
   const [sequenceMessages, setSequenceMessages] = useState([
     { order: 1, type: 'text', text: '', delay: 5 },
@@ -1309,7 +1324,7 @@ const MassDispatch = () => {
             >
               {instances.filter(i => i.status === 'connected').map((instance) => (
                 <MenuItem key={instance.instanceName} value={instance.instanceName}>
-                  {instance.instanceName}
+                  {instance.displayName || instance.instanceName}
                 </MenuItem>
               ))}
             </Select>
@@ -1845,47 +1860,257 @@ const MassDispatch = () => {
 
           {/* Campos condicionais baseados no tipo */}
           {templateForm.type === 'text' && (
-            <TextField
-              fullWidth
-              label={t('massDispatch.messageText')}
-              value={templateForm.text}
-              onChange={(e) => setTemplateForm(prev => ({ ...prev, text: e.target.value }))}
-              margin="normal"
-              multiline
-              rows={4}
-              required
-              sx={{
-                '& .MuiInputLabel-root': { color: '#8696a0' },
-                '& .MuiOutlinedInput-root': {
-                  color: '#e9edef',
-                  '& fieldset': { borderColor: '#313d43' },
-                  '&:hover fieldset': { borderColor: '#00a884' },
-                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
-                }
-              }}
-            />
+            <>
+              <TextField
+                fullWidth
+                label={t('massDispatch.messageText')}
+                value={templateForm.text}
+                onChange={(e) => setTemplateForm(prev => ({ ...prev, text: e.target.value }))}
+                margin="normal"
+                multiline
+                rows={4}
+                required
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#8696a0' },
+                  '& .MuiOutlinedInput-root': {
+                    color: '#e9edef',
+                    '& fieldset': { borderColor: '#313d43' },
+                    '&:hover fieldset': { borderColor: '#00a884' },
+                    '&.Mui-focused fieldset': { borderColor: '#00a884' },
+                  }
+                }}
+              />
+              
+              {/* Botões de Variáveis */}
+              <Box sx={{ mt: 1, mb: 2 }}>
+                <Typography variant="caption" sx={{ color: '#8696a0', mb: 1, display: 'block' }}>
+                  Inserir variáveis:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Tooltip title="Variável: $name">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$name')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Nome Completo
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $firstName">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$firstName')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Primeiro Nome
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $lastName">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$lastName')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Último Nome
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $number">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$number')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Número Formatado
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $originalNumber">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$originalNumber')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Número Original
+                    </Button>
+                  </Tooltip>
+                </Box>
+              </Box>
+            </>
           )}
 
           {(templateForm.type.includes('caption')) && (
-            <TextField
-              fullWidth
-              label="Legenda"
-              value={templateForm.caption}
-              onChange={(e) => setTemplateForm(prev => ({ ...prev, caption: e.target.value }))}
-              margin="normal"
-              multiline
-              rows={2}
-              required
-              sx={{
-                '& .MuiInputLabel-root': { color: '#8696a0' },
-                '& .MuiOutlinedInput-root': {
-                  color: '#e9edef',
-                  '& fieldset': { borderColor: '#313d43' },
-                  '&:hover fieldset': { borderColor: '#00a884' },
-                  '&.Mui-focused fieldset': { borderColor: '#00a884' },
-                }
-              }}
-            />
+            <>
+              <TextField
+                fullWidth
+                label="Legenda"
+                value={templateForm.caption}
+                onChange={(e) => setTemplateForm(prev => ({ ...prev, caption: e.target.value }))}
+                margin="normal"
+                multiline
+                rows={2}
+                required
+                sx={{
+                  '& .MuiInputLabel-root': { color: '#8696a0' },
+                  '& .MuiOutlinedInput-root': {
+                    color: '#e9edef',
+                    '& fieldset': { borderColor: '#313d43' },
+                    '&:hover fieldset': { borderColor: '#00a884' },
+                    '&.Mui-focused fieldset': { borderColor: '#00a884' },
+                  }
+                }}
+              />
+              
+              {/* Botões de Variáveis para Legenda */}
+              <Box sx={{ mt: 1, mb: 2 }}>
+                <Typography variant="caption" sx={{ color: '#8696a0', mb: 1, display: 'block' }}>
+                  Inserir variáveis:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Tooltip title="Variável: $name">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$name', 'caption')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Nome Completo
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $firstName">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$firstName', 'caption')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Primeiro Nome
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $lastName">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$lastName', 'caption')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Último Nome
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $number">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$number', 'caption')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Número Formatado
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip title="Variável: $originalNumber">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => insertVariable('$originalNumber', 'caption')}
+                      sx={{
+                        color: '#00a884',
+                        borderColor: '#313d43',
+                        fontSize: '0.75rem',
+                        '&:hover': {
+                          borderColor: '#00a884',
+                          backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                        }
+                      }}
+                    >
+                      Número Original
+                    </Button>
+                  </Tooltip>
+                </Box>
+              </Box>
+            </>
           )}
 
           {templateForm.type !== 'text' && templateForm.type !== 'sequence' && (
@@ -1976,28 +2201,153 @@ const MassDispatch = () => {
 
                   {/* Campo de texto */}
                   {(message.type === 'text' || message.type.includes('caption')) && (
-                    <TextField
-                      fullWidth
-                      label={message.type === 'text' ? 'Texto da mensagem' : 'Legenda'}
-                      value={message.text}
-                      onChange={(e) => {
-                        const newMessages = [...sequenceMessages];
-                        newMessages[index].text = e.target.value;
-                        setSequenceMessages(newMessages);
-                      }}
-                      multiline
-                      rows={2}
-                      placeholder={message.type === 'text' ? 'Digite a mensagem...' : 'Digite a legenda...'}
-                      sx={{
-                        '& .MuiInputLabel-root': { color: '#8696a0' },
-                        '& .MuiOutlinedInput-root': {
-                          color: '#e9edef',
-                          '& fieldset': { borderColor: '#313d43' },
-                          '&:hover fieldset': { borderColor: '#00a884' },
-                          '&.Mui-focused fieldset': { borderColor: '#00a884' }
-                        }
-                      }}
-                    />
+                    <>
+                      <TextField
+                        fullWidth
+                        label={message.type === 'text' ? 'Texto da mensagem' : 'Legenda'}
+                        value={message.text}
+                        onChange={(e) => {
+                          const newMessages = [...sequenceMessages];
+                          newMessages[index].text = e.target.value;
+                          setSequenceMessages(newMessages);
+                        }}
+                        multiline
+                        rows={2}
+                        placeholder={message.type === 'text' ? 'Digite a mensagem...' : 'Digite a legenda...'}
+                        sx={{
+                          '& .MuiInputLabel-root': { color: '#8696a0' },
+                          '& .MuiOutlinedInput-root': {
+                            color: '#e9edef',
+                            '& fieldset': { borderColor: '#313d43' },
+                            '&:hover fieldset': { borderColor: '#00a884' },
+                            '&.Mui-focused fieldset': { borderColor: '#00a884' }
+                          }
+                        }}
+                      />
+                      
+                      {/* Botões de Variáveis para Sequência */}
+                      <Box sx={{ mt: 1, mb: 2 }}>
+                        <Typography variant="caption" sx={{ color: '#8696a0', mb: 1, display: 'block' }}>
+                          Inserir variáveis:
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          <Tooltip title="Variável: $name">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                const newMessages = [...sequenceMessages];
+                                newMessages[index].text += '$name';
+                                setSequenceMessages(newMessages);
+                              }}
+                              sx={{
+                                color: '#00a884',
+                                borderColor: '#313d43',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  borderColor: '#00a884',
+                                  backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                                }
+                              }}
+                            >
+                              Nome Completo
+                            </Button>
+                          </Tooltip>
+                          
+                          <Tooltip title="Variável: $firstName">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                const newMessages = [...sequenceMessages];
+                                newMessages[index].text += '$firstName';
+                                setSequenceMessages(newMessages);
+                              }}
+                              sx={{
+                                color: '#00a884',
+                                borderColor: '#313d43',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  borderColor: '#00a884',
+                                  backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                                }
+                              }}
+                            >
+                              Primeiro Nome
+                            </Button>
+                          </Tooltip>
+                          
+                          <Tooltip title="Variável: $lastName">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                const newMessages = [...sequenceMessages];
+                                newMessages[index].text += '$lastName';
+                                setSequenceMessages(newMessages);
+                              }}
+                              sx={{
+                                color: '#00a884',
+                                borderColor: '#313d43',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  borderColor: '#00a884',
+                                  backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                                }
+                              }}
+                            >
+                              Último Nome
+                            </Button>
+                          </Tooltip>
+                          
+                          <Tooltip title="Variável: $number">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                const newMessages = [...sequenceMessages];
+                                newMessages[index].text += '$number';
+                                setSequenceMessages(newMessages);
+                              }}
+                              sx={{
+                                color: '#00a884',
+                                borderColor: '#313d43',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  borderColor: '#00a884',
+                                  backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                                }
+                              }}
+                            >
+                              Número Formatado
+                            </Button>
+                          </Tooltip>
+                          
+                          <Tooltip title="Variável: $originalNumber">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                const newMessages = [...sequenceMessages];
+                                newMessages[index].text += '$originalNumber';
+                                setSequenceMessages(newMessages);
+                              }}
+                              sx={{
+                                color: '#00a884',
+                                borderColor: '#313d43',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  borderColor: '#00a884',
+                                  backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                                }
+                              }}
+                            >
+                              Número Original
+                            </Button>
+                          </Tooltip>
+                        </Box>
+                      </Box>
+                    </>
                   )}
 
                   {/* Upload de arquivo para tipos que precisam */}
