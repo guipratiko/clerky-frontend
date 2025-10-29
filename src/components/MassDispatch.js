@@ -73,6 +73,7 @@ const MassDispatch = () => {
   const [selectedDispatch, setSelectedDispatch] = useState(null);
   const [formatHelpDialogOpen, setFormatHelpDialogOpen] = useState(false);
   const [speedHelpDialogOpen, setSpeedHelpDialogOpen] = useState(false);
+  const [templateTypeHelpDialogOpen, setTemplateTypeHelpDialogOpen] = useState(false);
   
   // Estados para seleção de contatos do Kanban
   const [kanbanColumns, setKanbanColumns] = useState([]);
@@ -1880,10 +1881,30 @@ Lara Linda;556291279592"
           />
           
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: '#8696a0' }}>{t('massDispatch.templateType')}</InputLabel>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', fontSize: '0.875rem' }}>
+                {t('massDispatch.templateType')}
+              </Typography>
+              <Tooltip title="Ver tipos de template disponíveis">
+                <IconButton
+                  onClick={() => setTemplateTypeHelpDialogOpen(true)}
+                  size="small"
+                  sx={{
+                    color: '#00a884',
+                    padding: '2px',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                    }
+                  }}
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
             <Select
               value={templateForm.type}
               onChange={(e) => setTemplateForm(prev => ({ ...prev, type: e.target.value }))}
+              displayEmpty
               sx={{
                 color: '#e9edef',
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
@@ -1897,7 +1918,7 @@ Lara Linda;556291279592"
               <MenuItem value="audio">{t('massDispatch.templateTypes.audio')}</MenuItem>
               <MenuItem value="file">{t('massDispatch.templateTypes.file')}</MenuItem>
               <MenuItem value="file_caption">{t('massDispatch.templateTypes.fileCaption')}</MenuItem>
-              <MenuItem value="sequence">📝 Sequência de Mensagens</MenuItem>
+              <MenuItem value="sequence">Sequência de Mensagens</MenuItem>
             </Select>
           </FormControl>
 
@@ -2826,6 +2847,134 @@ Lara Linda;556291279592"
         <DialogActions>
           <Button 
             onClick={() => setSpeedHelpDialogOpen(false)}
+            sx={{ color: '#00a884', '&:hover': { background: 'rgba(0, 168, 132, 0.1)' } }}
+          >
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog de Ajuda - Tipo de Template */}
+      <Dialog
+        open={templateTypeHelpDialogOpen}
+        onClose={() => setTemplateTypeHelpDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { background: '#202c33', color: '#e9edef' }
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#00a884' }}>
+          <InfoIcon />
+          Tipos de Template Disponíveis
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body1" sx={{ color: '#e9edef', mb: 3 }}>
+              Escolha o tipo de template que melhor se adequa à sua mensagem. Cada tipo permite diferentes formatos de conteúdo:
+            </Typography>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                📝 Texto
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Mensagem de texto simples. Suporta variáveis de personalização.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> Mensagens curtas, notificações, lembretes
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                🖼️ Imagem
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia uma imagem sem legenda adicional.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> Logos, infográficos, imagens promocionais
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                🖼️ Imagem com Legenda
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia uma imagem com texto de legenda personalizável. Suporta variáveis na legenda.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> Posts de redes sociais, promoções com imagem, tutoriais
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                🎵 Áudio
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia um arquivo de áudio (máximo 16MB). Formatos aceitos: MP3, OGG, AMR, M4A.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> Mensagens de voz, podcast, músicas curtas
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                📄 Arquivo
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia um documento sem legenda. Formatos aceitos: PDF, DOC, XLS, PPT, etc.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> Contratos, PDFs, planilhas, apresentações
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                📄 Arquivo com Legenda
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia um documento com texto de legenda personalizável. Suporta variáveis na legenda.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
+                <strong>Ideal para:</strong> E-books com descrição, relatórios explicados, manuais
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                📋 Sequência de Mensagens
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                Envia múltiplas mensagens em sequência com intervalos configuráveis. Pode incluir diferentes tipos de mídia.
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#e9edef', display: 'block', mb: 1 }}>
+                <strong>Ideal para:</strong> Campanhas multi-etapas, tutoriais passo a passo, diálogos estruturados
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#8696a0', display: 'block', fontStyle: 'italic' }}>
+                Você pode definir um delay entre cada mensagem e usar variáveis em todas elas
+              </Typography>
+            </Box>
+
+            <Box sx={{ mt: 3, p: 2, background: 'rgba(0, 168, 132, 0.1)', borderRadius: 1, border: '1px solid rgba(0, 168, 132, 0.3)' }}>
+              <Typography variant="body2" sx={{ color: '#00a884', fontWeight: 'bold', mb: 1 }}>
+                💡 Dica:
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                Todos os tipos de template suportam variáveis de personalização como $name, $firstName, $lastName, $number e $originalNumber.
+                Use essas variáveis para tornar suas mensagens mais pessoais e engajadas.
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setTemplateTypeHelpDialogOpen(false)}
             sx={{ color: '#00a884', '&:hover': { background: 'rgba(0, 168, 132, 0.1)' } }}
           >
             Fechar
