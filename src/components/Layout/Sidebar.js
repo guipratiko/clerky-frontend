@@ -455,7 +455,13 @@ const Sidebar = () => {
           }
         }}
       >
-        <MenuItem onClick={handleUserMenuClose} sx={{ color: '#fff', '&:hover': { background: 'rgba(255,255,255,0.1)' } }}>
+        <MenuItem 
+          onClick={() => { 
+            handleUserMenuClose(); 
+            navigate('/profile'); 
+          }} 
+          sx={{ color: '#fff', '&:hover': { background: 'rgba(255,255,255,0.1)' } }}
+        >
           <ListItemIcon sx={{ color: '#fff' }}>
             <AccountIcon />
           </ListItemIcon>

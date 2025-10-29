@@ -227,7 +227,7 @@ const AIWorkflowCard = ({ workflow, onToggle, onEdit, onTest, onDelete, testingW
 
 const N8nIntegration = () => {
   const { t } = useI18n();
-  const { user, isInTrial, getTrialDaysRemaining, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [integrations, setIntegrations] = useState([]);
   const [instances, setInstances] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -336,15 +336,9 @@ const N8nIntegration = () => {
     // Aguardar usuário estar carregado
     if (!user) return;
     
-    // Não carregar dados se usuário estiver em trial (exceto admins)
-    if (!isAdmin() && isInTrial()) {
-      console.log('⚠️ Usuário em trial - dados N8N não carregados');
-      setLoading(false);
-      return;
-    }
-    
+    // Carregar dados normalmente (trial não bloqueia mais)
     loadData();
-  }, [user, isAdmin, isInTrial]);
+  }, [user]);
 
   const loadData = async () => {
     try {
@@ -360,7 +354,7 @@ const N8nIntegration = () => {
       setAiWorkflows(aiWorkflowsResponse.data || []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
-      toast.error('Erro ao carregar integrações N8N');
+      toast.error('Erro ao carregar integrações webhook');
     } finally {
       setLoading(false);
     }
@@ -422,10 +416,10 @@ const N8nIntegration = () => {
     try {
       if (editingIntegration) {
         await updateN8nIntegration(editingIntegration._id, formData);
-        toast.success('Integração N8N atualizada com sucesso!');
+        toast.success('Integração webhook atualizada com sucesso!');
       } else {
         await createN8nIntegration(formData);
-        toast.success('Integração N8N criada com sucesso!');
+        toast.success('Integração webhook criada com sucesso!');
       }
       
       handleCloseDialog();
@@ -843,9 +837,7 @@ REGRAS DE COMPORTAMENTO:
     </div>
   );
 
-  // Verificar se usuário está em trial (exceto admins)
-  const showTrialWarning = !isAdmin() && isInTrial();
-  const trialDaysRemaining = getTrialDaysRemaining();
+  // Removido aviso de trial - funcionalidade agora disponível durante trial
 
   if (loading) {
     return (
@@ -857,40 +849,6 @@ REGRAS DE COMPORTAMENTO:
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Aviso de Trial */}
-      {showTrialWarning && (
-        <Paper sx={{ 
-          p: 3, 
-          mb: 3, 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          border: '2px solid #fff',
-          boxShadow: '0 8px 32px 0 rgba(102, 126, 234, 0.37)'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ 
-              background: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
-              p: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <WarningIcon sx={{ fontSize: 40, color: '#fff' }} />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 1 }}>
-                🎯 Período de Teste - Funcionalidade Restrita
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 1 }}>
-                Você está no período de teste de 7 dias e esta funcionalidade não está disponível durante este período.
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                ⏰ <strong>{trialDaysRemaining} dias restantes</strong> | Após a aprovação completa da sua conta, você terá acesso total à Integração N8N e AI Workflows.
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
-      )}
 
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1">

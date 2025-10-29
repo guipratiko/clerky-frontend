@@ -18,6 +18,7 @@ import MassDispatch from './components/MassDispatch';
 import N8nIntegration from './components/N8nIntegration';
 import WebhookDocumentation from './components/WebhookDocumentation';
 import StatusPage from './components/StatusPage';
+import UserProfile from './components/UserProfile';
 import './App.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
                         <Route path="/mass-dispatch" element={<MassDispatch />} />
                         <Route path="/n8n-integration" element={<N8nIntegration />} />
                         <Route path="/webhook-docs" element={<WebhookDocumentation />} />
+                        <Route path="/profile" element={<UserProfile />} />
                         <Route path="/admin" element={
                           <ProtectedRoute requireAdmin={true}>
                             <AdminPanel />

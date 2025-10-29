@@ -161,6 +161,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Recarregar dados do usuário
+  const refreshUser = async () => {
+    if (token) {
+      try {
+        const response = await api.get('/api/auth/me');
+        setUser(response.data.data.user);
+        return response.data.data.user;
+      } catch (error) {
+        console.error('Erro ao recarregar dados do usuário:', error);
+        throw error;
+      }
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -174,7 +188,8 @@ export const AuthProvider = ({ children }) => {
     getTrialDaysRemaining,
     getPendingUsers,
     approveUser,
-    getAllUsers
+    getAllUsers,
+    refreshUser
   };
 
   return (

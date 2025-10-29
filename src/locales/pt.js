@@ -52,7 +52,7 @@ export const pt = {
     analytics: 'Analytics',
     settings: 'Configurações',
     admin: 'Admin',
-    webhooks: 'Integrações N8N',
+    webhooks: 'Integração Webhook',
     documentation: 'Documentação de Webhooks',
     home: 'Início'
   },
@@ -323,8 +323,8 @@ export const pt = {
 
   // N8N Integration
   n8nIntegration: {
-    title: 'Integrações N8N',
-    subtitle: 'Configure integrações com N8N',
+    title: 'Integração Webhook',
+    subtitle: 'Configure integrações webhook',
     addIntegration: 'Adicionar Integração',
     webhookUrl: 'URL do Webhook',
     webhookSecret: 'Segredo do Webhook',
@@ -339,10 +339,10 @@ export const pt = {
     integrationDeleted: 'Integração excluída com sucesso!',
     integrationTested: 'Integração testada com sucesso!',
     testFailed: 'Teste falhou',
-    noIntegrations: 'Nenhuma integração N8N configurada',
+    noIntegrations: 'Nenhuma integração webhook configurada',
     createFirstIntegration: 'Criar Primeira Integração',
-    newIntegration: 'Nova Integração N8N',
-    editIntegration: 'Editar Integração N8N',
+    newIntegration: 'Nova Integração Webhook',
+    editIntegration: 'Editar Integração Webhook',
     tabs: {
       basic: 'Configuração Básica',
       events: 'Eventos',
@@ -350,7 +350,7 @@ export const pt = {
       advanced: 'Configurações Avançadas'
     },
     // Mensagens adicionais
-    testMessage: 'Teste de integração N8N',
+    testMessage: 'Teste de integração webhook',
     integrationToggled: 'Integração {status} com sucesso!',
     activated: 'ativada',
     deactivated: 'desativada',
