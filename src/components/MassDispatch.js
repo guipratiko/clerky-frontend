@@ -43,7 +43,9 @@ import {
   // AccessTime as TimeIcon,
   // CalendarToday as CalendarIcon,
   PlayCircleOutline as PlayCircleIcon,
-  PauseCircleOutline as PauseCircleIcon
+  PauseCircleOutline as PauseCircleIcon,
+  HelpOutline as HelpOutlineIcon,
+  Info as InfoIcon
 } from '@mui/icons-material';
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
@@ -69,6 +71,8 @@ const MassDispatch = () => {
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedDispatch, setSelectedDispatch] = useState(null);
+  const [formatHelpDialogOpen, setFormatHelpDialogOpen] = useState(false);
+  const [speedHelpDialogOpen, setSpeedHelpDialogOpen] = useState(false);
   
   // Estados para seleção de contatos do Kanban
   const [kanbanColumns, setKanbanColumns] = useState([]);
@@ -1358,7 +1362,10 @@ const MassDispatch = () => {
             margin="normal"
             multiline
             rows={4}
-            placeholder="556293557070&#10;556298448536&#10;..."
+            placeholder="556293557070
+guilherme;556298448536
+Lara Linda;556291279592"
+            helperText="Formato aceito: número apenas ou nome;número (um por linha)"
             sx={{
               '& .MuiInputLabel-root': { color: '#8696a0' },
               '& .MuiOutlinedInput-root': {
@@ -1366,6 +1373,9 @@ const MassDispatch = () => {
                 '& fieldset': { borderColor: '#313d43' },
                 '&:hover fieldset': { borderColor: '#00a884' },
                 '&.Mui-focused fieldset': { borderColor: '#00a884' },
+              },
+              '& .MuiFormHelperText-root': {
+                color: '#8696a0'
               }
             }}
           />
@@ -1450,12 +1460,12 @@ const MassDispatch = () => {
             )}
           </Box>
 
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button
               variant="outlined"
               component="label"
               startIcon={<CloudUploadIcon />}
-              sx={{ mr: 2 }}
+              sx={{ mr: 1 }}
             >
               Upload CSV/XML
               <input
@@ -1465,21 +1475,54 @@ const MassDispatch = () => {
                 onChange={(e) => setFormData(prev => ({ ...prev, file: e.target.files[0] }))}
               />
             </Button>
+            <Tooltip title="Ver formatos aceitos">
+              <IconButton
+                onClick={() => setFormatHelpDialogOpen(true)}
+                sx={{
+                  color: '#00a884',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                  }
+                }}
+              >
+                <HelpOutlineIcon />
+              </IconButton>
+            </Tooltip>
             {formData.file && (
-              <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', ml: 'auto' }}>
                 Arquivo selecionado: {formData.file.name}
               </Typography>
             )}
           </Box>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: '#8696a0' }}>Velocidade</InputLabel>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', fontSize: '0.875rem' }}>
+                Velocidade
+              </Typography>
+              <Tooltip title="Ver opções de velocidade">
+                <IconButton
+                  onClick={() => setSpeedHelpDialogOpen(true)}
+                  size="small"
+                  sx={{
+                    color: '#00a884',
+                    padding: '2px',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 168, 132, 0.1)'
+                    }
+                  }}
+                >
+                  <HelpOutlineIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
             <Select
               value={formData.settings.speed}
               onChange={(e) => setFormData(prev => ({ 
                 ...prev, 
                 settings: { ...prev.settings, speed: e.target.value }
               }))}
+              displayEmpty
               sx={{
                 color: '#e9edef',
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
@@ -2552,6 +2595,239 @@ const MassDispatch = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setViewDialogOpen(false)}>
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog de Ajuda - Formatos Aceitos */}
+      <Dialog
+        open={formatHelpDialogOpen}
+        onClose={() => setFormatHelpDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { background: '#202c33', color: '#e9edef' }
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#00a884' }}>
+          <InfoIcon />
+          Formatos Aceitos para Upload de Arquivos
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="h6" sx={{ color: '#00a884', mb: 2 }}>
+              📝 Formato de Entrada Manual (Campo de Texto)
+            </Typography>
+            <Typography variant="body1" sx={{ color: '#e9edef', mb: 2 }}>
+              Você pode inserir números diretamente no campo de texto. Aceitamos dois formatos:
+            </Typography>
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1, fontFamily: 'monospace' }}>
+                <strong>Formato 1:</strong> Apenas número (um por linha)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace', whiteSpace: 'pre-line' }}>
+                556293557070
+                556298448536
+                556291279592
+              </Typography>
+            </Box>
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1, fontFamily: 'monospace' }}>
+                <strong>Formato 2:</strong> Nome e número separados por ponto e vírgula (nome;número)
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace', whiteSpace: 'pre-line' }}>
+                guilherme;556298448536
+                Lara Linda;556291279592
+                Jorge Silva;556284827843
+              </Typography>
+            </Box>
+
+            <Typography variant="h6" sx={{ color: '#00a884', mb: 2, mt: 3 }}>
+              📄 Formato de Arquivo CSV
+            </Typography>
+            <Typography variant="body1" sx={{ color: '#e9edef', mb: 2 }}>
+              Arquivos CSV podem usar vírgula (,) ou ponto e vírgula (;) como delimitador. O sistema detecta automaticamente.
+            </Typography>
+            
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Colunas aceitas para nomes:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                name, nome
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Colunas aceitas para números:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                numero, telefone, phone, celular, whatsapp, números, contato, contatos
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Exemplo de CSV:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace', whiteSpace: 'pre-line' }}>
+                nome,telefone
+                guilherme,556298448536
+                Lara Linda,556291279592
+                Jorge,556284827843
+              </Typography>
+            </Box>
+
+            <Typography variant="h6" sx={{ color: '#00a884', mb: 2, mt: 3 }}>
+              📋 Formato de Arquivo XML
+            </Typography>
+            <Typography variant="body1" sx={{ color: '#e9edef', mb: 2 }}>
+              Arquivos XML devem seguir a estrutura abaixo:
+            </Typography>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Tags aceitas para nomes:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                &lt;name&gt; ou &lt;nome&gt;
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Tags aceitas para números:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace' }}>
+                &lt;numero&gt;, &lt;telefone&gt;, &lt;phone&gt;, &lt;celular&gt;, &lt;whatsapp&gt;
+              </Typography>
+            </Box>
+
+            <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                <strong>Exemplo de XML:</strong>
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#e9edef', fontFamily: 'monospace', whiteSpace: 'pre-line', fontSize: '0.85rem' }}>
+                {`<?xml version="1.0"?>
+<contatos>
+  <contato>
+    <nome>guilherme</nome>
+    <telefone>556298448536</telefone>
+  </contato>
+  <contato>
+    <nome>Lara Linda</nome>
+    <telefone>556291279592</telefone>
+  </contato>
+</contatos>`}
+              </Typography>
+            </Box>
+
+            <Typography variant="h6" sx={{ color: '#00a884', mb: 2, mt: 3 }}>
+              💡 Dicas Importantes
+            </Typography>
+            <Box component="ul" sx={{ color: '#e9edef', pl: 3 }}>
+              <li>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  Se você fornecer um nome junto com o número, esse nome será usado nas variáveis $name, $firstName e $lastName
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  Se não fornecer um nome, o sistema tentará buscar o nome do WhatsApp automaticamente
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  Se nenhum nome for encontrado, será usado o nome padrão definido em "Personalização de Mensagens" (padrão: "Cliente")
+                </Typography>
+              </li>
+              <li>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  O formato de número deve incluir DDI (código do país) + DDD + número (exemplo: 556298448536)
+                </Typography>
+              </li>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setFormatHelpDialogOpen(false)}
+            sx={{ color: '#00a884', '&:hover': { background: 'rgba(0, 168, 132, 0.1)' } }}
+          >
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog de Ajuda - Velocidade */}
+      <Dialog
+        open={speedHelpDialogOpen}
+        onClose={() => setSpeedHelpDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { background: '#202c33', color: '#e9edef' }
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#00a884' }}>
+          <InfoIcon />
+          Opções de Velocidade de Disparo
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body1" sx={{ color: '#e9edef', mb: 3 }}>
+              A velocidade determina o intervalo de tempo entre o envio de cada mensagem. Escolha a opção mais adequada para seu disparo:
+            </Typography>
+
+            {speedOptions.map((option, index) => (
+              <Box key={option.value} sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
+                <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
+                  {option.label}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                  {option.description}
+                </Typography>
+                {option.value === 'fast' && (
+                  <Typography variant="caption" sx={{ color: '#ffab00', display: 'block', mt: 1 }}>
+                    ⚠️ Atenção: Maior chance de bloqueio se enviar muitas mensagens
+                  </Typography>
+                )}
+                {option.value === 'normal' && (
+                  <Typography variant="caption" sx={{ color: '#00a884', display: 'block', mt: 1 }}>
+                    ✅ Recomendado para a maioria dos casos
+                  </Typography>
+                )}
+                {option.value === 'slow' && (
+                  <Typography variant="caption" sx={{ color: '#2196f3', display: 'block', mt: 1 }}>
+                    🔒 Mais seguro, menor risco de bloqueio
+                  </Typography>
+                )}
+                {option.value === 'random' && (
+                  <Typography variant="caption" sx={{ color: '#9c27b0', display: 'block', mt: 1 }}>
+                    🎲 Intervalos aleatórios dificultam a detecção de padrões
+                  </Typography>
+                )}
+              </Box>
+            ))}
+
+            <Box sx={{ mt: 3, p: 2, background: 'rgba(255, 171, 0, 0.1)', borderRadius: 1, border: '1px solid rgba(255, 171, 0, 0.3)' }}>
+              <Typography variant="body2" sx={{ color: '#ffab00', fontWeight: 'bold', mb: 1 }}>
+                ⚠️ Importante:
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                Velocidades muito altas podem resultar em bloqueio temporário ou permanente da conta WhatsApp. 
+                Recomendamos sempre testar com um pequeno grupo antes de disparar em massa.
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setSpeedHelpDialogOpen(false)}
+            sx={{ color: '#00a884', '&:hover': { background: 'rgba(0, 168, 132, 0.1)' } }}
+          >
             Fechar
           </Button>
         </DialogActions>

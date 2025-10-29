@@ -248,7 +248,7 @@ export const pt = {
         pending: 'Pendentes'
       },
       form: {
-        numbers: 'Números (um por linha)',
+        numbers: 'Números e/ou Nomes (um por linha)',
         enableScheduling: 'Ativar agendamento',
         cancel: 'Cancelar',
         createDispatch: 'Criar Disparo'
