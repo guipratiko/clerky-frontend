@@ -49,10 +49,12 @@ export const pt = {
     kanban: 'Kanban',
     contacts: 'Contatos',
     campaigns: 'Disparo em Massa',
+    mindClerky: 'Construtor MindClerky',
     analytics: 'Analytics',
     settings: 'Configurações',
     admin: 'Admin',
     webhooks: 'Integração Webhook',
+    aiWorkflows: 'Workflows de IA',
     documentation: 'Documentação de Webhooks',
     home: 'Início'
   },
@@ -263,6 +265,7 @@ export const pt = {
       scheduledDispatchStarted: 'Disparo agendado iniciado!',
       scheduledDispatchCancelled: 'Disparo agendado cancelado!',
       templateCreated: 'Template criado com sucesso!',
+      templateUpdated: 'Template atualizado com sucesso!',
       templateDeleted: 'Template excluído com sucesso!',
       // Mensagens de erro
       dispatchCreateError: 'Erro ao criar disparo',
@@ -276,6 +279,7 @@ export const pt = {
       scheduledDispatchStartError: 'Erro ao iniciar disparo agendado',
       scheduledDispatchCancelError: 'Erro ao cancelar disparo agendado',
       templateCreateError: 'Erro ao criar template',
+      templateUpdateError: 'Erro ao atualizar template',
       templateDeleteError: 'Erro ao excluir template',
       // Confirmações
       confirmCancelScheduled: 'Tem certeza que deseja cancelar este disparo agendado?',
@@ -284,6 +288,7 @@ export const pt = {
       confirmDeleteTemplate: 'Tem certeza que deseja excluir este template?',
       // Interface
       deleteTemplate: 'Excluir template',
+      editTemplate: 'Editar template',
       noDescription: 'Sem descrição',
       numbers: 'números',
       waiting: 'Aguardando',
@@ -314,11 +319,14 @@ export const pt = {
       // Formulários
       createNewDispatch: 'Criar Novo Disparo em Massa',
       createNewTemplate: 'Criar Novo Template',
+      saveTemplateChanges: 'Salvar alterações',
+      createTemplate: 'Criar Template',
       dispatchName: 'Nome do Disparo',
       templateName: 'Nome do Template',
       instance: 'Instância',
       templateType: 'Tipo de Template',
-      messageText: 'Texto da Mensagem'
+      messageText: 'Texto da Mensagem',
+      currentFile: 'Arquivo atual'
     },
 
   // N8N Integration
@@ -429,6 +437,15 @@ export const pt = {
       promptHelp: 'Exemplo: "Você é um assistente virtual de vendas. Seja sempre educado, profissional e focado em ajudar o cliente."',
       promptRequired: 'Prompt é obrigatório',
       promptMaxLength: 'Prompt muito longo (máximo 5000 caracteres)',
+      promptVariablesTitle: 'Variáveis disponíveis',
+      promptVariablesDescription: 'Clique para inserir dados dinâmicos do contato diretamente no prompt.',
+      promptVariableFirstName: 'Primeiro nome',
+      promptVariableFullName: 'Nome completo',
+      promptVariableLastName: 'Sobrenome',
+      promptVariablePhone: 'Telefone',
+      audioReplyLabel: 'Responder com áudio',
+      audioReplyDescription: 'Quando ativado, a IA envia também um áudio sintético (voz: {{voice}}).',
+      singleReplyLabel: 'Responder apenas uma vez por contato',
       instanceRequired: 'Selecione uma instância conectada',
       noConnectedInstances: 'Nenhuma instância conectada disponível',
       

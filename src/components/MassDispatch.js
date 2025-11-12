@@ -45,7 +45,8 @@ import {
   PlayCircleOutline as PlayCircleIcon,
   PauseCircleOutline as PauseCircleIcon,
   HelpOutline as HelpOutlineIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
@@ -53,6 +54,30 @@ import { useI18n } from '../contexts/I18nContext';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+
+const createDefaultSequenceMessages = () => ([
+  { order: 1, type: 'text', text: '', delay: 5, media: null, existingMediaUrl: '', existingFileName: '', existingMediaType: '' },
+  { order: 2, type: 'text', text: '', delay: 5, media: null, existingMediaUrl: '', existingFileName: '', existingMediaType: '' },
+  { order: 3, type: 'text', text: '', delay: 5, media: null, existingMediaUrl: '', existingFileName: '', existingMediaType: '' }
+]);
+
+const INITIAL_TEMPLATE_FORM = {
+  name: '',
+  description: '',
+  type: 'text',
+  text: '',
+  caption: '',
+  fileName: '',
+  media: null,
+  existingMediaUrl: '',
+  existingMediaName: ''
+};
+
+const getFileNameFromUrl = (url = '') => {
+  if (!url) return '';
+  const parts = url.split('/');
+  return parts[parts.length - 1];
+};
 
 const MassDispatch = () => {
   const { instances } = useInstance();
@@ -74,6 +99,7 @@ const MassDispatch = () => {
   const [formatHelpDialogOpen, setFormatHelpDialogOpen] = useState(false);
   const [speedHelpDialogOpen, setSpeedHelpDialogOpen] = useState(false);
   const [templateTypeHelpDialogOpen, setTemplateTypeHelpDialogOpen] = useState(false);
+  const [editingTemplateId, setEditingTemplateId] = useState(null);
   
   // Estados para seleção de contatos do Kanban
   const [kanbanColumns, setKanbanColumns] = useState([]);
@@ -108,15 +134,7 @@ const MassDispatch = () => {
   });
   
   // Estados do template
-  const [templateForm, setTemplateForm] = useState({
-    name: '',
-    description: '',
-    type: 'text',
-    text: '',
-    caption: '',
-    fileName: '',
-    media: null
-  });
+  const [templateForm, setTemplateForm] = useState(() => ({ ...INITIAL_TEMPLATE_FORM }));
 
   // Função para inserir variável no template
   const insertVariable = (variable, field = 'text') => {
@@ -133,12 +151,57 @@ const MassDispatch = () => {
     }
   };
 
+  const resetTemplateDialogState = () => {
+    setTemplateForm({ ...INITIAL_TEMPLATE_FORM });
+    setSequenceMessages(createDefaultSequenceMessages());
+    setEditingTemplateId(null);
+  };
+
+  const openNewTemplateDialog = () => {
+    resetTemplateDialogState();
+    setTemplateDialogOpen(true);
+  };
+
+  const handleCloseTemplateDialog = () => {
+    setTemplateDialogOpen(false);
+    resetTemplateDialogState();
+  };
+
+  const handleEditTemplate = (template) => {
+    setEditingTemplateId(template._id);
+    setTemplateForm({
+      name: template.name || '',
+      description: template.description || '',
+      type: template.type,
+      text: template.content?.text || '',
+      caption: template.content?.caption || '',
+      fileName: template.content?.fileName || '',
+      media: null,
+      existingMediaUrl: template.content?.media || '',
+      existingMediaName: template.content?.fileName || getFileNameFromUrl(template.content?.media)
+    });
+
+    if (template.type === 'sequence') {
+      const messages = (template.sequence?.messages || []).map((msg, index) => ({
+        order: msg.order ?? index + 1,
+        type: msg.type,
+        text: msg.content?.text || msg.content?.caption || '',
+        delay: msg.delay || 5,
+        media: null,
+        existingMediaUrl: msg.content?.media || '',
+        existingFileName: msg.content?.fileName || getFileNameFromUrl(msg.content?.media),
+        existingMediaType: msg.content?.mediaType || ''
+      }));
+      setSequenceMessages(messages.length > 0 ? messages : createDefaultSequenceMessages());
+    } else {
+      setSequenceMessages(createDefaultSequenceMessages());
+    }
+
+    setTemplateDialogOpen(true);
+  };
+
   // Estados para sequência de mensagens
-  const [sequenceMessages, setSequenceMessages] = useState([
-    { order: 1, type: 'text', text: '', delay: 5 },
-    { order: 2, type: 'text', text: '', delay: 5 },
-    { order: 3, type: 'text', text: '', delay: 5 }
-  ]);
+  const [sequenceMessages, setSequenceMessages] = useState(() => createDefaultSequenceMessages());
 
   // Estados para agendamento
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
@@ -549,19 +612,63 @@ const MassDispatch = () => {
     return `${minutes}min`;
   };
 
-  // Criar template
-  const handleCreateTemplate = async () => {
+  // Criar ou atualizar template
+  const handleSaveTemplate = async () => {
     try {
       setLoading(true);
 
+      if (editingTemplateId) {
+        const templateData = new FormData();
+        templateData.append('name', templateForm.name);
+        templateData.append('description', templateForm.description);
+        templateData.append('type', templateForm.type);
+
       if (templateForm.type === 'sequence') {
-        // Criar template de sequência
+          templateData.append('sequence', JSON.stringify({
+            messages: sequenceMessages.map(msg => ({
+              order: msg.order,
+              type: msg.type,
+              delay: msg.delay,
+              text: msg.text || '',
+              caption: msg.type.includes('caption') ? (msg.text || '') : '',
+              hasNewMedia: !!msg.media
+            }))
+          }));
+
+          sequenceMessages.forEach((msg) => {
+            if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+              templateData.append('media', msg.media);
+            }
+          });
+        } else {
+          if (templateForm.type === 'text') {
+            templateData.append('text', templateForm.text || '');
+          }
+          if (templateForm.type.includes('caption')) {
+            templateData.append('caption', templateForm.caption || '');
+          }
+          if (['audio', 'file', 'file_caption'].includes(templateForm.type) && templateForm.fileName) {
+            templateData.append('fileName', templateForm.fileName);
+          }
+          if (templateForm.media) {
+            templateData.append('media', templateForm.media);
+          }
+        }
+
+        await api.put(`/api/mass-dispatch/templates/${editingTemplateId}`, templateData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        toast.success(t('massDispatch.templateUpdated'));
+      } else {
+        if (templateForm.type === 'sequence') {
         const templateData = new FormData();
         templateData.append('name', templateForm.name);
         templateData.append('description', templateForm.description);
         templateData.append('type', 'sequence');
         
-        // Adicionar sequência de mensagens
         templateData.append('sequence', JSON.stringify({
           messages: sequenceMessages.map(msg => ({
             order: msg.order,
@@ -574,17 +681,10 @@ const MassDispatch = () => {
           }))
         }));
 
-        // Adicionar arquivos de mídia
-        sequenceMessages.forEach((msg, index) => {
+          sequenceMessages.forEach((msg) => {
           if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
             templateData.append('media', msg.media);
           }
-        });
-
-        console.log('🔍 Debug frontend - Template de sequência:', {
-          templateName: templateForm.name,
-          sequenceMessages: sequenceMessages,
-          mediaFiles: sequenceMessages.filter(msg => msg.media).length
         });
 
         await api.post('/api/mass-dispatch/templates/sequence', templateData, {
@@ -593,7 +693,6 @@ const MassDispatch = () => {
           }
         });
       } else {
-        // Criar template simples
         const templateData = new FormData();
         templateData.append('name', templateForm.name);
         templateData.append('description', templateForm.description);
@@ -612,26 +711,20 @@ const MassDispatch = () => {
       }
 
       toast.success(t('massDispatch.templateCreated'));
-      setTemplateDialogOpen(false);
-      setTemplateForm({
-        name: '',
-        description: '',
-        type: 'text',
-        text: '',
-        caption: '',
-        fileName: '',
-        media: null
-      });
-      setSequenceMessages([
-        { order: 1, type: 'text', text: '', delay: 5 },
-        { order: 2, type: 'text', text: '', delay: 5 },
-        { order: 3, type: 'text', text: '', delay: 5 }
-      ]);
+      }
+
+      handleCloseTemplateDialog();
       loadTemplates();
 
     } catch (error) {
-      console.error('Erro ao criar template:', error);
-      toast.error(error.response?.data?.error || t('massDispatch.templateCreateError'));
+      console.error('Erro ao salvar template:', error);
+      toast.error(
+        error.response?.data?.error || (
+          editingTemplateId
+            ? t('massDispatch.templateUpdateError')
+            : t('massDispatch.templateCreateError')
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -793,7 +886,7 @@ const MassDispatch = () => {
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
-            onClick={() => setTemplateDialogOpen(true)}
+            onClick={openNewTemplateDialog}
           >
             {t('massDispatch.newTemplate')}
           </Button>
@@ -823,7 +916,7 @@ const MassDispatch = () => {
             <Button
               variant="outlined"
               startIcon={<AddIcon />}
-              onClick={() => setTemplateDialogOpen(true)}
+              onClick={openNewTemplateDialog}
               sx={{
                 borderColor: '#00a884',
                 color: '#00a884',
@@ -843,6 +936,21 @@ const MassDispatch = () => {
                   '&:hover': { borderColor: '#00a884' },
                   transition: 'border-color 0.3s ease'
                 }}>
+                  <CardActions sx={{ justifyContent: 'flex-start', px: 2, pt: 2, pb: 0 }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleEditTemplate(template)}
+                      sx={{
+                        borderColor: '#00a884',
+                        color: '#00a884',
+                        '&:hover': { borderColor: '#008069', backgroundColor: 'rgba(0, 168, 132, 0.1)' }
+                      }}
+                    >
+                      {t('massDispatch.editTemplate')}
+                    </Button>
+                  </CardActions>
                   <CardContent>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -851,7 +959,8 @@ const MassDispatch = () => {
                           {template.name}
                         </Typography>
                       </Box>
-                      <Tooltip title={t('massDispatch.deleteTemplate')}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Tooltip title={t('massDispatch.deleteTemplate')}>
                         <IconButton
                           size="small"
                           onClick={() => handleDeleteTemplate(template._id)}
@@ -862,7 +971,8 @@ const MassDispatch = () => {
                         >
                           <DeleteIcon />
                         </IconButton>
-                      </Tooltip>
+                        </Tooltip>
+                      </Box>
                     </Box>
                     
                     <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
@@ -1850,17 +1960,19 @@ Lara Linda;556291279592"
         </DialogActions>
       </Dialog>
 
-      {/* Dialog de Criação de Template */}
+      {/* Dialog de Criação/Edição de Template */}
       <Dialog
         open={templateDialogOpen}
-        onClose={() => setTemplateDialogOpen(false)}
+        onClose={handleCloseTemplateDialog}
         maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: { background: '#202c33', color: '#e9edef' }
         }}
       >
-        <DialogTitle>{t('massDispatch.createNewTemplate')}</DialogTitle>
+        <DialogTitle>
+          {editingTemplateId ? t('massDispatch.editTemplate') : t('massDispatch.createNewTemplate')}
+        </DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -1905,6 +2017,7 @@ Lara Linda;556291279592"
               value={templateForm.type}
               onChange={(e) => setTemplateForm(prev => ({ ...prev, type: e.target.value }))}
               displayEmpty
+              disabled={Boolean(editingTemplateId)}
               sx={{
                 color: '#e9edef',
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
@@ -2193,12 +2306,25 @@ Lara Linda;556291279592"
                     templateForm.type.includes('image') ? 'image/*' :
                     templateForm.type.includes('audio') ? 'audio/*' : '*/*'
                   }
-                  onChange={(e) => setTemplateForm(prev => ({ ...prev, media: e.target.files[0] }))}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setTemplateForm(prev => ({
+                      ...prev,
+                      media: file,
+                      existingMediaUrl: file ? '' : prev.existingMediaUrl,
+                      existingMediaName: file ? file.name : prev.existingMediaName
+                    }));
+                  }}
                 />
               </Button>
               {templateForm.media && (
                 <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
                   Arquivo selecionado: {templateForm.media.name}
+                </Typography>
+              )}
+              {editingTemplateId && !templateForm.media && templateForm.existingMediaUrl && (
+                <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+                  {t('massDispatch.currentFile')}: {templateForm.existingMediaName || getFileNameFromUrl(templateForm.existingMediaUrl)}
                 </Typography>
               )}
             </Box>
@@ -2433,7 +2559,12 @@ Lara Linda;556291279592"
                           }
                           onChange={(e) => {
                             const newMessages = [...sequenceMessages];
-                            newMessages[index].media = e.target.files[0];
+                            const file = e.target.files?.[0] || null;
+                            newMessages[index].media = file;
+                            if (file) {
+                              newMessages[index].existingMediaUrl = '';
+                              newMessages[index].existingFileName = file.name;
+                            }
                             setSequenceMessages(newMessages);
                           }}
                         />
@@ -2441,6 +2572,11 @@ Lara Linda;556291279592"
                       {message.media && (
                         <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
                           Arquivo: {message.media.name}
+                        </Typography>
+                      )}
+                      {editingTemplateId && !message.media && message.existingFileName && (
+                        <Typography variant="body2" sx={{ color: '#8696a0', mt: 1 }}>
+                          {t('massDispatch.currentFile')}: {message.existingFileName}
                         </Typography>
                       )}
                     </Box>
@@ -2479,16 +2615,20 @@ Lara Linda;556291279592"
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setTemplateDialogOpen(false)}>
-            Cancelar
+          <Button onClick={handleCloseTemplateDialog}>
+            {t('massDispatch.form.cancel')}
           </Button>
           <Button
-            onClick={handleCreateTemplate}
+            onClick={handleSaveTemplate}
             variant="contained"
             disabled={loading}
             sx={{ background: '#00a884', '&:hover': { background: '#008069' } }}
           >
-            {loading ? <CircularProgress size={20} /> : 'Criar Template'}
+            {loading ? (
+              <CircularProgress size={20} />
+            ) : (
+              editingTemplateId ? t('massDispatch.saveTemplateChanges') : t('massDispatch.createTemplate')
+            )}
           </Button>
         </DialogActions>
       </Dialog>

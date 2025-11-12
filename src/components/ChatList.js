@@ -13,12 +13,11 @@ import {
   Chip,
 } from '@mui/material';
 import { Search as SearchIcon, Sync as SyncIcon } from '@mui/icons-material';
-import { useInstance } from '../contexts/InstanceContext';
+import api from '../services/api';
 import { useSocket } from '../contexts/SocketContext';
 import moment from 'moment';
 
 const ChatList = ({ instanceName, selectedChat, onSelectChat }) => {
-  const { api } = useInstance();
   const { on, off } = useSocket();
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,19 +27,19 @@ const ChatList = ({ instanceName, selectedChat, onSelectChat }) => {
   const loadChats = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/chats/${instanceName}`);
+      const response = await api.get(`/api/chats/${instanceName}`);
       setChats(response.data.data || []);
     } catch (error) {
       console.error('Erro ao carregar conversas:', error);
     } finally {
       setLoading(false);
     }
-  }, [instanceName, api]);
+  }, [instanceName]);
 
   // Sincronizar conversas
   const syncChats = async () => {
     try {
-      await api.post(`/chats/${instanceName}/sync`);
+      await api.post(`/api/chats/${instanceName}/sync`);
       await loadChats();
     } catch (error) {
       console.error('Erro ao sincronizar conversas:', error);
@@ -171,6 +170,7 @@ const ChatList = ({ instanceName, selectedChat, onSelectChat }) => {
               </ListItemAvatar>
               
               <ListItemText
+                disableTypography
                 primary={
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography

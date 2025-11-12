@@ -50,10 +50,12 @@ export const en = {
     kanban: 'Kanban',
     contacts: 'Contacts',
     campaigns: 'Mass Dispatch',
+    mindClerky: 'MindClerky Builder',
     analytics: 'Analytics',
     settings: 'Settings',
     admin: 'Admin',
     webhooks: 'N8N Integrations',
+    aiWorkflows: 'AI Workflows',
     documentation: 'Webhook Documentation',
     home: 'Home'
   },
@@ -264,6 +266,7 @@ export const en = {
       scheduledDispatchStarted: 'Scheduled dispatch started!',
       scheduledDispatchCancelled: 'Scheduled dispatch cancelled!',
       templateCreated: 'Template created successfully!',
+      templateUpdated: 'Template updated successfully!',
       templateDeleted: 'Template deleted successfully!',
       // Error messages
       dispatchCreateError: 'Error creating dispatch',
@@ -277,6 +280,7 @@ export const en = {
       scheduledDispatchStartError: 'Error starting scheduled dispatch',
       scheduledDispatchCancelError: 'Error cancelling scheduled dispatch',
       templateCreateError: 'Error creating template',
+      templateUpdateError: 'Error updating template',
       templateDeleteError: 'Error deleting template',
       // Confirmations
       confirmCancelScheduled: 'Are you sure you want to cancel this scheduled dispatch?',
@@ -285,6 +289,7 @@ export const en = {
       confirmDeleteTemplate: 'Are you sure you want to delete this template?',
       // Interface
       deleteTemplate: 'Delete template',
+      editTemplate: 'Edit template',
       noDescription: 'No description',
       numbers: 'numbers',
       waiting: 'Waiting',
@@ -315,11 +320,14 @@ export const en = {
       // Forms
       createNewDispatch: 'Create New Mass Dispatch',
       createNewTemplate: 'Create New Template',
+      saveTemplateChanges: 'Save changes',
+      createTemplate: 'Create Template',
       dispatchName: 'Dispatch Name',
       templateName: 'Template Name',
       instance: 'Instance',
       templateType: 'Template Type',
-      messageText: 'Message Text'
+      messageText: 'Message Text',
+      currentFile: 'Current file'
     },
 
   // N8N Integration
@@ -430,6 +438,15 @@ export const en = {
       promptHelp: 'Example: "You are a virtual sales assistant. Always be polite, professional and focused on helping the customer."',
       promptRequired: 'Prompt is required',
       promptMaxLength: 'Prompt too long (maximum 2000 characters)',
+      promptVariablesTitle: 'Available variables',
+      promptVariablesDescription: 'Click to insert dynamic contact data directly into the prompt.',
+      promptVariableFirstName: 'First name',
+      promptVariableFullName: 'Full name',
+      promptVariableLastName: 'Last name',
+      promptVariablePhone: 'Phone',
+      audioReplyLabel: 'Reply with audio',
+      audioReplyDescription: 'When enabled, the assistant also sends a synthetic audio reply (voice: {{voice}}).',
+      singleReplyLabel: 'Reply only once per contact',
       instanceRequired: 'Select a connected instance',
       noConnectedInstances: 'No connected instances available',
       

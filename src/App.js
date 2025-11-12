@@ -16,9 +16,11 @@ import InstanceManager from './components/InstanceManager';
 import KanbanBoard from './components/KanbanBoard';
 import MassDispatch from './components/MassDispatch';
 import N8nIntegration from './components/N8nIntegration';
+import AIWorkflows from './components/AIWorkflows';
 import WebhookDocumentation from './components/WebhookDocumentation';
 import StatusPage from './components/StatusPage';
 import UserProfile from './components/UserProfile';
+import MindClerkyPage from './components/MindClerky/MindClerkyPage';
 import './App.css';
 
 function App() {
@@ -51,6 +53,8 @@ function App() {
                         <Route path="/crm/:instanceName" element={<KanbanBoard />} />
                         <Route path="/mass-dispatch" element={<MassDispatch />} />
                         <Route path="/n8n-integration" element={<N8nIntegration />} />
+                        <Route path="/ai-workflows" element={<AIWorkflows />} />
+                        <Route path="/mind-clerky" element={<MindClerkyPage />} />
                         <Route path="/webhook-docs" element={<WebhookDocumentation />} />
                         <Route path="/profile" element={<UserProfile />} />
                         <Route path="/admin" element={

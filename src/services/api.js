@@ -245,6 +245,28 @@ export const updateAIWorkflowKanbanTool = async (workflowId, kanbanToolConfig) =
   }
 };
 
+// Atualizar configuração de resposta em áudio
+export const updateAIWorkflowAudioReply = async (workflowId, audioReplyConfig) => {
+  try {
+    const response = await api.put(`/api/ai-workflows/${workflowId}/audio-reply`, audioReplyConfig);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar resposta em áudio do workflow:', error);
+    throw error;
+  }
+};
+
+// Atualizar configuração de resposta única por contato
+export const updateAIWorkflowSingleReply = async (workflowId, singleReplyConfig) => {
+  try {
+    const response = await api.put(`/api/ai-workflows/${workflowId}/single-reply`, singleReplyConfig);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar resposta única do workflow:', error);
+    throw error;
+  }
+};
+
 // Testar workflow
 export const testAIWorkflow = async (workflowId, testMessage) => {
   try {

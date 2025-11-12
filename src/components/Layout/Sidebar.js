@@ -33,7 +33,9 @@ import {
   AccountCircle as AccountIcon,
   Send as SendIcon,
   Webhook as WebhookIcon,
-  Description as DocsIcon
+  Description as DocsIcon,
+  SmartToy as AIIcon,
+  AutoAwesome as AutoAwesomeIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useInstance } from '../../contexts/InstanceContext';
@@ -76,10 +78,22 @@ const Sidebar = () => {
       description: 'Envio de mensagens em massa'
     },
     {
+      text: t('nav.mindClerky'),
+      icon: <AutoAwesomeIcon />,
+      path: '/mind-clerky',
+      description: 'Construir fluxos visuais MindClerky'
+    },
+    {
       text: t('nav.webhooks'),
       icon: <WebhookIcon />,
       path: '/n8n-integration',
       description: 'Configurar integrações com N8N'
+    },
+    {
+      text: t('nav.aiWorkflows'),
+      icon: <AIIcon />,
+      path: '/ai-workflows',
+      description: 'Gerenciar Workflows de IA'
     },
     {
       text: t('nav.documentation'),

@@ -4,6 +4,7 @@ import {
   DialogTitle, 
   DialogContent,
   DialogActions,
+  Slide,
   Box,
   Typography,
   Avatar,
@@ -64,6 +65,17 @@ import { useSocket } from '../contexts/SocketContext';
 import AudioPlayer from './AudioPlayer';
 import toast from 'react-hot-toast';
 import api, { getContactNames, getContactHistory, getContactTasks, createContactTask, updateContactTask, deleteContactTask } from '../services/api';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return (
+    <Slide
+      direction="up"
+      ref={ref}
+      timeout={{ enter: 250, exit: 200 }}
+      {...props}
+    />
+  );
+});
 
 const ChatWindow = ({ open, onClose, chat, instanceName }) => {
   const { socket, on, off } = useSocket();
@@ -878,6 +890,7 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
     <Dialog
       open={open}
       onClose={onClose}
+      TransitionComponent={Transition}
       maxWidth="md"
       fullWidth
       PaperProps={{
@@ -901,9 +914,13 @@ const ChatWindow = ({ open, onClose, chat, instanceName }) => {
           top: position.y !== null ? `${position.y}px` : '10vh',
           left: position.x !== null ? `${position.x}px` : '50%',
           margin: 0,
-          transform: position.x === null ? 'translateX(-50%)' : 'none',
+          transform: position.x === null
+            ? 'translate3d(-50%, 0, 0)'
+            : 'translate3d(0, 0, 0)',
           cursor: isDragging ? 'grabbing' : 'default',
-          transition: isDragging ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: isDragging
+            ? 'none'
+            : 'box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease, background 0.3s ease',
           zIndex: isDragging ? 1400 : 1300,
           willChange: isDragging ? 'transform' : 'auto',
           // Otimizações de performance

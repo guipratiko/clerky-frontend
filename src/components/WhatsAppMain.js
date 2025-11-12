@@ -33,6 +33,10 @@ const WhatsAppMain = () => {
     setSelectedChat(chat);
   };
 
+  const handleCloseChat = () => {
+    setSelectedChat(null);
+  };
+
   if (!instance) {
     return (
       <Box sx={{ 
@@ -88,6 +92,8 @@ const WhatsAppMain = () => {
           <Grid item xs={8}>
             {selectedChat ? (
               <ChatWindow
+                open={Boolean(selectedChat)}
+                onClose={handleCloseChat}
                 instanceName={instanceName}
                 chat={selectedChat}
               />
