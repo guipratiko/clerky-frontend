@@ -391,6 +391,7 @@ const MassDispatch = () => {
       const dispatchData = {
         name: formData.name,
         instanceName: formData.instanceName,
+        templateId: selectedTemplate._id,
         template: {
           type: selectedTemplate.type,
           content: selectedTemplate.content,
@@ -545,7 +546,8 @@ const MassDispatch = () => {
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/pause`);
       if (response.data.success) {
         toast.success(t('massDispatch.dispatchPaused'));
-        loadScheduledDispatches();
+      loadDispatches();
+      loadScheduledDispatches();
       }
     } catch (error) {
       console.error('Erro ao pausar disparo:', error);
@@ -558,7 +560,8 @@ const MassDispatch = () => {
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/resume`);
       if (response.data.success) {
         toast.success(t('massDispatch.dispatchResumed'));
-        loadScheduledDispatches();
+      loadDispatches();
+      loadScheduledDispatches();
       }
     } catch (error) {
       console.error('Erro ao retomar disparo:', error);
@@ -1325,6 +1328,17 @@ const MassDispatch = () => {
                     </Tooltip>
                   )}
                   
+                  {dispatch.status === 'paused' && (
+                    <Tooltip title={t('massDispatch.resume')}>
+                      <IconButton
+                        onClick={() => handleResumeDispatch(dispatch._id)}
+                        sx={{ color: '#00a884' }}
+                      >
+                        <PlayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+
                   {(dispatch.status === 'running' || dispatch.status === 'paused') && (
                     <Tooltip title="Cancelar Disparo">
                       <IconButton
