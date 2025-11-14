@@ -78,7 +78,6 @@ const MindClerkyPage = () => {
     }
 
     const defaultInstance = instances[0];
-    const defaultNodeId = `node-${Date.now()}`;
 
     try {
       const response = await api.post('/api/mind-clerky/flows', {
@@ -94,20 +93,7 @@ const MindClerkyPage = () => {
             }
           }
         ],
-        nodes: [
-          {
-            id: defaultNodeId,
-            type: 'whatsapp-message',
-            name: 'Mensagem inicial',
-            position: { x: 320, y: 180 },
-            data: {
-              templateType: 'text',
-              content: {
-                text: 'Olá {{contact.name || "Cliente"}}, estamos aqui para ajudar.'
-              }
-            }
-          }
-        ],
+        nodes: [],
         edges: [],
         settings: {
           logging: { level: 'info', storePayloads: true }
