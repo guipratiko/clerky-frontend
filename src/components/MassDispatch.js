@@ -23,7 +23,10 @@ import {
   LinearProgress,
   Paper,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -46,7 +49,8 @@ import {
   PauseCircleOutline as PauseCircleIcon,
   HelpOutline as HelpOutlineIcon,
   Info as InfoIcon,
-  Edit as EditIcon
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import { useInstance } from '../contexts/InstanceContext';
 import { useSocket } from '../contexts/SocketContext';
@@ -473,6 +477,11 @@ const MassDispatch = () => {
         personalization: {
           enabled: true,
           defaultName: 'Cliente'
+        },
+        autoDelete: {
+          enabled: false,
+          delaySeconds: 3600,
+          unit: 'hours'
         },
         schedule: {
           enabled: false,
@@ -1352,9 +1361,18 @@ const MassDispatch = () => {
                   
                   <Tooltip title="Ver Detalhes">
                     <IconButton
-                      onClick={() => {
-                        setSelectedDispatch(dispatch);
-                        setViewDialogOpen(true);
+                      onClick={async () => {
+                        try {
+                          // Buscar detalhes completos do disparo incluindo números
+                          const response = await api.get(`/api/mass-dispatch/${dispatch._id}`);
+                          setSelectedDispatch(response.data.data);
+                          setViewDialogOpen(true);
+                        } catch (error) {
+                          console.error('Erro ao buscar detalhes do disparo:', error);
+                          // Se falhar, usar o dispatch da lista mesmo
+                          setSelectedDispatch(dispatch);
+                          setViewDialogOpen(true);
+                        }
                       }}
                       sx={{ color: '#2196f3' }}
                     >
@@ -1691,6 +1709,133 @@ Lara Linda;556291279592"
               }
               label="Remover 9º dígito para DDDs fora de SP/RJ"
             />
+          </Box>
+
+          {/* Configurações de Exclusão Automática */}
+          <Box sx={{ mt: 3, p: 2, border: '1px solid #313d43', borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: '#00a884' }}>
+              🗑️ Exclusão Automática de Mensagens
+            </Typography>
+            
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.settings.autoDelete?.enabled || false}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    settings: { 
+                      ...prev.settings, 
+                      autoDelete: { 
+                        ...prev.settings.autoDelete,
+                        enabled: e.target.checked,
+                        delaySeconds: prev.settings.autoDelete?.delaySeconds || 3600
+                      }
+                    }
+                  }))}
+                  color="primary"
+                />
+              }
+              label="Apagar mensagens enviadas automaticamente após X tempo"
+              sx={{ mb: 2 }}
+            />
+            
+            {formData.settings.autoDelete?.enabled && (
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Tempo para exclusão"
+                  value={(() => {
+                    const delaySeconds = formData.settings.autoDelete.delaySeconds || 3600;
+                    const unit = formData.settings.autoDelete.unit || 'hours';
+                    if (unit === 'hours') return delaySeconds / 3600;
+                    if (unit === 'minutes') return delaySeconds / 60;
+                    return delaySeconds;
+                  })()}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    const unit = formData.settings.autoDelete?.unit || 'hours';
+                    let delaySeconds;
+                    if (unit === 'hours') delaySeconds = value * 3600;
+                    else if (unit === 'minutes') delaySeconds = value * 60;
+                    else delaySeconds = value;
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      settings: { 
+                        ...prev.settings, 
+                        autoDelete: { 
+                          ...prev.settings.autoDelete,
+                          delaySeconds: delaySeconds
+                        }
+                      }
+                    }));
+                  }}
+                  helperText={(() => {
+                    const unit = formData.settings.autoDelete?.unit || 'hours';
+                    if (unit === 'hours') return 'Exemplo: 1 = 1 hora, 2 = 2 horas, 24 = 24 horas';
+                    if (unit === 'minutes') return 'Exemplo: 5 = 5 minutos, 30 = 30 minutos, 60 = 1 hora';
+                    return 'Exemplo: 60 = 1 minuto, 3600 = 1 hora';
+                  })()}
+                  inputProps={{ 
+                    min: 0.1, 
+                    step: formData.settings.autoDelete?.unit === 'hours' ? 0.5 : 
+                          formData.settings.autoDelete?.unit === 'minutes' ? 1 : 1 
+                  }}
+                  sx={{
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      color: '#e9edef',
+                      '& fieldset': { borderColor: '#313d43' },
+                      '&:hover fieldset': { borderColor: '#00a884' },
+                      '&.Mui-focused fieldset': { borderColor: '#00a884' }
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#8696a0'
+                    }
+                  }}
+                />
+                <FormControl sx={{ minWidth: 120 }}>
+                  <Select
+                    value={formData.settings.autoDelete?.unit || 'hours'}
+                    onChange={(e) => {
+                      const unit = e.target.value;
+                      const currentValue = (() => {
+                        const delaySeconds = formData.settings.autoDelete?.delaySeconds || 3600;
+                        const currentUnit = formData.settings.autoDelete?.unit || 'hours';
+                        if (currentUnit === 'hours') return delaySeconds / 3600;
+                        if (currentUnit === 'minutes') return delaySeconds / 60;
+                        return delaySeconds;
+                      })();
+                      let delaySeconds;
+                      if (unit === 'hours') delaySeconds = currentValue * 3600;
+                      else if (unit === 'minutes') delaySeconds = currentValue * 60;
+                      else delaySeconds = currentValue;
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        settings: { 
+                          ...prev.settings, 
+                          autoDelete: { 
+                            ...prev.settings.autoDelete,
+                            unit: unit,
+                            delaySeconds: delaySeconds
+                          }
+                        }
+                      }));
+                    }}
+                    sx={{
+                      color: '#e9edef',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#313d43' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00a884' }
+                    }}
+                  >
+                    <MenuItem value="hours">Horas</MenuItem>
+                    <MenuItem value="minutes">Minutos</MenuItem>
+                    <MenuItem value="seconds">Segundos</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            )}
           </Box>
 
           {/* Configurações de Personalização */}
@@ -2734,6 +2879,159 @@ Lara Linda;556291279592"
                   </Paper>
                 </Grid>
               </Grid>
+
+              {/* Números dos Contatos */}
+              <Typography variant="h6" sx={{ mb: 2, mt: 3, color: '#00a884' }}>
+                Números dos Contatos
+              </Typography>
+              
+              <Box sx={{ mb: 3 }}>
+                {/* Contatos Enviados */}
+                {selectedDispatch.numbers && selectedDispatch.numbers.filter(n => n.status === 'sent').length > 0 && (
+                  <Accordion sx={{ background: '#313d43', mb: 1, '&:before': { display: 'none' } }}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: '#00a884' }} />}
+                      sx={{ borderBottom: '1px solid #202c33' }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                        <Chip 
+                          label={`${selectedDispatch.numbers.filter(n => n.status === 'sent').length} enviados`}
+                          size="small"
+                          sx={{ 
+                            backgroundColor: 'rgba(0, 168, 132, 0.2)',
+                            color: '#00a884',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                        <Typography variant="body2" sx={{ color: '#8696a0', ml: 1 }}>
+                          Contatos com disparo realizado
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, maxHeight: '200px', overflowY: 'auto' }}>
+                        {selectedDispatch.numbers
+                          .filter(n => n.status === 'sent')
+                          .map((number, index) => (
+                            <Chip
+                              key={index}
+                              label={number.formatted || number.original}
+                              size="small"
+                              sx={{
+                                backgroundColor: 'rgba(0, 168, 132, 0.1)',
+                                color: '#00a884',
+                                fontFamily: 'monospace'
+                              }}
+                            />
+                          ))}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
+                {/* Contatos Pendentes */}
+                {selectedDispatch.numbers && selectedDispatch.numbers.filter(n => n.status === 'pending' || n.status === 'scheduled').length > 0 && (
+                  <Accordion sx={{ background: '#313d43', mb: 1, '&:before': { display: 'none' } }}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: '#ffab00' }} />}
+                      sx={{ borderBottom: '1px solid #202c33' }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                        <Chip 
+                          label={`${selectedDispatch.numbers.filter(n => n.status === 'pending' || n.status === 'scheduled').length} pendentes`}
+                          size="small"
+                          sx={{ 
+                            backgroundColor: 'rgba(255, 171, 0, 0.2)',
+                            color: '#ffab00',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                        <Typography variant="body2" sx={{ color: '#8696a0', ml: 1 }}>
+                          Contatos aguardando disparo
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, maxHeight: '200px', overflowY: 'auto' }}>
+                        {selectedDispatch.numbers
+                          .filter(n => n.status === 'pending' || n.status === 'scheduled')
+                          .map((number, index) => (
+                            <Chip
+                              key={index}
+                              label={number.formatted || number.original}
+                              size="small"
+                              sx={{
+                                backgroundColor: 'rgba(255, 171, 0, 0.1)',
+                                color: '#ffab00',
+                                fontFamily: 'monospace'
+                              }}
+                            />
+                          ))}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
+                {/* Contatos com Falha */}
+                {selectedDispatch.numbers && selectedDispatch.numbers.filter(n => n.status === 'failed').length > 0 && (
+                  <Accordion sx={{ background: '#313d43', mb: 1, '&:before': { display: 'none' } }}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: '#f15c6d' }} />}
+                      sx={{ borderBottom: '1px solid #202c33' }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                        <Chip 
+                          label={`${selectedDispatch.numbers.filter(n => n.status === 'failed').length} falhas`}
+                          size="small"
+                          sx={{ 
+                            backgroundColor: 'rgba(241, 92, 109, 0.2)',
+                            color: '#f15c6d',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                        <Typography variant="body2" sx={{ color: '#8696a0', ml: 1 }}>
+                          Contatos com falha no disparo
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxHeight: '200px', overflowY: 'auto' }}>
+                        {selectedDispatch.numbers
+                          .filter(n => n.status === 'failed')
+                          .map((number, index) => (
+                            <Box 
+                              key={index}
+                              sx={{ 
+                                p: 1, 
+                                background: 'rgba(241, 92, 109, 0.1)',
+                                borderRadius: 1,
+                                border: '1px solid rgba(241, 92, 109, 0.2)'
+                              }}
+                            >
+                              <Typography variant="body2" sx={{ color: '#f15c6d', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                {number.formatted || number.original}
+                              </Typography>
+                              {number.error && (
+                                <Typography variant="caption" sx={{ color: '#8696a0', display: 'block', mt: 0.5 }}>
+                                  Erro: {number.error}
+                                </Typography>
+                              )}
+                            </Box>
+                          ))}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
+                {/* Mensagem quando não há números */}
+                {(!selectedDispatch.numbers || selectedDispatch.numbers.length === 0) && (
+                  <Paper sx={{ p: 2, background: '#313d43', textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                      Nenhum contato encontrado
+                    </Typography>
+                  </Paper>
+                )}
+              </Box>
 
               {/* Template Preview */}
               <Typography variant="h6" sx={{ mb: 2, color: '#00a884' }}>

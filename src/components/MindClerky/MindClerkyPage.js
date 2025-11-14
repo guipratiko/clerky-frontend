@@ -133,6 +133,19 @@ const MindClerkyPage = () => {
     setMode('executions');
   };
 
+  const handleActivateFlow = async (flow) => {
+    try {
+      const response = await api.post(`/api/mind-clerky/flows/${flow._id}/status`, {
+        status: 'active'
+      });
+      toast.success('Fluxo ativado!');
+      fetchFlows();
+    } catch (error) {
+      console.error('Erro ao ativar fluxo MindClerky:', error);
+      toast.error(error.response?.data?.error || 'Erro ao ativar fluxo');
+    }
+  };
+
   const handleConfirmDelete = (flow) => {
     setFlowToDelete(flow);
     setDeleteDialogOpen(true);
@@ -299,6 +312,17 @@ const MindClerkyPage = () => {
                           <Button size="small" startIcon={<PlayArrowIcon />} onClick={() => handleOpenExecutions(flow)}>
                             Execuções
                           </Button>
+                          {flow.status !== 'active' && (
+                            <Button 
+                              size="small" 
+                              variant="outlined" 
+                              color="success"
+                              startIcon={<PlayArrowIcon />} 
+                              onClick={() => handleActivateFlow(flow)}
+                            >
+                              Ativar
+                            </Button>
+                          )}
                         </CardActions>
                       </Card>
                     </Grid>
@@ -352,8 +376,20 @@ const MindClerkyPage = () => {
                           </Stack>
                         </CardContent>
                         <CardActions>
-                          <Button size="small" onClick={() => handleOpenBuilder(flow)}>
-                            Continuar editando
+                          <Button size="small" startIcon={<DesignServicesIcon />} onClick={() => handleOpenBuilder(flow)}>
+                            Builder
+                          </Button>
+                          <Button size="small" startIcon={<PlayArrowIcon />} onClick={() => handleOpenExecutions(flow)}>
+                            Execuções
+                          </Button>
+                          <Button 
+                            size="small" 
+                            variant="outlined" 
+                            color="success"
+                            startIcon={<PlayArrowIcon />} 
+                            onClick={() => handleActivateFlow(flow)}
+                          >
+                            Ativar
                           </Button>
                         </CardActions>
                       </Card>
