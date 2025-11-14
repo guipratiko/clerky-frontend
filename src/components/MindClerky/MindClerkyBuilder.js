@@ -231,7 +231,7 @@ const defaultConfigForType = (type) => {
       return {
         templateType: 'text',
         content: {
-          text: 'Olá {{contact.name || "Cliente"}}, tudo bem?'
+          text: 'Olá $firstName, tudo bem?'
         }
       };
     case 'delay':
