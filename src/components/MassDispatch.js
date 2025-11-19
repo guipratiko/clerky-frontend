@@ -26,7 +26,8 @@ import {
   Tooltip,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  Checkbox
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -210,12 +211,9 @@ const MassDispatch = () => {
   // Estados para agendamento
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
   const [scheduleData, setScheduleData] = useState({
-    startDate: '',
-    startTime: '',
-    pauseDate: '',
-    pauseTime: '',
-    resumeDate: '',
-    resumeTime: '',
+    startTime: '08:00',
+    pauseTime: '18:00',
+    excludedDays: [], // 0=domingo, 1=segunda, 2=terça, 3=quarta, 4=quinta, 5=sexta, 6=sábado
     timezone: 'America/Sao_Paulo'
   });
   const [scheduledDispatches, setScheduledDispatches] = useState([]);
@@ -340,7 +338,11 @@ const MassDispatch = () => {
     try {
       setLoading(true);
       const response = await api.get('/api/mass-dispatch');
-      setDispatches(response.data.data);
+      // Filtrar disparos agendados da lista normal (eles aparecem na seção de agendados)
+      const filteredDispatches = response.data.data.filter(
+        dispatch => !dispatch.settings?.schedule?.enabled
+      );
+      setDispatches(filteredDispatches);
     } catch (error) {
       console.error('Erro ao carregar disparos:', error);
       toast.error('Erro ao carregar disparos');
@@ -409,13 +411,10 @@ const MassDispatch = () => {
         ...(schedulingEnabled && {
           schedule: {
             enabled: true,
-            startDateTime: scheduleData.startDate && scheduleData.startTime ? 
-              new Date(`${scheduleData.startDate}T${scheduleData.startTime}`).toISOString() : null,
-            pauseDateTime: scheduleData.pauseDate && scheduleData.pauseTime ? 
-              new Date(`${scheduleData.pauseDate}T${scheduleData.pauseTime}`).toISOString() : null,
-            resumeDateTime: scheduleData.resumeDate && scheduleData.resumeTime ? 
-              new Date(`${scheduleData.resumeDate}T${scheduleData.resumeTime}`).toISOString() : null,
-            timezone: scheduleData.timezone
+            startTime: scheduleData.startTime || '08:00',
+            pauseTime: scheduleData.pauseTime || '18:00',
+            excludedDays: scheduleData.excludedDays || [],
+            timezone: scheduleData.timezone || 'America/Sao_Paulo'
           }
         })
       };
@@ -494,12 +493,9 @@ const MassDispatch = () => {
     });
     setSchedulingEnabled(false);
     setScheduleData({
-      startDate: '',
-      startTime: '',
-      pauseDate: '',
-      pauseTime: '',
-      resumeDate: '',
-      resumeTime: '',
+      startTime: '08:00',
+      pauseTime: '18:00',
+      excludedDays: [],
       timezone: 'America/Sao_Paulo'
     });
   };
@@ -514,24 +510,7 @@ const MassDispatch = () => {
         return;
       }
 
-      // Verificar se é hora de iniciar
-      if (dispatch.schedule && dispatch.schedule.startDateTime) {
-        const startTime = new Date(dispatch.schedule.startDateTime);
-        const now = new Date();
-        
-        if (now < startTime) {
-          const timeDiff = startTime - now;
-          const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-          const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-          
-          toast.error(t('massDispatch.scheduledDispatchTimeError', { 
-            time: startTime.toLocaleString('pt-BR'), 
-            hours, 
-            minutes 
-          }));
-          return;
-        }
-      }
+      // A validação de horário será feita no backend
 
       const response = await api.post(`/api/mass-dispatch/${dispatchId}/start`);
       if (response.data.success) {
@@ -795,6 +774,7 @@ const MassDispatch = () => {
       await api.delete(`/api/mass-dispatch/${dispatchId}`);
       toast.success(t('massDispatch.dispatchDeleted'));
       loadDispatches();
+      loadScheduledDispatches(); // Atualizar lista de agendados também
     } catch (error) {
       console.error('Erro ao deletar disparo:', error);
       toast.error(error.response?.data?.error || t('massDispatch.dispatchDeleteError'));
@@ -1053,118 +1033,151 @@ const MassDispatch = () => {
                         {dispatch.name}
                       </Typography>
                       <Chip 
-                        label={dispatch.status === 'scheduled' ? t('massDispatch.status.scheduled') : 
-                               dispatch.status === 'paused' ? t('massDispatch.status.paused') : 
-                               dispatch.status === 'running' ? t('massDispatch.status.running') : t('massDispatch.status.completed')}
+                        label={getStatusText(dispatch.status)}
+                        color={getStatusColor(dispatch.status)}
                         size="small"
-                        sx={{
-                          backgroundColor: dispatch.status === 'scheduled' ? 'rgba(102, 126, 234,0.2)' :
-                                         dispatch.status === 'paused' ? 'rgba(255, 193, 7,0.2)' :
-                                         dispatch.status === 'running' ? 'rgba(0, 168, 132,0.2)' : 'rgba(76, 175, 80,0.2)',
-                          color: dispatch.status === 'scheduled' ? '#667eea' :
-                                 dispatch.status === 'paused' ? '#ffc107' :
-                                 dispatch.status === 'running' ? '#00a884' : '#4caf50',
-                          fontSize: '0.7rem'
-                        }}
                       />
                     </Box>
                     
                     <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                      📅 {t('massDispatch.schedule.start')}: {new Date(dispatch.schedule.startDateTime).toLocaleString('pt-BR')}
-                      {dispatch.status === 'scheduled' && dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date() && (
-                        <Typography component="span" variant="caption" sx={{ color: '#ffc107', ml: 1 }}>
-                          ({t('massDispatch.schedule.timeRemaining')} {getTimeRemaining(dispatch.schedule.startDateTime)})
+                      Instância: {dispatch.instanceName}
+                    </Typography>
+                    
+                    {dispatch.schedule?.enabled && (
+                      <>
+                        <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                          🕐 Início diário: {dispatch.schedule.startTime || '08:00'}
                         </Typography>
-                      )}
-                    </Typography>
-                    
-                    {dispatch.schedule.pauseDateTime && (
-                      <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                        ⏸️ {t('massDispatch.schedule.pause')}: {new Date(dispatch.schedule.pauseDateTime).toLocaleString('pt-BR')}
-                      </Typography>
+                        <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                          ⏸️ Pausa diária: {dispatch.schedule.pauseTime || '18:00'}
+                        </Typography>
+                        {dispatch.schedule.excludedDays && dispatch.schedule.excludedDays.length > 0 && (
+                          <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
+                            🚫 Dias suspensos: {dispatch.schedule.excludedDays.map(d => {
+                              const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                              return days[d];
+                            }).join(', ')}
+                          </Typography>
+                        )}
+                        {dispatch.nextScheduledRun && (
+                          <Typography variant="caption" sx={{ color: '#ffc107', display: 'block', mb: 1 }}>
+                            ⏰ Próxima execução: {new Date(dispatch.nextScheduledRun).toLocaleString('pt-BR')}
+                          </Typography>
+                        )}
+                      </>
                     )}
-                    
-                    {dispatch.schedule.resumeDateTime && (
-                      <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                        ▶️ {t('massDispatch.schedule.resume')}: {new Date(dispatch.schedule.resumeDateTime).toLocaleString('pt-BR')}
-                      </Typography>
+
+                    {/* Estatísticas */}
+                    {dispatch.statistics && (
+                      <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#8696a0' }}>
+                          {t('massDispatch.stats.total')}: {dispatch.statistics.total || 0}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#00a884' }}>
+                          {t('massDispatch.stats.sent')}: {dispatch.statistics.sent || 0}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#f15c6d' }}>
+                          {t('massDispatch.stats.failed')}: {dispatch.statistics.failed || 0}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#ffab00' }}>
+                          {t('massDispatch.stats.pending')}: {dispatch.statistics.pending || 0}
+                        </Typography>
+                      </Box>
                     )}
-                    
-                    <Typography variant="caption" sx={{ color: '#8696a0', display: 'block' }}>
-                      📱 {dispatch.instanceName} • 📊 {dispatch.numbers?.split('\n').length || 0} {t('massDispatch.numbers')}
-                    </Typography>
+
+                    {/* Template */}
+                    {dispatch.template && (
+                      <Box sx={{ mt: 2, p: 1, background: '#313d43', borderRadius: 1 }}>
+                        <Typography variant="caption" sx={{ color: '#8696a0', display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {getTemplateIcon(dispatch.template?.type)}
+                          Template: {dispatch.template?.type === 'text' ? 'Texto' : 
+                                    dispatch.template?.type === 'image' ? 'Imagem' :
+                                    dispatch.template?.type === 'image_caption' ? 'Imagem + Legenda' :
+                                    dispatch.template?.type === 'audio' ? 'Áudio' :
+                                    dispatch.template?.type === 'file' ? 'Arquivo' :
+                                    dispatch.template?.type === 'file_caption' ? 'Arquivo + Legenda' :
+                                    dispatch.template?.type === 'sequence' ? 'Sequência' : 'Desconhecido'}
+                        </Typography>
+                      </Box>
+                    )}
                   </CardContent>
                   
                   <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      {dispatch.status === 'scheduled' && (
-                        <Button
-                          size="small"
-                          startIcon={<PlayIcon />}
-                          onClick={() => handleStartScheduledDispatch(dispatch.id)}
-                          disabled={dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date()}
-                          sx={{ 
-                            color: dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date() ? 
-                              'rgba(255,255,255,0.3)' : '#00a884',
-                            fontSize: '0.7rem',
-                            minWidth: 'auto',
-                            px: 1,
-                            '&:disabled': {
-                              color: 'rgba(255,255,255,0.3)'
-                            }
-                          }}
-                        >
-                          {dispatch.schedule?.startDateTime && new Date(dispatch.schedule.startDateTime) > new Date() ? 
-                            t('massDispatch.waiting') : t('massDispatch.start')}
-                        </Button>
+                      {dispatch.status === 'ready' && (
+                        <Tooltip title="Iniciar Disparo">
+                          <IconButton
+                            onClick={() => handleStartScheduledDispatch(dispatch.id || dispatch._id)}
+                            sx={{ color: '#00a884' }}
+                          >
+                            <PlayIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
                       
                       {dispatch.status === 'running' && (
-                        <Button
-                          size="small"
-                          startIcon={<PauseIcon />}
-                          onClick={() => handlePauseDispatch(dispatch.id)}
-                          sx={{ 
-                            color: '#ffc107',
-                            fontSize: '0.7rem',
-                            minWidth: 'auto',
-                            px: 1
-                          }}
-                        >
-                          {t('massDispatch.pause')}
-                        </Button>
+                        <Tooltip title="Pausar Disparo">
+                          <IconButton
+                            onClick={() => handlePauseDispatch(dispatch.id || dispatch._id)}
+                            sx={{ color: '#ffab00' }}
+                          >
+                            <PauseIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
                       
                       {dispatch.status === 'paused' && (
-                        <Button
-                          size="small"
-                          startIcon={<PlayIcon />}
-                          onClick={() => handleResumeDispatch(dispatch.id)}
-                          sx={{ 
-                            color: '#00a884',
-                            fontSize: '0.7rem',
-                            minWidth: 'auto',
-                            px: 1
-                          }}
-                        >
-                          {t('massDispatch.resume')}
-                        </Button>
+                        <Tooltip title={t('massDispatch.resume')}>
+                          <IconButton
+                            onClick={() => handleResumeDispatch(dispatch.id || dispatch._id)}
+                            sx={{ color: '#00a884' }}
+                          >
+                            <PlayIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
+
+                      {(dispatch.status === 'running' || dispatch.status === 'paused') && (
+                        <Tooltip title="Cancelar Disparo">
+                          <IconButton
+                            onClick={() => handleCancelScheduledDispatch(dispatch.id || dispatch._id)}
+                            sx={{ color: '#f15c6d' }}
+                          >
+                            <StopIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      
+                      <Tooltip title="Ver Detalhes">
+                        <IconButton
+                          onClick={async () => {
+                            try {
+                              const response = await api.get(`/api/mass-dispatch/${dispatch.id || dispatch._id}`);
+                              setSelectedDispatch(response.data.data);
+                              setViewDialogOpen(true);
+                            } catch (error) {
+                              console.error('Erro ao buscar detalhes do disparo:', error);
+                              setSelectedDispatch(dispatch);
+                              setViewDialogOpen(true);
+                            }
+                          }}
+                          sx={{ color: '#2196f3' }}
+                        >
+                          <ViewIcon />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
-                    
-                    <Button
-                      size="small"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => handleCancelScheduledDispatch(dispatch.id)}
-                      sx={{ 
-                        color: '#f44336',
-                        fontSize: '0.7rem',
-                        minWidth: 'auto',
-                        px: 1
-                      }}
-                    >
-                      Cancelar
-                    </Button>
+
+                    {dispatch.status !== 'running' && (
+                      <Tooltip title={t('massDispatch.delete')}>
+                        <IconButton
+                          onClick={() => handleDeleteDispatch(dispatch.id || dispatch._id)}
+                          sx={{ color: '#f15c6d' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </CardActions>
                 </Card>
               </Grid>
@@ -1370,8 +1383,8 @@ const MassDispatch = () => {
                         } catch (error) {
                           console.error('Erro ao buscar detalhes do disparo:', error);
                           // Se falhar, usar o dispatch da lista mesmo
-                          setSelectedDispatch(dispatch);
-                          setViewDialogOpen(true);
+                        setSelectedDispatch(dispatch);
+                        setViewDialogOpen(true);
                         }
                       }}
                       sx={{ color: '#2196f3' }}
@@ -1911,172 +1924,111 @@ Lara Linda;556291279592"
             {schedulingEnabled && (
               <Box sx={{ mt: 2 }}>
                 <Grid container spacing={2}>
-                  {/* Data e Hora de Início */}
-                  <Grid item xs={12}>
+                  {/* Horário de Início */}
+                  <Grid item xs={12} sm={6}>
                     <Typography variant="subtitle2" sx={{ color: '#667eea', mb: 1, display: 'flex', alignItems: 'center' }}>
                       <PlayCircleIcon sx={{ mr: 1, fontSize: 20 }} />
-                      {t('massDispatch.schedule.startSending')}
+                      Horário de Início Diário
                     </Typography>
-                    <Grid container spacing={1}>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="date"
-                          label={t('massDispatch.schedule.startDate')}
-                          value={scheduleData.startDate}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, startDate: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#667eea' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#667eea' },
-                            },
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="time"
-                          label="Hora de Início"
-                          value={scheduleData.startTime}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, startTime: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#667eea' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#667eea' },
-                            },
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
+                    <TextField
+                      fullWidth
+                      type="time"
+                      label="Hora de Início"
+                      value={scheduleData.startTime}
+                      onChange={(e) => setScheduleData(prev => ({ ...prev, startTime: e.target.value }))}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          background: 'rgba(255,255,255,0.1)',
+                          color: '#fff',
+                          '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                          '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                          '&.Mui-focused fieldset': { borderColor: '#667eea' },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: 'rgba(255,255,255,0.7)',
+                          '&.Mui-focused': { color: '#667eea' },
+                        },
+                      }}
+                    />
                   </Grid>
 
-                  {/* Data e Hora de Pausa */}
-                  <Grid item xs={12}>
+                  {/* Horário de Pausa */}
+                  <Grid item xs={12} sm={6}>
                     <Typography variant="subtitle2" sx={{ color: '#ffc107', mb: 1, display: 'flex', alignItems: 'center' }}>
                       <PauseCircleIcon sx={{ mr: 1, fontSize: 20 }} />
-                      Pausa do Envio
+                      Horário de Pausa Diário
                     </Typography>
-                    <Grid container spacing={1}>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="date"
-                          label="Data de Pausa"
-                          value={scheduleData.pauseDate}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, pauseDate: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#ffc107' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#ffc107' },
-                            },
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="time"
-                          label="Hora de Pausa"
-                          value={scheduleData.pauseTime}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, pauseTime: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#ffc107' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#ffc107' },
-                            },
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
+                    <TextField
+                      fullWidth
+                      type="time"
+                      label="Hora de Pausa"
+                      value={scheduleData.pauseTime}
+                      onChange={(e) => setScheduleData(prev => ({ ...prev, pauseTime: e.target.value }))}
+                      InputLabelProps={{ shrink: true }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          background: 'rgba(255,255,255,0.1)',
+                          color: '#fff',
+                          '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                          '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                          '&.Mui-focused fieldset': { borderColor: '#ffc107' },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: 'rgba(255,255,255,0.7)',
+                          '&.Mui-focused': { color: '#ffc107' },
+                        },
+                      }}
+                    />
                   </Grid>
 
-                  {/* Data e Hora de Retorno */}
+                  {/* Dias Excluídos */}
                   <Grid item xs={12}>
-                    <Typography variant="subtitle2" sx={{ color: '#4caf50', mb: 1, display: 'flex', alignItems: 'center' }}>
-                      <PlayCircleIcon sx={{ mr: 1, fontSize: 20 }} />
-                      Retorno do Envio
+                    <Typography variant="subtitle2" sx={{ color: '#f44336', mb: 1, display: 'flex', alignItems: 'center' }}>
+                      <PauseCircleIcon sx={{ mr: 1, fontSize: 20 }} />
+                      Suspender Disparo nos Seguintes Dias
                     </Typography>
-                    <Grid container spacing={1}>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="date"
-                          label="Data de Retorno"
-                          value={scheduleData.resumeDate}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, resumeDate: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#4caf50' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#4caf50' },
-                            },
-                          }}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {[
+                        { value: 0, label: 'Domingo' },
+                        { value: 1, label: 'Segunda' },
+                        { value: 2, label: 'Terça' },
+                        { value: 3, label: 'Quarta' },
+                        { value: 4, label: 'Quinta' },
+                        { value: 5, label: 'Sexta' },
+                        { value: 6, label: 'Sábado' }
+                      ].map((day) => (
+                        <FormControlLabel
+                          key={day.value}
+                          control={
+                            <Checkbox
+                              checked={scheduleData.excludedDays.includes(day.value)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setScheduleData(prev => ({
+                                    ...prev,
+                                    excludedDays: [...prev.excludedDays, day.value]
+                                  }));
+                                } else {
+                                  setScheduleData(prev => ({
+                                    ...prev,
+                                    excludedDays: prev.excludedDays.filter(d => d !== day.value)
+                                  }));
+                                }
+                              }}
+                              sx={{
+                                color: 'rgba(255,255,255,0.7)',
+                                '&.Mui-checked': {
+                                  color: '#f44336'
+                                }
+                              }}
+                            />
+                          }
+                          label={day.label}
+                          sx={{ color: 'rgba(255,255,255,0.7)' }}
                         />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextField
-                          fullWidth
-                          type="time"
-                          label="Hora de Retorno"
-                          value={scheduleData.resumeTime}
-                          onChange={(e) => setScheduleData(prev => ({ ...prev, resumeTime: e.target.value }))}
-                          InputLabelProps={{ shrink: true }}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              background: 'rgba(255,255,255,0.1)',
-                              color: '#fff',
-                              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                              '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                              '&.Mui-focused fieldset': { borderColor: '#4caf50' },
-                            },
-                            '& .MuiInputLabel-root': {
-                              color: 'rgba(255,255,255,0.7)',
-                              '&.Mui-focused': { color: '#4caf50' },
-                            },
-                          }}
-                        />
-                      </Grid>
-                    </Grid>
+                      ))}
+                    </Box>
                   </Grid>
 
                   {/* Informações do Agendamento */}
@@ -2086,16 +2038,21 @@ Lara Linda;556291279592"
                         📅 Resumo do Agendamento:
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
-                        • Início: {scheduleData.startDate && scheduleData.startTime ? 
-                          `${scheduleData.startDate} às ${scheduleData.startTime}` : 'Não definido'}
+                        • Início diário: {scheduleData.startTime || 'Não definido'}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
-                        • Pausa: {scheduleData.pauseDate && scheduleData.pauseTime ? 
-                          `${scheduleData.pauseDate} às ${scheduleData.pauseTime}` : 'Não definido'}
+                        • Pausa diária: {scheduleData.pauseTime || 'Não definido'}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }}>
-                        • Retorno: {scheduleData.resumeDate && scheduleData.resumeTime ? 
-                          `${scheduleData.resumeDate} às ${scheduleData.resumeTime}` : 'Não definido'}
+                        • Dias suspensos: {scheduleData.excludedDays.length === 0 
+                          ? 'Nenhum' 
+                          : scheduleData.excludedDays.map(d => {
+                              const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                              return days[d];
+                            }).join(', ')}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mt: 1, fontStyle: 'italic' }}>
+                        O disparo será retomado automaticamente no próximo dia útil no horário de início, caso não conclua todos os contatos.
                       </Typography>
                     </Paper>
                   </Grid>

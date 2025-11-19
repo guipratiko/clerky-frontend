@@ -1907,50 +1907,50 @@ useEffect(() => {
 
                       {selectedNode.data?.config?.delayType === 'duration' ? (
                         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
-                          <TextField
-                            label="Duração"
-                            type="number"
-                            value={selectedNode.data?.config?.duration || 5}
-                            onChange={(event) =>
-                              updateSelectedNode((node) => ({
-                                ...node,
-                                data: {
-                                  ...node.data,
-                                  config: {
-                                    ...(node.data?.config || {}),
-                                    duration: Number(event.target.value)
-                                  }
-                                }
-                              }))
+                      <TextField
+                        label="Duração"
+                        type="number"
+                        value={selectedNode.data?.config?.duration || 5}
+                        onChange={(event) =>
+                          updateSelectedNode((node) => ({
+                            ...node,
+                            data: {
+                              ...node.data,
+                              config: {
+                                ...(node.data?.config || {}),
+                                duration: Number(event.target.value)
+                              }
                             }
-                            InputLabelProps={{ shrink: true }}
+                          }))
+                        }
+                        InputLabelProps={{ shrink: true }}
                             sx={{ flex: 1, minWidth: 0 }}
-                          />
-                          <TextField
-                            label="Unidade"
-                            value={selectedNode.data?.config?.unit || 'seconds'}
-                            onChange={(event) =>
-                              updateSelectedNode((node) => ({
-                                ...node,
-                                data: {
-                                  ...node.data,
-                                  config: {
-                                    ...(node.data?.config || {}),
-                                    unit: event.target.value
-                                  }
-                                }
-                              }))
+                      />
+                      <TextField
+                        label="Unidade"
+                        value={selectedNode.data?.config?.unit || 'seconds'}
+                        onChange={(event) =>
+                          updateSelectedNode((node) => ({
+                            ...node,
+                            data: {
+                              ...node.data,
+                              config: {
+                                ...(node.data?.config || {}),
+                                unit: event.target.value
+                              }
                             }
-                            select
-                            SelectProps={{ native: true }}
-                            InputLabelProps={{ shrink: true }}
+                          }))
+                        }
+                        select
+                        SelectProps={{ native: true }}
+                        InputLabelProps={{ shrink: true }}
                             sx={{ flex: 1, minWidth: 0 }}
-                          >
-                            <option value="seconds">Segundos</option>
-                            <option value="minutes">Minutos</option>
-                            <option value="hours">Horas</option>
-                            <option value="days">Dias</option>
-                          </TextField>
+                      >
+                        <option value="seconds">Segundos</option>
+                        <option value="minutes">Minutos</option>
+                        <option value="hours">Horas</option>
+                        <option value="days">Dias</option>
+                      </TextField>
                         </Stack>
                       ) : (
                         <Stack spacing={2} sx={{ width: '100%' }}>
@@ -2750,33 +2750,33 @@ Maria;556291279592"
             </Box>
 
             <Stack direction="row" spacing={1} mt={1} sx={{ width: '100%', flexWrap: 'wrap', gap: 1 }}>
-              <Button
-                variant="outlined"
-                size="small"
+                <Button
+                  variant="outlined"
+                  size="small"
                 onClick={handleClosePropertyPanel}
                 sx={{ flex: 1, minWidth: 0 }}
-              >
+                >
                 Fechar
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<CopyAllIcon fontSize="small" />}
-                onClick={duplicateTemplate}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<CopyAllIcon fontSize="small" />}
+                  onClick={duplicateTemplate}
                 sx={{ flex: 1, minWidth: 0 }}
-              >
-                Template
-              </Button>
-              <Button
+                >
+                  Template
+                </Button>
+                <Button
                 variant="contained"
-                size="small"
+                  size="small"
                 startIcon={<SaveIcon fontSize="small" />}
                 onClick={saveFlow}
                 disabled={saving}
                 sx={{ flex: 1, minWidth: 0 }}
-              >
+                >
                 Salvar
-              </Button>
+                </Button>
             </Stack>
           </Stack>
         </Box>
