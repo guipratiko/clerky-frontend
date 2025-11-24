@@ -229,7 +229,8 @@ export const pt = {
         running: 'Executando',
         paused: 'Pausado',
         completed: 'Concluído',
-        scheduled: 'Agendado'
+        scheduled: 'Agendado',
+        cancelled: 'Cancelado'
       },
       schedule: {
         start: 'Início',
