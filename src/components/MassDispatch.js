@@ -667,7 +667,7 @@ const MassDispatch = () => {
             delay: msg.delay,
             content: {
               text: msg.text || '',
-              caption: msg.text || ''
+              caption: msg.caption || ''
             }
           }))
         }));
