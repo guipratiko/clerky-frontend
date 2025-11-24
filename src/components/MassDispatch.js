@@ -627,7 +627,7 @@ const MassDispatch = () => {
           }));
 
           sequenceMessages.forEach((msg) => {
-            if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+            if (msg.media && ['image', 'image_caption', 'video', 'video_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
               templateData.append('media', msg.media);
             }
           });
@@ -673,7 +673,7 @@ const MassDispatch = () => {
         }));
 
           sequenceMessages.forEach((msg) => {
-          if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+          if (msg.media && ['image', 'image_caption', 'video', 'video_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
             templateData.append('media', msg.media);
           }
         });
@@ -2144,6 +2144,8 @@ Lara Linda;556291279592"
               <MenuItem value="text">{t('massDispatch.templateTypes.text')}</MenuItem>
               <MenuItem value="image">{t('massDispatch.templateTypes.image')}</MenuItem>
               <MenuItem value="image_caption">{t('massDispatch.templateTypes.imageCaption')}</MenuItem>
+              <MenuItem value="video">Vídeo</MenuItem>
+              <MenuItem value="video_caption">Vídeo com Legenda</MenuItem>
               <MenuItem value="audio">{t('massDispatch.templateTypes.audio')}</MenuItem>
               <MenuItem value="file">{t('massDispatch.templateTypes.file')}</MenuItem>
               <MenuItem value="file_caption">{t('massDispatch.templateTypes.fileCaption')}</MenuItem>
@@ -2420,6 +2422,7 @@ Lara Linda;556291279592"
                   hidden
                   accept={
                     templateForm.type.includes('image') ? 'image/*' :
+                    templateForm.type.includes('video') ? 'video/*' :
                     templateForm.type.includes('audio') ? 'audio/*' : '*/*'
                   }
                   onChange={(e) => {
@@ -2478,6 +2481,8 @@ Lara Linda;556291279592"
                         <MenuItem value="text">Texto</MenuItem>
                         <MenuItem value="image">Imagem</MenuItem>
                         <MenuItem value="image_caption">Imagem + Legenda</MenuItem>
+                        <MenuItem value="video">Vídeo</MenuItem>
+                        <MenuItem value="video_caption">Vídeo + Legenda</MenuItem>
                         <MenuItem value="audio">Áudio</MenuItem>
                         <MenuItem value="file">Arquivo</MenuItem>
                         <MenuItem value="file_caption">Arquivo + Legenda</MenuItem>
@@ -2671,6 +2676,7 @@ Lara Linda;556291279592"
                           hidden
                           accept={
                             message.type.includes('image') ? 'image/*' :
+                            message.type.includes('video') ? 'video/*' :
                             message.type.includes('audio') ? 'audio/*' : '*/*'
                           }
                           onChange={(e) => {
