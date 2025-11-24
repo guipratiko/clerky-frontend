@@ -298,8 +298,8 @@ export const pt = {
       // Tipos de template
       templateTypes: {
         text: 'Texto',
-        image: 'Imagem',
-        imageCaption: 'Imagem + Legenda',
+        image: 'Imagem/Vídeo',
+        imageCaption: 'Imagem/Vídeo + Legenda',
         audio: 'Áudio',
         file: 'Arquivo',
         fileCaption: 'Arquivo + Legenda',
