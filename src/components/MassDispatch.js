@@ -674,7 +674,8 @@ const MassDispatch = () => {
         }));
 
           sequenceMessages.forEach((msg) => {
-          if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+          if (msg.media && ['image', 'image_caption', 'video', 'video_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+            console.log(`📎 Adicionando arquivo ao FormData: ${msg.media.name} (tipo: ${msg.type})`);
             templateData.append('media', msg.media);
           }
         });
