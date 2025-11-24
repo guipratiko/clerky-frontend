@@ -39,6 +39,7 @@ import {
   CloudUpload as CloudUploadIcon,
   Description as FileIcon,
   Image as ImageIcon,
+  Videocam as VideoIcon,
   AudioFile as AudioIcon,
   AttachFile as AttachIcon,
   Visibility as ViewIcon,
@@ -627,7 +628,7 @@ const MassDispatch = () => {
           }));
 
           sequenceMessages.forEach((msg) => {
-            if (msg.media && ['image', 'image_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
+            if (msg.media && ['image', 'image_caption', 'video', 'video_caption', 'audio', 'file', 'file_caption'].includes(msg.type)) {
               templateData.append('media', msg.media);
             }
           });
@@ -815,6 +816,8 @@ const MassDispatch = () => {
       text: <FileIcon />,
       image: <ImageIcon />,
       image_caption: <ImageIcon />,
+      video: <VideoIcon />,
+      video_caption: <VideoIcon />,
       audio: <AudioIcon />,
       file: <AttachIcon />,
       file_caption: <AttachIcon />
@@ -975,6 +978,8 @@ const MassDispatch = () => {
                       label={template.type === 'text' ? t('massDispatch.templateTypes.text') : 
                              template.type === 'image' ? t('massDispatch.templateTypes.image') :
                              template.type === 'image_caption' ? t('massDispatch.templateTypes.imageCaption') :
+                             template.type === 'video' ? 'Vídeo' :
+                             template.type === 'video_caption' ? 'Vídeo + Legenda' :
                              template.type === 'audio' ? t('massDispatch.templateTypes.audio') :
                              template.type === 'file' ? t('massDispatch.templateTypes.file') :
                              template.type === 'file_caption' ? t('massDispatch.templateTypes.fileCaption') : t('massDispatch.templateTypes.unknown')}
@@ -1091,8 +1096,10 @@ const MassDispatch = () => {
                         <Typography variant="caption" sx={{ color: '#8696a0', display: 'flex', alignItems: 'center', gap: 1 }}>
                           {getTemplateIcon(dispatch.template?.type)}
                           Template: {dispatch.template?.type === 'text' ? 'Texto' : 
-                                    dispatch.template?.type === 'image' ? 'Imagem/Vídeo' :
-                                    dispatch.template?.type === 'image_caption' ? 'Imagem/Vídeo + Legenda' :
+                                    dispatch.template?.type === 'image' ? 'Imagem' :
+                                    dispatch.template?.type === 'image_caption' ? 'Imagem + Legenda' :
+                                    dispatch.template?.type === 'video' ? 'Vídeo' :
+                                    dispatch.template?.type === 'video_caption' ? 'Vídeo + Legenda' :
                                     dispatch.template?.type === 'audio' ? 'Áudio' :
                                     dispatch.template?.type === 'file' ? 'Arquivo' :
                                     dispatch.template?.type === 'file_caption' ? 'Arquivo + Legenda' :
@@ -1317,8 +1324,8 @@ const MassDispatch = () => {
                   <Typography variant="caption" sx={{ color: '#8696a0', display: 'flex', alignItems: 'center', gap: 1 }}>
                     {getTemplateIcon(dispatch.template?.type)}
                     Template: {dispatch.template?.type === 'text' ? 'Texto' : 
-                              dispatch.template?.type === 'image' ? 'Imagem/Vídeo' :
-                              dispatch.template?.type === 'image_caption' ? 'Imagem/Vídeo + Legenda' :
+                              dispatch.template?.type === 'image' ? 'Imagem' :
+                              dispatch.template?.type === 'image_caption' ? 'Imagem + Legenda' :
                               dispatch.template?.type === 'audio' ? 'Áudio' :
                               dispatch.template?.type === 'file' ? 'Arquivo' :
                               dispatch.template?.type === 'file_caption' ? 'Arquivo + Legenda' : 'Desconhecido'}
@@ -2144,6 +2151,8 @@ Lara Linda;556291279592"
               <MenuItem value="text">{t('massDispatch.templateTypes.text')}</MenuItem>
               <MenuItem value="image">{t('massDispatch.templateTypes.image')}</MenuItem>
               <MenuItem value="image_caption">{t('massDispatch.templateTypes.imageCaption')}</MenuItem>
+              <MenuItem value="video">Vídeo</MenuItem>
+              <MenuItem value="video_caption">Vídeo + Legenda</MenuItem>
               <MenuItem value="audio">{t('massDispatch.templateTypes.audio')}</MenuItem>
               <MenuItem value="file">{t('massDispatch.templateTypes.file')}</MenuItem>
               <MenuItem value="file_caption">{t('massDispatch.templateTypes.fileCaption')}</MenuItem>
@@ -2420,6 +2429,7 @@ Lara Linda;556291279592"
                   hidden
                   accept={
                     templateForm.type.includes('image') ? 'image/*,video/mp4,.mp4' :
+                    templateForm.type.includes('video') ? 'video/*,.mp4' :
                     templateForm.type.includes('audio') ? 'audio/*' : '*/*'
                   }
                   onChange={(e) => {
@@ -2476,8 +2486,10 @@ Lara Linda;556291279592"
                         }}
                       >
                         <MenuItem value="text">Texto</MenuItem>
-                        <MenuItem value="image">Imagem/Vídeo</MenuItem>
-                        <MenuItem value="image_caption">Imagem/Vídeo + Legenda</MenuItem>
+                        <MenuItem value="image">Imagem</MenuItem>
+                        <MenuItem value="image_caption">Imagem + Legenda</MenuItem>
+                        <MenuItem value="video">Vídeo</MenuItem>
+                        <MenuItem value="video_caption">Vídeo + Legenda</MenuItem>
                         <MenuItem value="audio">Áudio</MenuItem>
                         <MenuItem value="file">Arquivo</MenuItem>
                         <MenuItem value="file_caption">Arquivo + Legenda</MenuItem>
@@ -2671,6 +2683,7 @@ Lara Linda;556291279592"
                           hidden
                           accept={
                             message.type.includes('image') ? 'image/*,video/mp4,.mp4' :
+                            message.type.includes('video') ? 'video/*,.mp4' :
                             message.type.includes('audio') ? 'audio/*' : '*/*'
                           }
                           onChange={(e) => {
@@ -3000,8 +3013,10 @@ Lara Linda;556291279592"
                   {getTemplateIcon(selectedDispatch.template?.type)}
                   <Typography variant="body1">
                     {selectedDispatch.template?.type === 'text' ? 'Mensagem de Texto' :
-                     selectedDispatch.template?.type === 'image' ? 'Imagem/Vídeo' :
-                     selectedDispatch.template?.type === 'image_caption' ? 'Imagem/Vídeo com Legenda' :
+                     selectedDispatch.template?.type === 'image' ? 'Imagem' :
+                     selectedDispatch.template?.type === 'image_caption' ? 'Imagem com Legenda' :
+                     selectedDispatch.template?.type === 'video' ? 'Vídeo' :
+                     selectedDispatch.template?.type === 'video_caption' ? 'Vídeo com Legenda' :
                      selectedDispatch.template?.type === 'audio' ? 'Áudio' :
                      selectedDispatch.template?.type === 'file' ? 'Arquivo' :
                      selectedDispatch.template?.type === 'file_caption' ? 'Arquivo com Legenda' : 'Desconhecido'}
@@ -3297,10 +3312,10 @@ Lara Linda;556291279592"
 
             <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
               <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
-                🖼️ Imagem/Vídeo
+                🖼️ Imagem
               </Typography>
               <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                Envia uma imagem ou vídeo sem legenda adicional.
+                Envia uma imagem sem legenda adicional.
               </Typography>
               <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
                 <strong>Ideal para:</strong> Logos, infográficos, imagens promocionais
@@ -3309,10 +3324,10 @@ Lara Linda;556291279592"
 
             <Box sx={{ mb: 3, p: 2, background: '#313d43', borderRadius: 1 }}>
               <Typography variant="h6" sx={{ color: '#00a884', mb: 1 }}>
-                🖼️ Imagem/Vídeo com Legenda
+                🖼️ Imagem com Legenda
               </Typography>
               <Typography variant="body2" sx={{ color: '#8696a0', mb: 1 }}>
-                Envia uma imagem ou vídeo com texto de legenda personalizável. Suporta variáveis na legenda.
+                Envia uma imagem com texto de legenda personalizável. Suporta variáveis na legenda.
               </Typography>
               <Typography variant="caption" sx={{ color: '#e9edef', display: 'block' }}>
                 <strong>Ideal para:</strong> Posts de redes sociais, promoções com imagem, tutoriais

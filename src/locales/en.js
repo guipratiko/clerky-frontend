@@ -230,8 +230,7 @@ export const en = {
         running: 'Running',
         paused: 'Paused',
         completed: 'Completed',
-        scheduled: 'Scheduled',
-        cancelled: 'Cancelled'
+        scheduled: 'Scheduled'
       },
       schedule: {
         start: 'Start',

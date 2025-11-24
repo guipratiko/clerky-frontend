@@ -229,8 +229,7 @@ export const pt = {
         running: 'Executando',
         paused: 'Pausado',
         completed: 'Concluído',
-        scheduled: 'Agendado',
-        cancelled: 'Cancelado'
+        scheduled: 'Agendado'
       },
       schedule: {
         start: 'Início',
@@ -299,8 +298,8 @@ export const pt = {
       // Tipos de template
       templateTypes: {
         text: 'Texto',
-        image: 'Imagem/Vídeo',
-        imageCaption: 'Imagem/Vídeo + Legenda',
+        image: 'Imagem',
+        imageCaption: 'Imagem + Legenda',
         audio: 'Áudio',
         file: 'Arquivo',
         fileCaption: 'Arquivo + Legenda',

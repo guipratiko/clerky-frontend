@@ -198,7 +198,7 @@ const CONDITION_TYPE_OPTIONS = [
     input: 'select',
     options: [
       { value: 'text', label: 'Texto' },
-      { value: 'image', label: 'Imagem/Vídeo' },
+      { value: 'image', label: 'Imagem' },
       { value: 'audio', label: 'Áudio' },
       { value: 'video', label: 'Vídeo' },
       { value: 'document', label: 'Documento' },
