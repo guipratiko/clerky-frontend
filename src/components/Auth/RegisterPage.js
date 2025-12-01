@@ -107,15 +107,13 @@ const RegisterPage = () => {
       return false;
     }
 
-    if (!formData.phone.trim()) {
-      setError('Telefone é obrigatório');
-      return false;
-    }
-
-    const phoneClean = formData.phone.replace(/\D/g, '');
-    if (phoneClean.length < 10 || phoneClean.length > 11) {
-      setError('Telefone inválido. Digite DDD + número');
-      return false;
+    // Validar telefone apenas se fornecido (opcional)
+    if (formData.phone.trim()) {
+      const phoneClean = formData.phone.replace(/\D/g, '');
+      if (phoneClean.length < 10 || phoneClean.length > 11) {
+        setError('Telefone inválido. Digite DDD + número');
+        return false;
+      }
     }
 
     if (!formData.password) {
@@ -483,10 +481,9 @@ const RegisterPage = () => {
             <TextField
               fullWidth
               name="phone"
-              label="Telefone"
+              label="Telefone (opcional)"
               value={formData.phone}
               onChange={handleChange}
-              required
               disabled={loading}
               placeholder="(00) 00000-0000"
               inputProps={{ maxLength: 15 }}

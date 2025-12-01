@@ -88,7 +88,7 @@ const MassDispatch = () => {
   const { instances } = useInstance();
   const { socket } = useSocket();
   const { t } = useI18n();
-  const { user, isInTrial, getTrialDaysRemaining, isAdmin } = useAuth();
+  const { user, isInTrial, getTrialDaysRemaining, isAdmin, isPremium } = useAuth();
   
   // Estados principais
   const [dispatches, setDispatches] = useState([]);
@@ -828,41 +828,40 @@ const MassDispatch = () => {
 
   return (
     <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
-      {/* Aviso de Trial */}
-      {showTrialWarning && (
+      {/* Bloqueio para usuários free (trial ou não) */}
+      {!isPremium() && !isAdmin() && (
         <Paper sx={{ 
-          p: 3, 
+          p: 4, 
           mb: 3, 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          border: '2px solid #fff',
-          boxShadow: '0 8px 32px 0 rgba(102, 126, 234, 0.37)'
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          borderRadius: 2, 
+          textAlign: 'center'
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ 
-              background: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
-              p: 2,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <WarningIcon sx={{ fontSize: 40, color: '#fff' }} />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 1 }}>
-                🎯 Período de Teste - Funcionalidade Restrita
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ fontSize: '4rem' }}>🔒</Box>
+            <Box>
+              <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 2 }}>
+                Acesso Restrito - Assinatura Premium Necessária
               </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 1 }}>
-                Você está no período de teste de 7 dias e esta funcionalidade não está disponível durante este período.
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.95)', mb: 2, maxWidth: 600, mx: 'auto' }}>
+                Esta funcionalidade está disponível apenas para usuários com assinatura Premium.
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                ⏰ <strong>{trialDaysRemaining} dias restantes</strong> | Após a aprovação completa da sua conta, você terá acesso total ao Disparo em Massa.
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                Para continuar usando o Disparo em Massa, você precisa adquirir uma assinatura Premium.
               </Typography>
+              {isInTrial() && (
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)', mt: 1 }}>
+                  ⏰ Você está no período de teste. Após adquirir a assinatura, terá acesso completo a todas as funcionalidades.
+                </Typography>
+              )}
             </Box>
           </Box>
         </Paper>
       )}
 
+      {/* Conteúdo bloqueado para usuários free */}
+      {(!isPremium() && !isAdmin()) ? null : (
+        <>
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box>
@@ -3396,6 +3395,8 @@ Lara Linda;556291279592"
           </Button>
         </DialogActions>
       </Dialog>
+        </>
+      )}
     </Box>
   );
 };

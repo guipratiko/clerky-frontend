@@ -53,7 +53,7 @@ const Sidebar = () => {
   const location = useLocation();
   const { instanceName } = useParams();
   const { getInstance } = useInstance();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isPremium } = useAuth();
   const { t } = useI18n();
   
   const currentInstance = instanceName ? getInstance(instanceName) : null;
@@ -71,12 +71,12 @@ const Sidebar = () => {
       path: '/instances',
       description: 'Gerenciar conexões WhatsApp'
     },
-    {
+    ...(isPremium() || isAdmin() ? [{
       text: t('nav.campaigns'),
       icon: <SendIcon />,
       path: '/mass-dispatch',
       description: 'Envio de mensagens em massa'
-    },
+    }] : []),
     {
       text: t('nav.mindClerky'),
       icon: <AutoAwesomeIcon />,

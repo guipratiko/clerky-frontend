@@ -48,6 +48,32 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [token, logout]);
 
+  // Verificar periodicamente se o plano expirou e atualizar automaticamente
+  useEffect(() => {
+    if (!token || !user) return;
+
+    const checkPlanExpiration = async () => {
+      try {
+        const response = await api.get('/api/auth/me');
+        const updatedUser = response.data.data.user;
+        
+        // Se o plano mudou, atualizar o estado
+        if (updatedUser.plan !== user.plan) {
+          console.log(`🔄 Plano atualizado: ${user.plan} → ${updatedUser.plan}`);
+          setUser(updatedUser);
+        }
+      } catch (error) {
+        console.error('Erro ao verificar plano:', error);
+        // Não fazer logout em caso de erro, apenas logar
+      }
+    };
+
+    // Verificar a cada 60 segundos
+    const interval = setInterval(checkPlanExpiration, 60000);
+    
+    return () => clearInterval(interval);
+  }, [token, user]);
+
   // Login
   const login = async (email, password) => {
     try {
@@ -110,6 +136,11 @@ export const AuthProvider = ({ children }) => {
   // Verificar se está em período de trial
   const isInTrial = () => {
     return user?.isInTrial === true;
+  };
+
+  // Verificar se é premium
+  const isPremium = () => {
+    return user?.plan === 'premium';
   };
 
   // Obter dias restantes do trial
@@ -185,6 +216,7 @@ export const AuthProvider = ({ children }) => {
     isAdmin,
     isApproved,
     isInTrial,
+    isPremium,
     getTrialDaysRemaining,
     getPendingUsers,
     approveUser,
